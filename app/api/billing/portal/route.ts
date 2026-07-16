@@ -3,7 +3,7 @@ import { auth } from "@/auth"
 import { db } from "@/db"
 import { billingCustomers } from "@/db/schema"
 import { eq } from "drizzle-orm"
-import { stripe } from "@/lib/stripe"
+import { dodo } from "@/lib/dodo"
 
 export const dynamic = "force-dynamic"
 
@@ -29,16 +29,16 @@ export async function POST() {
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-    const portalSession = await stripe.billingPortal.sessions.create({
-      customer: customerRow.providerCustomerId,
-      return_url: `${appUrl}/?tab=settings`,
-    })
+    const portalSession = await dodo.customers.customerPortal.create(
+      customerRow.providerCustomerId,
+      { return_url: `${appUrl}/?tab=settings` }
+    )
 
-    if (!portalSession.url) {
-      throw new Error("Stripe portal failed to generate redirect URL")
+    if (!portalSession.link) {
+      throw new Error("Dodo Payments portal failed to generate redirect URL")
     }
 
-    return NextResponse.json({ url: portalSession.url })
+    return NextResponse.json({ url: portalSession.link })
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error("[billing-portal] failed to create portal session:", msg)
