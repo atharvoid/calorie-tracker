@@ -7,8 +7,11 @@ import {
 	uuid,
 	numeric,
 	jsonb,
+	index,
+	unique,
 } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
+import type { NutritionResult } from "@/lib/nutrition"
 
 export const users = pgTable("user", {
 	id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -108,26 +111,73 @@ export const pendingCaptures = pgTable("pending_capture", {
 	userId: text("user_id")
 		.notNull()
 		.references(() => users.id, { onDelete: "cascade" }),
-	payload: jsonb("payload").notNull(),
+	payload: jsonb("payload").notNull().$type<NutritionResult>(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
-export const mealItems = pgTable("meal_item", {
+export const mealItems = pgTable(
+	"meal_item",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		date: text("date").notNull(), // YYYY-MM-DD
+		mealType: text("meal_type"), // Breakfast | Lunch | Dinner | Snack | null
+		timeHint: text("time_hint"),
+		name: text("name").notNull(),
+		grams: numeric("grams"),
+		kcal: numeric("kcal"),
+		proteinG: numeric("protein_g"),
+		carbsG: numeric("carbs_g"),
+		fatG: numeric("fat_g"),
+		notes: text("notes"),
+		source: text("source").notNull().default("telegram"),
+		captureId: text("capture_id"), // links to pending_capture.id for deduplication
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(t) => [index("meal_item_user_date_idx").on(t.userId, t.date)]
+)
+
+// ── New nutrition settings tables ──────────────────────────────────────────────
+
+export const nutritionSettings = pgTable("nutrition_settings", {
 	id: uuid("id").defaultRandom().primaryKey(),
 	userId: text("user_id")
 		.notNull()
 		.references(() => users.id, { onDelete: "cascade" }),
-	date: text("date").notNull(), // YYYY-MM-DD
-	mealType: text("meal_type"), // Breakfast | Lunch | Dinner | Snack | null
-	timeHint: text("time_hint"),
-	name: text("name").notNull(),
-	grams: numeric("grams"),
-	kcal: numeric("kcal"),
-	proteinG: numeric("protein_g"),
-	carbsG: numeric("carbs_g"),
-	fatG: numeric("fat_g"),
-	notes: text("notes"),
-	source: text("source").notNull().default("telegram"),
+	maintenanceKcal: integer("maintenance_kcal"),
+	targetKcal: integer("target_kcal"),
+	proteinTargetG: numeric("protein_target_g"),
+	carbsTargetG: numeric("carbs_target_g"),
+	fatTargetG: numeric("fat_target_g"),
+	targetToleranceKcal: integer("target_tolerance_kcal"),
+	timezone: text("timezone").notNull().default("Asia/Kolkata"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+	updatedAt: timestamp("updated_at").defaultNow().notNull(),
+},
+	(t) => [unique("nutrition_settings_user_id_unique").on(t.userId)]
+)
 
+export const nutritionDayOverrides = pgTable(
+	"nutrition_day_override",
+	{
+		id: uuid("id").defaultRandom().primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => users.id, { onDelete: "cascade" }),
+		date: text("date").notNull(), // YYYY-MM-DD
+		maintenanceKcal: integer("maintenance_kcal"),
+		targetKcal: integer("target_kcal"),
+		proteinTargetG: numeric("protein_target_g"),
+		carbsTargetG: numeric("carbs_target_g"),
+		fatTargetG: numeric("fat_target_g"),
+		reason: text("reason"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	},
+	(t) => [
+		unique("nutrition_day_override_user_date_unique").on(t.userId, t.date),
+		index("nutrition_day_override_user_date_idx").on(t.userId, t.date),
+	]
+)

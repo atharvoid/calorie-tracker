@@ -3,31 +3,45 @@
 import { useEffect } from "react"
 import { toast } from "sonner"
 import { supabaseBrowser } from "@/lib/supabase-browser"
-import type { NormalizedRow } from "@/lib/types"
 
-type RealtimeListenerProps = {
-	userId: string
-	onEntries: (rows: NormalizedRow[]) => void
+type NutritionChangedPayload = {
+  eventId: string
+  occurredAt: string
+  date: string
+  mutation: "insert" | "update" | "delete"
+  itemIds: string[]
 }
 
-export function RealtimeListener({ userId, onEntries }: RealtimeListenerProps) {
-	useEffect(() => {
-		const channel = supabaseBrowser.channel(`user:${userId}`)
-		channel
-			.on("broadcast", { event: "entries" }, (message) => {
-				const payload = message.payload as { rows?: NormalizedRow[] }
-				const rows = payload?.rows ?? []
-				if (rows.length === 0) return
-				onEntries(rows)
-				const plural = rows.length > 1 ? "s" : ""
-				toast.success(`${rows.length} new order${plural} from your phone`)
-			})
-			.subscribe()
+type RealtimeListenerProps = {
+  userId: string
+  onNutritionChanged?: (date: string) => void
+  /** @deprecated use onNutritionChanged */
+  onEntries?: () => void
+}
 
-		return () => {
-			supabaseBrowser.removeChannel(channel)
-		}
-	}, [userId, onEntries])
+export function RealtimeListener({
+  userId,
+  onNutritionChanged,
+  onEntries,
+}: RealtimeListenerProps) {
+  useEffect(() => {
+    const channel = supabaseBrowser.channel(`user:${userId}`)
 
-	return null
+    channel
+      .on("broadcast", { event: "nutrition_changed" }, (message) => {
+        const payload = message.payload as NutritionChangedPayload
+        if (!payload?.date) return
+        onNutritionChanged?.(payload.date)
+        toast.success("Meal log updated", {
+          description: `${payload.itemIds.length} item${payload.itemIds.length !== 1 ? "s" : ""} saved`,
+        })
+      })
+      .subscribe()
+
+    return () => {
+      void supabaseBrowser.removeChannel(channel)
+    }
+  }, [userId, onNutritionChanged, onEntries])
+
+  return null
 }

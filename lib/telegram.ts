@@ -6,7 +6,7 @@ import {
 	linkTokens,
 	pendingCaptures,
 } from "@/db/schema"
-import { extractNutrition, type NutritionResult } from "@/lib/nutrition"
+import { extractNutrition, nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { commitNutrition } from "@/lib/commit"
 
 export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN || "123456:dummy-token")
@@ -16,14 +16,15 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
 	for (let i = 0; i <= retries; i++) {
 		try {
 			return await fn()
-		} catch (err: any) {
+		} catch (err: unknown) {
+			const e = err as { message?: string; code?: string; cause?: { message?: string; code?: string } }
 			const isConnectionError =
-				err.message?.includes("ECONNRESET") ||
-				err.code === "ECONNRESET" ||
-				err.message?.includes("terminated") ||
-				err.cause?.message?.includes("ECONNRESET") ||
-				err.cause?.code === "ECONNRESET" ||
-				err.cause?.message?.includes("terminated");
+				e.message?.includes("ECONNRESET") ||
+				e.code === "ECONNRESET" ||
+				e.message?.includes("terminated") ||
+				e.cause?.message?.includes("ECONNRESET") ||
+				e.cause?.code === "ECONNRESET" ||
+				e.cause?.message?.includes("terminated")
 			if (isConnectionError && i < retries) {
 				console.warn(`[telegram] DB connection error, retrying in 500ms (attempt ${i + 1}/${retries})...`)
 				await new Promise((resolve) => setTimeout(resolve, 500))
@@ -86,7 +87,7 @@ async function presentNutritionConfirm(
 	const pending = await withRetry(async () => {
 		const [row] = await db
 			.insert(pendingCaptures)
-			.values({ userId, payload: nutrition as unknown as Record<string, unknown> })
+			.values({ userId, payload: nutrition })
 			.returning({ id: pendingCaptures.id })
 		return row
 	})
@@ -184,20 +185,45 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 		return res ?? null
 	})
 	if (!pending) {
-		await ctx.answerCallbackQuery("Expired — please send your meal again.")
+		await ctx.answerCallbackQuery("Already saved or expired — check your meal log.")
 		return
 	}
-	const nutrition = pending.payload as unknown as NutritionResult
-	try {
-		const { rowCount } = await commitNutrition(pending.userId, nutrition, "telegram")
+
+	// Validate the stored payload before committing
+	const validationResult = nutritionSchema.safeParse(pending.payload)
+	if (!validationResult.success) {
+		console.error("[telegram] Invalid stored payload:", validationResult.error.message)
+		await ctx.answerCallbackQuery("Invalid data — please send your meal again.")
+		// Clean up invalid pending capture
 		await withRetry(async () => {
 			await db.delete(pendingCaptures).where(eq(pendingCaptures.id, id))
 		})
+		return
+	}
+
+	const nutrition = validationResult.data
+	try {
+		const { rowCount, syncWarning } = await commitNutrition({
+			userId: pending.userId,
+			nutrition,
+			source: "telegram",
+			captureId: id,
+			timezone: "Asia/Kolkata",
+		})
+
+		// Delete pending capture AFTER confirmed DB insert
+		await withRetry(async () => {
+			await db.delete(pendingCaptures).where(eq(pendingCaptures.id, id))
+		})
+
+		const warningText = syncWarning ? "\n⚠️ _Sheet sync failed but meals are saved._" : ""
 		await ctx.editMessageText(
-			summarizeMeals(nutrition) + `\n\n✅ *Saved ${rowCount} item${rowCount !== 1 ? "s" : ""} to your sheet!*`,
+			summarizeMeals(nutrition) +
+				`\n\n✅ *Saved ${rowCount} meal${rowCount !== 1 ? "s" : ""} to your log!*` +
+				warningText,
 			{ parse_mode: "Markdown" }
 		)
-		await ctx.answerCallbackQuery("Saved!")
+		await ctx.answerCallbackQuery("Meals saved!")
 	} catch (err) {
 		console.error("[telegram] commitNutrition failed:", err)
 		await ctx.answerCallbackQuery("Save failed — try again.")

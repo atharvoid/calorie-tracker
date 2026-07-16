@@ -7,7 +7,10 @@
     "dev:tunnel": "pnpm dlx tsx scripts/start-dev.ts",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "test:run": "vitest run"
   },
   "dependencies": {
     "@ai-sdk/google": "^4.0.8",
@@ -50,6 +53,7 @@
     "eslint-config-next": "16.2.10",
     "localtunnel": "^2.0.2",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.10"
   }
 }

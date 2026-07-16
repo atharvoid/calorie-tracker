@@ -1,3 +1,7 @@
+/**
+ * Legacy order analytics — preserved for data safety, not rendered in calorie UI.
+ * @deprecated This component is not used in the calorie tracker UI.
+ */
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
@@ -33,7 +37,7 @@ export function AnalyticsReport({
 		fetch("/api/entries")
 			.then(async (r) => (r.ok ? r.json() : null))
 			.then((d) => {
-				if (active) setAllRows(d?.rows ?? [])
+				if (active) setAllRows((d as { rows?: NormalizedRow[] } | null)?.rows ?? [])
 			})
 			.catch(() => {
 				if (active) setAllRows([])
@@ -61,7 +65,7 @@ export function AnalyticsReport({
 		})
 			.then(async (res) => {
 				if (!res.ok) throw new Error("failed")
-				const data = await res.json()
+				const data = await res.json() as { insights?: string[] }
 				if (!cancelled) {
 					setInsights(Array.isArray(data.insights) ? data.insights : [])
 					setStatus("idle")
