@@ -1,0 +1,143 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ── App design tokens ── */
+:root {
+  /* Dark-first canvas */
+  --bg-base:        #0A0A0B;
+  --bg-surface:     #131417;
+  --bg-elevated:    #1B1C20;
+  --border-subtle:  rgba(255, 255, 255, 0.06);
+  --border-default: rgba(255, 255, 255, 0.10);
+
+  /* Text scale */
+  --text-primary:   #F4F5F6;
+  --text-secondary: #A1A1AA;
+  --text-muted:     #6B6C72;
+
+  /* Accent – single emerald */
+  --accent:          #10B981;
+  --accent-hover:    #34D399;
+  --accent-contrast: #08110D;
+
+  /* Status */
+  --paid:    #10B981;
+  --pending: #F59E0B;
+  --partial: #38BDF8;
+  --danger:  #EF4444;
+
+  /* Radii */
+  --radius-btn:  10px;
+  --radius-card: 16px;
+
+  /* ── Remap shadcn base vars to our dark palette ── */
+  --background:          var(--bg-base);
+  --foreground:          var(--text-primary);
+  --card:                var(--bg-surface);
+  --card-foreground:     var(--text-primary);
+  --popover:             var(--bg-elevated);
+  --popover-foreground:  var(--text-primary);
+  --primary:             var(--accent);
+  --primary-foreground:  var(--accent-contrast);
+  --secondary:           var(--bg-elevated);
+  --secondary-foreground: var(--text-primary);
+  --muted:               var(--bg-elevated);
+  --muted-foreground:    var(--text-muted);
+  --accent-base:         var(--bg-elevated);
+  --accent-foreground:   var(--text-primary);
+  --destructive:         var(--danger);
+  --border:              var(--border-default);
+  --input:               var(--bg-elevated);
+  --ring:                var(--accent);
+  --radius:              0.625rem;
+}
+
+@theme inline {
+  /* Shadcn standard slot mappings */
+  --color-background:        var(--background);
+  --color-foreground:        var(--foreground);
+  --font-sans:               var(--font-geist-sans);
+  --font-mono:               var(--font-geist-mono);
+  --color-card:              var(--card);
+  --color-card-foreground:   var(--card-foreground);
+  --color-popover:           var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary:           var(--text-primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary:         var(--text-secondary);
+  --color-secondary-foreground: var(--text-primary);
+  --color-muted:             var(--text-muted);
+  --color-muted-foreground:  var(--text-muted);
+  --color-accent:            var(--accent);
+  --color-accent-foreground: var(--accent-contrast);
+  --color-destructive:       var(--destructive);
+  --color-border:            var(--border);
+  --color-input:             var(--input);
+  --color-ring:              var(--ring);
+  --radius-sm:               calc(var(--radius) * 0.6);
+  --radius-md:               calc(var(--radius) * 0.8);
+  --radius-lg:               var(--radius);
+  --radius-xl:               calc(var(--radius) * 1.4);
+  --radius-2xl:              calc(var(--radius) * 1.8);
+  --radius-3xl:              calc(var(--radius) * 2.2);
+  --radius-4xl:              calc(var(--radius) * 2.6);
+
+  /* ── Our design system tokens → Tailwind utilities ── */
+  --color-base:         var(--bg-base);
+  --color-surface:      var(--bg-surface);
+  --color-elevated:     var(--bg-elevated);
+  --color-subtle:       var(--border-subtle);
+  --color-paid:         var(--paid);
+  --color-pending:      var(--pending);
+  --color-partial:      var(--partial);
+  --color-danger:       var(--danger);
+  --color-accent-hover: var(--accent-hover);
+  --radius-btn:         var(--radius-btn);
+  --radius-card:        var(--radius-card);
+}
+
+/* Base resets */
+html, body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+/* Premium hero backdrop: subtle emerald radial glow */
+.app-backdrop {
+  background:
+    radial-gradient(60% 40% at 50% 0%, rgba(16, 185, 129, 0.10), transparent 60%),
+    var(--bg-base);
+  min-height: 100vh;
+}
+
+/* Tabular numbers */
+.tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
+  }
+}
