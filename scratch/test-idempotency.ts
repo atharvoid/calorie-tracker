@@ -30,16 +30,16 @@ async function run() {
             protein_g: 4,
             carbs_g: 36,
             fat_g: 1,
-            notes: "estimated",
+            notes: "estimated first idli",
           },
           {
-            name: "Sambar",
-            grams: 100,
-            kcal: 80,
-            protein_g: 2,
-            carbs_g: 12,
-            fat_g: 2,
-            notes: "estimated",
+            name: "Idli",
+            grams: 120,
+            kcal: 180,
+            protein_g: 4,
+            carbs_g: 36,
+            fat_g: 1,
+            notes: "estimated second idli",
           }
         ]
       }

@@ -134,6 +134,7 @@ export const mealItems = pgTable(
 		notes: text("notes"),
 		source: text("source").notNull().default("telegram"),
 		captureId: text("capture_id"), // links to pending_capture.id for deduplication
+		itemIndex: integer("item_index"), // position in capture payload for accurate idempotency
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(t) => [index("meal_item_user_date_idx").on(t.userId, t.date)]

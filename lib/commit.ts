@@ -44,6 +44,7 @@ export async function commitNutrition({
   type PendingSheetRow = Omit<MealRow, "id">
   const pendingSheetRows: PendingSheetRow[] = []
 
+  let idx = 0
   for (const meal of validated.data.meals) {
     for (const item of meal.items) {
       dbRows.push({
@@ -60,6 +61,7 @@ export async function commitNutrition({
         notes: item.notes ?? null,
         source,
         captureId: captureId ?? null,
+        itemIndex: captureId ? idx : null,
       })
       pendingSheetRows.push({
         date,
@@ -74,12 +76,13 @@ export async function commitNutrition({
         notes: item.notes ?? null,
         source,
       })
+      idx++
     }
   }
 
   // Write to DB first — get stable IDs back.
   // onConflictDoNothing handles concurrent Telegram double-tap: the partial unique
-  // index on (user_id, capture_id, name) WHERE capture_id IS NOT NULL silently
+  // index on (user_id, capture_id, item_index) WHERE capture_id IS NOT NULL silently
   // discards duplicate rows instead of throwing a constraint error.
   let insertedIds: string[] = []
   if (dbRows.length > 0) {
