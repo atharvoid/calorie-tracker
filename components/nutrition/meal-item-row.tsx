@@ -26,7 +26,9 @@ export function MealItemRow({ item, onDelete, onEdit }: Props) {
     try {
       const res = await fetch(`/api/nutrition/items/${item.id}`, { method: "DELETE" })
       if (!res.ok) throw new Error("Delete failed")
-      toast.success(`Removed ${item.name}`)
+      toast.success(`Removed ${item.name}`, {
+        description: "Removed from your log. Google Sheets backup is append-only and not updated.",
+      })
       onDelete?.(item.id)
     } catch {
       toast.error("Couldn't delete item")

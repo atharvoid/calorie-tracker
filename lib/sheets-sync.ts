@@ -29,6 +29,7 @@ export async function getConnection(userId: string) {
 // ─── Calorie Tracker sheet helpers ────────────────────────────────────────────
 
 const MEALS_HEADER = [
+	"Item ID",
 	"Date",
 	"Meal",
 	"Time",
@@ -69,6 +70,7 @@ export async function ensureMealSheet(userId: string): Promise<string> {
 }
 
 export type MealRow = {
+	id?: string			// meal_item.id — included for new rows; absent for legacy rows
 	date: string
 	mealType: string | null
 	timeHint: string | null
@@ -89,6 +91,7 @@ export async function appendMealRows(
 	const spreadsheetId = await ensureMealSheet(userId)
 	const sheets = sheetsClient(await getGoogleAuth(userId))
 	const values = rows.map((r) => [
+		r.id ?? "",		// Item ID — empty for rows committed before this migration
 		r.date,
 		r.mealType ?? "",
 		r.timeHint ?? "",

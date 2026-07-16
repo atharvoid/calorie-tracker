@@ -4,10 +4,7 @@ import { appendMealRows, type MealRow } from "@/lib/sheets-sync"
 import { nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { broadcastNutritionChanged } from "@/lib/realtime"
 import { localDate } from "@/lib/nutrition-date"
-// Use globalThis.crypto which is available in Node 19+/Next.js runtime
-function newId(): string {
-  return globalThis.crypto.randomUUID()
-}
+
 
 type CommitInput = {
   userId: string
@@ -42,7 +39,10 @@ export async function commitNutrition({
 
   const date = localDate(timezone)
   const dbRows: (typeof mealItems.$inferInsert)[] = []
-  const sheetRows: MealRow[] = []
+
+  // Intermediate shape before we have IDs
+  type PendingSheetRow = Omit<MealRow, "id">
+  const pendingSheetRows: PendingSheetRow[] = []
 
   for (const meal of validated.data.meals) {
     for (const item of meal.items) {
@@ -61,12 +61,12 @@ export async function commitNutrition({
         source,
         captureId: captureId ?? null,
       })
-      sheetRows.push({
+      pendingSheetRows.push({
         date,
         mealType: meal.meal_type ?? null,
         timeHint: meal.time_hint ?? null,
         name: item.name,
-        grams: item.grams,
+        grams: item.grams ?? null,
         kcal: item.kcal,
         proteinG: item.protein_g,
         carbsG: item.carbs_g,
@@ -77,20 +77,30 @@ export async function commitNutrition({
     }
   }
 
-  // Write to DB first
+  // Write to DB first — get stable IDs back.
+  // onConflictDoNothing handles concurrent Telegram double-tap: the partial unique
+  // index on (user_id, capture_id, name) WHERE capture_id IS NOT NULL silently
+  // discards duplicate rows instead of throwing a constraint error.
   let insertedIds: string[] = []
   if (dbRows.length > 0) {
     const inserted = await db
       .insert(mealItems)
       .values(dbRows)
+      .onConflictDoNothing()
       .returning({ id: mealItems.id })
     insertedIds = inserted.map((r) => r.id)
   }
 
+  // Pair DB IDs into sheet rows (same order guaranteed by Postgres RETURNING)
+  const sheetRows: MealRow[] = pendingSheetRows.map((r, i) => ({
+    ...r,
+    id: insertedIds[i],
+  }))
+
   // Broadcast nutrition_changed event (non-blocking)
   if (insertedIds.length > 0) {
     void broadcastNutritionChanged(userId, {
-      eventId: newId(),
+      eventId: globalThis.crypto.randomUUID(),
       occurredAt: new Date().toISOString(),
       date,
       mutation: "insert",

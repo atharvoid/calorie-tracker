@@ -216,6 +216,12 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 			await db.delete(pendingCaptures).where(eq(pendingCaptures.id, id))
 		})
 
+		// rowCount === 0 means the DB idempotency index absorbed a duplicate (double-tap)
+		if (rowCount === 0) {
+			await ctx.answerCallbackQuery("Already saved — check your meal log.")
+			return
+		}
+
 		const warningText = syncWarning ? "\n⚠️ _Sheet sync failed but meals are saved._" : ""
 		await ctx.editMessageText(
 			summarizeMeals(nutrition) +
