@@ -9,6 +9,7 @@ import {
 	jsonb,
 	index,
 	unique,
+	boolean,
 } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
 import type { NutritionResult } from "@/lib/nutrition"
@@ -180,5 +181,81 @@ export const nutritionDayOverrides = pgTable(
 	(t) => [
 		unique("nutrition_day_override_user_date_unique").on(t.userId, t.date),
 		index("nutrition_day_override_user_date_idx").on(t.userId, t.date),
+	]
+)
+
+// ── Billing and Entitlements tables ──────────────────────────────────────────
+
+export const billingCustomers = pgTable("billing_customer", {
+	userId: text("user_id")
+		.primaryKey()
+		.references(() => users.id, { onDelete: "cascade" }),
+	provider: text("provider").notNull().default("stripe"),
+	providerCustomerId: text("provider_customer_id").notNull().unique(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at").defaultNow().notNull(),
+})
+
+export const subscriptions = pgTable("subscription", {
+	id: uuid("id").defaultRandom().primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	providerSubscriptionId: text("provider_subscription_id").unique(),
+	providerPriceId: text("provider_price_id"),
+	status: text("status").notNull(), // trialing, active, past_due, canceled, unpaid, incomplete, paused
+	planKey: text("plan_key").notNull(), // personal_monthly, personal_annual
+	currency: text("currency"),
+	currentPeriodStart: timestamp("current_period_start"),
+	currentPeriodEnd: timestamp("current_period_end"),
+	cancelAtPeriodEnd: boolean("cancel_at_period_end").default(false).notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at").defaultNow().notNull(),
+},
+	(t) => [
+		index("subscription_user_id_idx").on(t.userId),
+	]
+)
+
+export const productEntitlements = pgTable("product_entitlement", {
+	id: uuid("id").defaultRandom().primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.unique()
+		.references(() => users.id, { onDelete: "cascade" }),
+	trialStartedAt: timestamp("trial_started_at"),
+	trialEndsAt: timestamp("trial_ends_at"),
+	trialAiLogsUsed: integer("trial_ai_logs_used").notNull().default(0),
+	trialAiLogLimit: integer("trial_ai_log_limit").notNull().default(50),
+	paidAiLogsToday: integer("paid_ai_logs_today").notNull().default(0),
+	paidAiLogDate: text("paid_ai_log_date"), // YYYY-MM-DD
+	accessState: text("access_state").notNull().default("pre_trial"), // pre_trial, trial, active, grace, expired, blocked
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at").defaultNow().notNull(),
+},
+	(t) => [
+		index("product_entitlement_user_id_idx").on(t.userId),
+	]
+)
+
+export const usageEvents = pgTable("usage_event", {
+	id: uuid("id").defaultRandom().primaryKey(),
+	userId: text("user_id")
+		.notNull()
+		.references(() => users.id, { onDelete: "cascade" }),
+	eventType: text("event_type").notNull(), // e.g. 'ai_extraction'
+	requestId: text("request_id").notNull().unique(), // Telegram update ID or web request ID
+	source: text("source").notNull(), // web or telegram
+	model: text("model").notNull(),
+	inputTokens: integer("input_tokens"),
+	outputTokens: integer("output_tokens"),
+	estimatedCostMicros: integer("estimated_cost_micros"),
+	success: boolean("success").notNull(),
+	failureCategory: text("failure_category"),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+},
+	(t) => [
+		index("usage_event_user_id_idx").on(t.userId),
+		index("usage_event_user_created_idx").on(t.userId, t.createdAt),
 	]
 )

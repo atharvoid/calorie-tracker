@@ -59,43 +59,87 @@ export const nutritionSchema = z.object({
 export type NutritionResult = z.infer<typeof nutritionSchema>
 export type FoodItem = z.infer<typeof foodItemSchema>
 
-export const NUTRITION_SYSTEM = `You are a nutrition estimator for an Indian home-cooked diet.
-Given a free-form message describing what a person ate, extract EVERY food item and estimate its calories + macronutrients.
+export const NUTRITION_SYSTEM = `You are a global nutrition estimator.
+Given a free-form message describing what a person ate, extract EVERY food item and estimate its calories + macronutrients (protein, carbs, fat in grams).
 
-Context & assumptions (unless the user says otherwise):
-- Home-cooked, medium oil (≈1 tsp per portion for sabzi/subji/dal tadka; ghee only if specified).
-- Whole spices, masala, curry leaves, onion, tomato in standard home ratios.
-- If grams are missing, use reasonable Indian household portions: 1 roti ≈30g, 1 aloo parantha ≈120g, small bowl dal ≈150g, 1 boiled egg ≈50g, 1 cup rice cooked ≈160g.
-- Round to whole integers for kcal and macros.
+Input & Translation Guidelines:
+- Support natural language descriptions. Users may write in English, Hinglish, or mix other languages.
+- Support food names from different cuisines in their original form (e.g. tacos, sushi, shawarma, roti, paneer, jollof rice).
+- Do not translate or transliterate food names in the final JSON output; preserve the user's specific food names.
+- Responses and notes must be in English.
 
-Meal grouping:
-- Split into separate meals when time / place words change:
-  - subah / morning / breakfast → Breakfast
-  - dopahar / afternoon / lunch → Lunch
-  - shaam / evening / snack → Snack
-  - raat / night / dinner → Dinner
-- Keep the original time phrase in time_hint (e.g. "morning", "afternoon in college").
+Estimation Rules:
+- Support home-cooked meals, restaurant dishes, packaged foods, and brand names.
+- If the user specifies explicit raw vs cooked weights (e.g. "200g raw chicken breast"), calculate values for that state.
+- Interpret household measurements (cups, spoons, bowls, slices, pieces) using standard weights.
+- Take preparation methods (fried, boiled, baked, grilled, steamed) into account.
+- For mixed recipes/dishes (e.g. burrito bowls, stir-fry, pasta, dal tadka), estimate based on standard home-cooked or restaurant preparation ratios.
+- Material assumptions must be noted in 'notes' (e.g. "assumed raw", "portion approx", "medium oil", "standard recipe").
+- If serving details are completely missing, assume a standard single-serving portion and state the assumed grams in the notes.
+- Never invent metrics not defined in the schema.
+- If you cannot estimate a food item, set its macros and calories to 0 and state the reason in notes.
 
-Rules:
-- Never invent items that are not in the message.
-- Interpret Hinglish confidently: "amul dahi" = curd, "moong usal" = sprouted moong subji, "hing chana" = roasted chickpeas with asafoetida.
-- Treat raw meat, fish, and poultry as RAW unless the user explicitly says cooked, grilled, fried, boiled, roasted, bhuna, or tandoori. Raw vs cooked macros differ noticeably (e.g. 200g raw chicken breast ≈ 220 kcal / 40g protein; 200g cooked ≈ 330 kcal / 62g protein). When it's ambiguous, choose RAW and note "assumed raw" in notes.
-- Assume plain roti / chapati / paratha unless butter, ghee, or oil is explicitly mentioned.
-- Confidence markers in notes: whenever you had to guess grams, or a cooking assumption drove the numbers, prepend a short tag like "assumed ~120g", "assumed home-style 1 tsp oil", or "portion approx." so the user can spot approximations at a glance.
-- Prefer honest estimates — do not inflate or deflate to seem confident. ±10–15% is expected for home food.
-- If you truly cannot estimate an item, set macros to 0 and put your reason in notes.
+Small Balanced Reference Set (Use for calorie/macro scaling, not hardcoded outputs):
+- Eggs: 1 large egg ≈ 70 kcal | P 6g C 0g F 5g
+- Toast: 1 slice white/whole wheat ≈ 75 kcal | P 3g C 15g F 1g
+- Greek Yogurt (plain, low-fat): 100g ≈ 60 kcal | P 10g C 4g F 0g
+- Chicken Breast (cooked): 100g ≈ 165 kcal | P 31g C 0g F 3.6g
+- White Rice (cooked): 100g ≈ 130 kcal | P 2.7g C 28g F 0.3g
+- Tacos (beef, hard shell): 1 standard taco ≈ 150-200 kcal | P 8g C 16g F 10g
+- Burrito Bowl (chicken, rice, beans): 1 standard bowl ≈ 650 kcal | P 40g C 70g F 22g
+- Hummus: 1 tbsp (15g) ≈ 25 kcal | P 1g C 2g F 2g
+- Pita Bread: 1 standard pocket ≈ 150 kcal | P 5g C 30g F 1g
+- Jollof Rice: 1 cup ≈ 300 kcal | P 6g C 50g F 8g
+- Roti/Chapati: 1 standard plain roti ≈ 85 kcal | P 3g C 18g F 0.5g
+- Dal Tadka: 1 small bowl (150g) ≈ 120 kcal | P 5g C 16g F 4g (assumed 1 tsp oil)
+- Paneer Sabji: 1 portion (150g) ≈ 250 kcal | P 12g C 8g F 18g
 
 Return ONE JSON object matching the given schema. No commentary outside the JSON.`
 
-export async function extractNutrition(text: string): Promise<NutritionResult> {
-	const { object } = await generateObject({
-		model: TEXT_MODEL,
-		schema: nutritionSchema,
-		system: NUTRITION_SYSTEM,
-		prompt: text,
-		temperature: 0,
-		abortSignal: AbortSignal.timeout(30000),
-	})
-	console.log("Raw Gemini response:", JSON.stringify(object, null, 2))
-	return object
+export async function extractNutrition(
+	text: string,
+	userId: string,
+	requestId: string,
+	source: "web" | "telegram" = "telegram"
+): Promise<NutritionResult> {
+	// 1. Assert entitlement first before calling Gemini API
+	const { assertCanUseAiLog, recordAiUsage } = await import("@/lib/entitlements")
+	await assertCanUseAiLog(userId)
+
+	const modelName = "gemini-2.5-flash"
+	try {
+		const { object, usage } = await generateObject({
+			model: TEXT_MODEL,
+			schema: nutritionSchema,
+			system: NUTRITION_SYSTEM,
+			prompt: text,
+			temperature: 0,
+			abortSignal: AbortSignal.timeout(30000),
+		})
+		console.log("Raw Gemini response:", JSON.stringify(object, null, 2))
+
+		// 2. Record success usage event
+		await recordAiUsage(userId, {
+			requestId,
+			source,
+			model: modelName,
+			inputTokens: usage?.inputTokens || 0,
+			outputTokens: usage?.outputTokens || 0,
+			success: true,
+		})
+
+		return object
+	} catch (err: any) {
+		const isEntitlementError = err.message?.includes("free trial") || err.message?.includes("limit reached")
+		if (!isEntitlementError) {
+			await recordAiUsage(userId, {
+				requestId,
+				source,
+				model: modelName,
+				success: false,
+				failureCategory: err.message || String(err),
+			})
+		}
+		throw err
+	}
 }

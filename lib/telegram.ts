@@ -136,7 +136,7 @@ bot.command("start", async (ctx) => {
 		await db.delete(linkTokens).where(eq(linkTokens.token, token))
 	})
 	await ctx.reply(
-		"✅ Connected! Now send me what you ate — e.g.:\n_morning 2 roti with sabzi, dahi 80g. lunch 200g raw chicken, 1 cup rice_",
+		"✅ Connected! Now send me what you ate — e.g.:\n_morning 2 eggs with toast, Greek yogurt. lunch chicken salad, 1 cup rice_",
 		{ parse_mode: "Markdown" }
 	)
 })
@@ -149,16 +149,42 @@ bot.on("message:text", async (ctx) => {
 		await ctx.reply("Please connect your account first — open the app and click Connect Telegram.")
 		return
 	}
+	const requestId = `tg-${ctx.update.update_id}`
+	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://willing-exhibition-inherited-subaru.trycloudflare.com"
+
+	// Pre-extract entitlement check to avoid sending thinking message if already blocked
+	try {
+		const { assertCanUseAiLog } = await import("@/lib/entitlements")
+		await assertCanUseAiLog(userId)
+	} catch {
+		const kb = new InlineKeyboard().url("View plans", `${appUrl}/?tab=settings`)
+		await ctx.reply(
+			"Your free trial has ended. Your meal history is still available. Upgrade to continue logging new meals.",
+			{ reply_markup: kb }
+		)
+		return
+	}
+
 	const thinking = await ctx.reply("🧮 Estimating macros…")
 	try {
-		const nutrition = await extractNutrition(ctx.message.text)
+		const nutrition = await extractNutrition(ctx.message.text, userId, requestId, "telegram")
 		// Delete the "thinking" message before showing results
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		await presentNutritionConfirm(ctx, userId, nutrition)
-	} catch (err) {
+	} catch (err: any) {
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		console.error("[telegram] extractNutrition failed:", err)
-		await ctx.reply("❌ Couldn't estimate. Try describing your meal again — e.g. '2 roti with dal, 1 glass milk'")
+
+		const isEntitlementError = err.message?.includes("free trial") || err.message?.includes("limit reached")
+		if (isEntitlementError) {
+			const kb = new InlineKeyboard().url("View plans", `${appUrl}/?tab=settings`)
+			await ctx.reply(
+				"Your free trial has ended. Your meal history is still available. Upgrade to continue logging new meals.",
+				{ reply_markup: kb }
+			)
+		} else {
+			await ctx.reply("❌ Couldn't estimate. Try describing your meal again — e.g. '2 eggs with toast, 1 glass milk'")
+		}
 	}
 })
 

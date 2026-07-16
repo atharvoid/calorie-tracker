@@ -92,6 +92,19 @@ export async function commitNutrition({
       .onConflictDoNothing()
       .returning({ id: mealItems.id })
     insertedIds = inserted.map((r) => r.id)
+
+    if (insertedIds.length > 0) {
+      // Trigger trial start on first committed meal
+      const { getUserEntitlement, startTrialOnFirstMeal } = await import("@/lib/entitlements")
+      try {
+        const ent = await getUserEntitlement(userId)
+        if (ent.accessState === "pre_trial") {
+          await startTrialOnFirstMeal(userId)
+        }
+      } catch (err) {
+        console.error("[commit] Failed to start free trial:", err)
+      }
+    }
   }
 
   // Pair DB IDs into sheet rows (same order guaranteed by Postgres RETURNING)
