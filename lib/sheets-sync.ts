@@ -6,17 +6,6 @@ import type { NormalizedRow } from "./types"
 
 // ─── Legacy Orders helpers (kept for backwards-compat with any stale routes) ──
 
-const ORDERS_HEADER = [
-	"Customer",
-	"Quantity",
-	"Unit",
-	"Rate",
-	"Amount",
-	"Date",
-	"Status",
-	"Source",
-]
-
 export async function getConnection(userId: string) {
 	const [conn] = await db
 		.select()

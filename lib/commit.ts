@@ -108,17 +108,21 @@ export async function commitNutrition({
     })
   }
 
-  // Write to Sheet — if it fails, preserve DB rows and return sync warning
+  // Write to Sheet — if it fails, preserve DB rows and return sync warning.
+  // We only sync if rows were actually inserted (insertedIds.length > 0).
+  // This prevents duplicating rows in Google Sheets on Telegram double-tap replays.
   let spreadsheetId = ""
   let syncWarning: string | undefined
-  try {
-    spreadsheetId = await appendMealRows(userId, sheetRows)
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error("[commit] Sheets sync failed (DB rows preserved):", msg)
-    syncWarning = `Sheet sync failed: ${msg}`
-    spreadsheetId = ""
+  if (insertedIds.length > 0) {
+    try {
+      spreadsheetId = await appendMealRows(userId, sheetRows)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err)
+      console.error("[commit] Sheets sync failed (DB rows preserved):", msg)
+      syncWarning = `Sheet sync failed: ${msg}`
+      spreadsheetId = ""
+    }
   }
 
-  return { rowCount: dbRows.length, date, spreadsheetId, syncWarning, insertedIds }
+  return { rowCount: insertedIds.length, date, spreadsheetId, syncWarning, insertedIds }
 }

@@ -36,7 +36,7 @@ export function NutritionShell({ userId }: Props) {
   // Track which date needs refresh on realtime event
   const [refreshKey, setRefreshKey] = useState(0)
 
-  const handleNutritionChanged = useCallback((_date: string) => {
+  const handleNutritionChanged = useCallback(() => {
     // Bump key to force re-mount of active tab
     setRefreshKey((k) => k + 1)
   }, [])

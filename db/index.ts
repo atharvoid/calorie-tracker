@@ -2,7 +2,15 @@ import { drizzle } from "drizzle-orm/postgres-js"
 import postgres from "postgres"
 import * as schema from "./schema"
 
-// `prepare: false` is required for Supabase's transaction pooler.
-const client = postgres(process.env.DATABASE_URL as string, { prepare: false })
+declare global {
+	var postgresClient: ReturnType<typeof postgres> | undefined
+}
+
+const connectionString = process.env.DATABASE_URL as string
+const client = globalThis.postgresClient ?? postgres(connectionString, { prepare: false })
+
+if (process.env.NODE_ENV !== "production") {
+	globalThis.postgresClient = client
+}
 
 export const db = drizzle(client, { schema })

@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { Loader2 } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { AnalyticsKpis } from "./analytics-kpis"
 import { CalorieTrendChart } from "./calorie-trend-chart"

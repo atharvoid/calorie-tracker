@@ -3,7 +3,6 @@
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
-  mondayOfWeek,
   sundayOfWeek,
   addDays,
   dateRange,

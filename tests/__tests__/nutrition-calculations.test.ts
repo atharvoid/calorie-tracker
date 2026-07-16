@@ -241,7 +241,6 @@ describe("computeDailySummary", () => {
 
 describe("computeWeeklyAverage", () => {
   it("divides by logged days not total days", () => {
-    const noMealsGoal = resolveGoal("2026-07-10", null, null)
     const days = [
       computeDailySummary("2026-07-14", [{ kcal: "2000", proteinG: "100", carbsG: "200", fatG: "60", notes: null }], BASE_SETTINGS, null),
       computeDailySummary("2026-07-15", [], BASE_SETTINGS, null), // no meals

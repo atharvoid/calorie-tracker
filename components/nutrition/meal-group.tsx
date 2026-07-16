@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Trash2, Pencil } from "lucide-react"
-import { cn } from "@/lib/utils"
 import type { MealGroupDTO } from "@/lib/nutrition-types"
 import { MealItemRow } from "./meal-item-row"
 
