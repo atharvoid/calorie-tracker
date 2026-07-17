@@ -159,10 +159,10 @@ html, body {
   }
 }
 
-@utility text-primary {
-  color: var(--text-primary);
+.text-primary {
+  color: var(--text-primary) !important;
 }
 
-@utility text-secondary {
-  color: var(--text-secondary);
+.text-secondary {
+  color: var(--text-secondary) !important;
 }
