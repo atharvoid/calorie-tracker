@@ -40,51 +40,53 @@ export function MealItemRow({ item, onDelete, onEdit }: Props) {
   }
 
   return (
-    <div className="relative flex items-start gap-3 px-4 py-3">
+    <div className="relative flex items-center justify-between gap-3 px-4 py-3 min-h-[56px]">
       {/* Food info */}
       <div className="min-w-0 flex-1">
-        <div className="flex items-baseline gap-2">
-          <span className="truncate text-sm font-medium text-primary">{item.name}</span>
+        <span className="break-words line-clamp-2 text-sm font-semibold text-primary leading-snug">
+          {item.name}
+        </span>
+        <div className="flex items-center gap-1.5 text-[11px] text-muted font-medium mt-0.5">
           {item.grams !== null && (
-            <span className="shrink-0 text-xs text-muted tabular">{item.grams}g</span>
+            <span className="font-mono tabular">{item.grams}g</span>
+          )}
+          {item.grams !== null && item.notes && <span>·</span>}
+          {item.notes && (
+            <span className="italic truncate max-w-[180px]">{item.notes}</span>
           )}
         </div>
-        {item.notes && (
-          <p className="mt-0.5 text-xs text-muted italic">
-            {item.notes}
-          </p>
-        )}
       </div>
 
-      {/* Macros */}
-      <div className="shrink-0 text-right">
-        <p className="font-mono text-sm font-semibold tabular text-primary">
-          {item.kcal.toLocaleString("en-IN")} kcal
+      {/* Calories & Protein right aligned */}
+      <div className="shrink-0 text-right pl-2">
+        <p className="font-mono text-sm font-bold tabular text-primary leading-tight">
+          {item.kcal.toLocaleString("en-IN")}{" "}
+          <span className="text-[10px] text-muted font-normal">kcal</span>
         </p>
-        <p className="text-xs text-muted tabular">
+        <p className="text-[11px] text-muted font-medium tabular mt-0.5">
           P {item.proteinG.toFixed(1)}g
         </p>
       </div>
 
       {/* Actions menu */}
       {(onDelete || onEdit) && (
-        <div className="relative">
+        <div className="relative shrink-0">
           <button
             onClick={() => { setMenuOpen(!menuOpen); setConfirmDelete(false) }}
-            className="ml-1 mt-0.5 rounded p-1 text-muted hover:text-primary hover:bg-elevated"
+            className="ml-1 rounded-lg h-11 w-11 flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-colors"
             aria-label="Meal item actions"
           >
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="h-5 w-5" />
           </button>
 
           {menuOpen && (
-            <div className="absolute right-0 top-7 z-10 min-w-[120px] rounded-xl border border-subtle bg-elevated shadow-lg">
+            <div className="absolute right-0 top-11 z-20 min-w-[130px] rounded-xl border border-subtle bg-elevated shadow-xl animate-in fade-in slide-in-from-top-2 duration-150">
               {onEdit && (
                 <button
                   onClick={() => { setMenuOpen(false); onEdit(item.id) }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-sm text-secondary hover:text-primary hover:bg-surface rounded-t-xl"
+                  className="flex w-full items-center gap-2 h-11 px-3.5 text-xs font-semibold text-secondary hover:text-primary hover:bg-surface rounded-t-xl transition-colors text-left"
                 >
-                  <Pencil className="h-3.5 w-3.5" /> Edit
+                  <Pencil className="h-4 w-4 text-muted" /> Edit
                 </button>
               )}
               {onDelete && (
@@ -92,14 +94,14 @@ export function MealItemRow({ item, onDelete, onEdit }: Props) {
                   onClick={handleDelete}
                   disabled={deleting}
                   className={cn(
-                    "flex w-full items-center gap-2 px-3 py-2 text-sm rounded-b-xl",
+                    "flex w-full items-center gap-2 h-11 px-3.5 text-xs font-semibold rounded-b-xl transition-colors text-left",
                     confirmDelete
-                      ? "bg-danger/10 text-danger font-semibold"
+                      ? "bg-danger/15 text-danger"
                       : "text-secondary hover:text-danger hover:bg-surface"
                   )}
                 >
-                  <Trash2 className="h-3.5 w-3.5" />
-                  {deleting ? "Deleting…" : confirmDelete ? "Confirm delete" : "Delete"}
+                  <Trash2 className={cn("h-4 w-4", confirmDelete ? "text-danger" : "text-muted")} />
+                  {deleting ? "Deleting…" : confirmDelete ? "Confirm" : "Delete"}
                 </button>
               )}
             </div>

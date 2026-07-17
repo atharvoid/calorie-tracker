@@ -17,9 +17,9 @@ export default async function Home() {
   if (signedIn) {
     return (
       <main className="app-backdrop">
-        <div className="mx-auto max-w-5xl px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
-          {/* Top nav bar */}
-          <div className="mb-10 flex items-center justify-between">
+        <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 md:pt-10 sm:px-6 sm:pt-14">
+          {/* Top nav bar - hidden on mobile, shown on desktop/tablet */}
+          <div className="mb-6 md:mb-10 hidden md:flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-lg font-semibold tracking-tight text-primary">
                 Calorie<span className="text-accent">Tracker</span>
@@ -28,7 +28,7 @@ export default async function Home() {
             <AuthButton />
           </div>
 
-          <DemoApp signedIn={true} userId={session?.user?.id} />
+          <DemoApp signedIn={true} userId={session?.user?.id} user={session?.user} />
         </div>
       </main>
     )

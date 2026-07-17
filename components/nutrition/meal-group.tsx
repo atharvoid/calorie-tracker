@@ -24,21 +24,26 @@ export function MealGroup({ group, onDeleteItem, onEditItem }: Props) {
       {/* Group header */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between px-4 py-3 text-left"
+        className="flex w-full items-center justify-between px-4 py-3.5 text-left transition-colors hover:bg-elevated/10 rounded-xl"
         aria-expanded={expanded}
       >
-        <div>
-          <span className="font-medium text-primary">{label}</span>
+        <div className="min-w-0 flex-1 pr-2">
+          <span className="font-semibold text-primary">{label}</span>
+          <span className="text-[11px] text-muted ml-1.5 font-medium">
+            ({group.subtotal.itemCount} {group.subtotal.itemCount === 1 ? "item" : "items"})
+          </span>
           {timeLabel && (
-            <span className="ml-1 text-xs text-muted">{timeLabel}</span>
+            <span className="block sm:inline sm:ml-2 text-[10px] sm:text-xs text-muted font-normal bg-elevated px-1.5 py-0.5 rounded w-max mt-0.5 sm:mt-0">
+              {group.timeHint}
+            </span>
           )}
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 shrink-0">
           <div className="text-right">
-            <p className="font-mono text-sm font-semibold tabular text-primary">
-              {group.subtotal.kcal.toLocaleString("en-IN")} kcal
+            <p className="font-mono text-sm font-bold tabular text-primary leading-tight">
+              {group.subtotal.kcal.toLocaleString("en-IN")} <span className="text-[10px] text-muted font-normal">kcal</span>
             </p>
-            <p className="text-xs text-muted tabular">
+            <p className="text-[11px] text-muted font-medium tabular mt-0.5">
               P {group.subtotal.proteinG.toFixed(1)}g
               {" "}C {group.subtotal.carbsG.toFixed(1)}g
               {" "}F {group.subtotal.fatG.toFixed(1)}g
@@ -46,9 +51,9 @@ export function MealGroup({ group, onDeleteItem, onEditItem }: Props) {
           </div>
           <span className="text-muted">
             {expanded ? (
-              <ChevronUp className="h-4 w-4" />
+              <ChevronUp className="h-4.5 w-4.5" />
             ) : (
-              <ChevronDown className="h-4 w-4" />
+              <ChevronDown className="h-4.5 w-4.5" />
             )}
           </span>
         </div>

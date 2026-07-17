@@ -54,35 +54,46 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted">Macros</p>
-      {macros.map(({ label, value, target, unit, color }) => {
-        const pct = target !== null && value > 0
-          ? Math.min(100, Math.round((value / target) * 100))
-          : null
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted">Macros</p>
+      
+      {/* 3-column responsive grid on mobile, falling back to vertical list on very narrow screens */}
+      <div className="grid grid-cols-3 gap-2 sm:gap-4 max-[349px]:grid-cols-1">
+        {macros.map(({ label, value, target, unit, color }) => {
+          const pct = target !== null && value > 0
+            ? Math.min(100, Math.round((value / target) * 100))
+            : null
 
-        return (
-          <div key={label}>
-            <div className="flex items-center justify-between text-sm">
-              <span className="text-secondary">{label}</span>
-              <span className="font-mono tabular text-primary">
-                {value.toFixed(1)}{unit}
+          return (
+            <div key={label} className="rounded-xl bg-elevated/30 border border-subtle/30 p-2 sm:p-3 flex flex-col justify-between">
+              <div>
+                <p className="text-[11px] font-medium text-muted uppercase tracking-wider">{label}</p>
+                <p className="mt-1 font-mono text-sm sm:text-base font-bold tabular text-primary whitespace-nowrap">
+                  {value.toFixed(1)}
+                  <span className="text-[10px] text-muted font-normal ml-0.5">{unit}</span>
+                </p>
                 {target !== null && (
-                  <span className="ml-1 text-muted">/ {target.toFixed(0)}{unit}</span>
+                  <p className="text-[9px] sm:text-[10px] text-muted tabular leading-none mt-0.5">
+                    / {target.toFixed(0)}{unit} target
+                  </p>
                 )}
-              </span>
-            </div>
-            {pct !== null && (
-              <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-elevated">
-                <div
-                  className={cn("h-full rounded-full transition-all duration-500", color)}
-                  style={{ width: `${pct}%` }}
-                  aria-label={`${label} ${pct}% of target`}
-                />
               </div>
-            )}
-          </div>
-        )
-      })}
+              
+              {pct !== null && (
+                <div className="mt-2">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-elevated">
+                    <div
+                      className={cn("h-full rounded-full transition-all duration-500", color)}
+                      style={{ width: `${pct}%` }}
+                      aria-label={`${label} ${pct}% of target`}
+                    />
+                  </div>
+                  <span className="text-[9px] text-muted font-medium mt-0.5 block text-right">{pct}%</span>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
 
       {!totals && (
         <p className="text-xs text-muted">No meals logged yet.</p>

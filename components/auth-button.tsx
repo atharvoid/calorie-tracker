@@ -1,15 +1,11 @@
-import { auth, signIn, signOut } from "@/auth"
+import { auth, signIn } from "@/auth"
 import { SECONDARY_BTN, GHOST_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
+import { signOutAction } from "./auth-actions"
 
 async function doSignIn() {
 	"use server"
 	await signIn("google", { redirectTo: "/" })
-}
-
-async function doSignOut() {
-	"use server"
-	await signOut({ redirectTo: "/" })
 }
 
 export async function AuthButton() {
@@ -20,9 +16,10 @@ export async function AuthButton() {
 			<form action={doSignIn}>
 				<button
 					type="submit"
-					className={cn("rounded-btn px-4 py-1.5 text-sm font-medium", SECONDARY_BTN)}
+					className={cn("rounded-btn px-3.5 py-1.5 text-xs sm:text-sm font-semibold whitespace-nowrap", SECONDARY_BTN)}
 				>
-					Sign in with Google
+					<span className="hidden min-[360px]:inline">Sign in with Google</span>
+					<span className="inline min-[360px]:hidden">Sign In</span>
 				</button>
 			</form>
 		)
@@ -51,7 +48,7 @@ export async function AuthButton() {
 					{session.user.email}
 				</span>
 			</div>
-			<form action={doSignOut}>
+			<form action={signOutAction}>
 				<button
 					type="submit"
 					className={cn("text-xs px-2 py-1 rounded", GHOST_BTN)}

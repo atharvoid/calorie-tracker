@@ -56,20 +56,14 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Main calorie display */}
-      <div className="flex items-end gap-3">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">Calories Today</p>
-          <p className="mt-1 font-mono text-5xl font-bold tabular text-primary">
-            {consumed.toLocaleString("en-IN")}
-          </p>
-          <p className="mt-0.5 text-sm text-muted">kcal consumed</p>
-        </div>
-
+      {/* Main calorie display Header */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted">Calories Today</p>
+        
         {/* Status badge */}
         <div
           className={cn(
-            "ml-auto mb-1 rounded-full px-3 py-1 text-xs font-semibold",
+            "rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide uppercase",
             STATUS_BG[status] ?? "bg-elevated",
             STATUS_COLOR[status] ?? "text-muted"
           )}
@@ -79,9 +73,19 @@ export function CalorieProgress({ summary, loading = false }: Props) {
         </div>
       </div>
 
+      {/* Large calorie value + target label */}
+      <div className="flex items-baseline gap-1.5 flex-wrap">
+        <span className="font-mono text-4xl sm:text-5xl font-extrabold tracking-tight text-primary whitespace-nowrap">
+          {consumed.toLocaleString("en-IN")}
+        </span>
+        <span className="text-xs sm:text-sm text-muted font-medium whitespace-nowrap">
+          {target !== null ? `of ${target.toLocaleString("en-IN")} kcal target` : "kcal consumed"}
+        </span>
+      </div>
+
       {/* Progress bar */}
       {target !== null && (
-        <div>
+        <div className="space-y-1.5">
           <div
             className="relative h-2.5 w-full overflow-hidden rounded-full bg-elevated"
             role="progressbar"
@@ -97,61 +101,64 @@ export function CalorieProgress({ summary, loading = false }: Props) {
               style={{ width: `${progressPct}%` }}
             />
           </div>
-          <div className="mt-1 flex justify-between text-xs text-muted">
-            <span>0</span>
-            <span>{target.toLocaleString("en-IN")} kcal target</span>
+          <div className="flex justify-between text-[10px] sm:text-xs text-muted font-medium">
+            <span>0 kcal</span>
+            <span>{progressPct}% filled</span>
+            <span>{target.toLocaleString("en-IN")} kcal</span>
           </div>
         </div>
       )}
 
-      {/* Remaining / over amount */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      {/* Remaining / over amount cards */}
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
         {target !== null && (
-          <div className="rounded-xl bg-elevated p-3">
-            <p className="text-xs text-muted">
+          <div className="rounded-xl bg-elevated/50 border border-subtle/30 p-2.5 sm:p-3 flex flex-col justify-between">
+            <p className="text-[10px] sm:text-xs font-medium text-muted uppercase tracking-wider">
               {isOver ? "Over target" : "Remaining"}
             </p>
             <p className={cn(
-              "mt-1 font-mono text-lg font-semibold tabular",
+              "mt-1 font-mono text-base sm:text-lg font-bold tabular leading-none",
               isOver ? "text-danger" : "text-primary"
             )}>
               {isOver
                 ? `+${Math.abs(targetDelta ?? 0).toLocaleString("en-IN")}`
                 : (remainingToTarget ?? 0).toLocaleString("en-IN")}
             </p>
-            <p className="text-xs text-muted">kcal</p>
+            <span className="text-[9px] sm:text-[10px] text-muted mt-0.5">kcal</span>
           </div>
         )}
 
         {target !== null && (
-          <div className="rounded-xl bg-elevated p-3">
-            <p className="text-xs text-muted">Target</p>
-            <p className="mt-1 font-mono text-lg font-semibold tabular text-primary">
+          <div className="rounded-xl bg-elevated/50 border border-subtle/30 p-2.5 sm:p-3 flex flex-col justify-between">
+            <p className="text-[10px] sm:text-xs font-medium text-muted uppercase tracking-wider">Target</p>
+            <p className="mt-1 font-mono text-base sm:text-lg font-bold tabular text-primary leading-none">
               {target.toLocaleString("en-IN")}
             </p>
-            <p className="text-xs text-muted">kcal / day</p>
+            <span className="text-[9px] sm:text-[10px] text-muted mt-0.5">kcal / day</span>
           </div>
         )}
 
         {maintenance !== null && (
-          <div className="rounded-xl bg-elevated p-3">
-            <p className="text-xs text-muted">vs Maintenance</p>
+          <div className="col-span-2 sm:col-span-1 rounded-xl bg-elevated/50 border border-subtle/30 p-2.5 sm:p-3 flex flex-col justify-between">
+            <p className="text-[10px] sm:text-xs font-medium text-muted uppercase tracking-wider">vs Maintenance</p>
             <p className={cn(
-              "mt-1 font-mono text-lg font-semibold tabular",
+              "mt-1 font-mono text-base sm:text-lg font-bold tabular leading-none",
               (maintenanceBalance ?? 0) > 0 ? "text-pending" : "text-paid"
             )}>
               {(maintenanceBalance ?? 0) > 0 ? "+" : ""}{(maintenanceBalance ?? 0).toLocaleString("en-IN")}
             </p>
-            <p className="text-xs text-muted">kcal ({maintenance.toLocaleString("en-IN")} maint.)</p>
+            <span className="text-[9px] sm:text-[10px] text-muted mt-0.5">
+              kcal ({maintenance.toLocaleString("en-IN")} maint.)
+            </span>
           </div>
         )}
       </div>
 
       {/* No target configured */}
       {status === "unconfigured" && (
-        <p className="text-xs text-muted">
+        <p className="text-[11px] text-muted leading-relaxed">
           Set your daily target in{" "}
-          <span className="text-accent">Settings</span> to track progress.
+          <span className="text-accent font-semibold">Settings</span> to track progress.
         </p>
       )}
     </div>

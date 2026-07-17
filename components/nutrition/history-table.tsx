@@ -136,29 +136,56 @@ export function HistoryTable({
       </div>
 
       {/* Mobile cards */}
-      <div className="sm:hidden space-y-2">
+      <div className="sm:hidden space-y-2.5">
         {summaries.map((s) => (
           <div
             key={s.date}
             onClick={() => onSelectDate?.(s.date)}
-            className="rounded-xl border border-subtle bg-surface p-3 cursor-pointer hover:bg-elevated/10 transition-colors"
+            className="rounded-xl border border-subtle bg-surface p-3.5 cursor-pointer hover:bg-elevated/20 transition-all active:scale-[0.99] flex flex-col justify-between gap-2"
           >
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-primary">{s.date}</p>
-                <p className={cn("text-xs mt-0.5", STATUS_COLOR[s.status] ?? "text-muted")}>
-                  {STATUS_LABEL[s.status] ?? ""}
-                </p>
+                <p className="text-sm font-bold text-primary">{s.date}</p>
+                <span className={cn(
+                  "inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider mt-1",
+                  s.status === "within" ? "bg-paid/10 text-paid" :
+                  s.status === "over" ? "bg-danger/10 text-danger" :
+                  s.status === "under" ? "bg-partial/10 text-partial" : "bg-elevated text-muted"
+                )}>
+                  {STATUS_LABEL[s.status] ?? s.status}
+                </span>
               </div>
-              <p className="font-mono text-lg font-bold tabular text-primary">
-                {s.totals !== null ? `${s.totals.kcal.toLocaleString("en-IN")} kcal` : "—"}
-              </p>
+              
+              <div className="text-right">
+                <p className="font-mono text-base font-extrabold tabular text-primary leading-none">
+                  {s.totals !== null ? `${s.totals.kcal.toLocaleString("en-IN")}` : "—"}{" "}
+                  <span className="text-[10px] text-muted font-normal">kcal</span>
+                </p>
+                {s.goal.targetKcal !== null && (
+                  <p className="text-[10px] text-muted font-medium mt-1">
+                    of {s.goal.targetKcal.toLocaleString("en-IN")} target
+                  </p>
+                )}
+              </div>
             </div>
+
             {s.totals !== null && (
-              <div className="mt-2 grid grid-cols-3 gap-1 text-xs text-muted tabular">
-                <span>P {s.totals.proteinG.toFixed(1)}g</span>
-                <span>C {s.totals.carbsG.toFixed(1)}g</span>
-                <span>F {s.totals.fatG.toFixed(1)}g</span>
+              <div className="flex items-center justify-between border-t border-subtle/50 pt-2 flex-wrap gap-2">
+                <div className="flex gap-2.5 text-[10px] text-muted font-semibold tabular">
+                  <span>P: <strong className="text-secondary">{s.totals.proteinG.toFixed(0)}g</strong></span>
+                  <span>C: <strong className="text-secondary">{s.totals.carbsG.toFixed(0)}g</strong></span>
+                  <span>F: <strong className="text-secondary">{s.totals.fatG.toFixed(0)}g</strong></span>
+                </div>
+                
+                <span className="text-[9px] text-muted bg-elevated/80 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
+                  {s.mealCount} {s.mealCount === 1 ? "meal" : "meals"}
+                </span>
+              </div>
+            )}
+            
+            {s.totals === null && (
+              <div className="border-t border-subtle/50 pt-2 text-[10px] text-muted italic">
+                No meals logged for this date. Tap to log.
               </div>
             )}
           </div>

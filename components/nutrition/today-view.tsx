@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState, useRef } from "react"
 import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -37,6 +37,7 @@ export function TodayView({ initialDate }: Props) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showComposer, setShowComposer] = useState(false)
+  const dateInputRef = useRef<HTMLInputElement>(null)
 
   const load = useCallback(async (d: string) => {
     setLoading(true)
@@ -59,6 +60,17 @@ export function TodayView({ initialDate }: Props) {
   useEffect(() => {
     void load(date)
   }, [date, load])
+
+  // Listen to mobile header event to open meal composer
+  useEffect(() => {
+    const handleOpenComposer = () => {
+      setShowComposer(true)
+    }
+    window.addEventListener("open_meal_composer", handleOpenComposer)
+    return () => {
+      window.removeEventListener("open_meal_composer", handleOpenComposer)
+    }
+  }, [])
 
   // Exposed for realtime updates
   const refresh = useCallback(() => {
@@ -97,6 +109,16 @@ export function TodayView({ initialDate }: Props) {
   const nextDisabled = isFuture(addDays(date, 1), TZ)
   const dateLabel = isToday(date, TZ) ? "Today" : formatShortDate(date)
 
+  const handleDateClick = () => {
+    if (dateInputRef.current) {
+      if (typeof dateInputRef.current.showPicker === "function") {
+        dateInputRef.current.showPicker()
+      } else {
+        dateInputRef.current.click()
+      }
+    }
+  }
+
   function handleDeleteItem(id: string) {
     if (!data) return
     setData({
@@ -119,37 +141,55 @@ export function TodayView({ initialDate }: Props) {
   return (
     <div className="space-y-4">
       {/* Date navigator */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center justify-between bg-surface border border-subtle rounded-xl p-1">
         <button
           onClick={goToPrev}
-          className="rounded-lg p-2 text-muted hover:text-primary hover:bg-elevated"
+          className="rounded-lg h-11 w-11 flex items-center justify-center text-muted hover:text-primary hover:bg-elevated transition-colors"
           aria-label="Previous day"
         >
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
 
-        <div className="flex-1 text-center">
-          <p className="font-semibold text-primary">{dateLabel}</p>
-          <p className="text-xs text-muted">{date}</p>
+        <div
+          onClick={handleDateClick}
+          className="flex-1 text-center cursor-pointer hover:bg-elevated/35 rounded-lg py-1 px-2 transition-colors select-none"
+          role="button"
+          aria-label="Select date"
+        >
+          <p className="font-semibold text-primary text-sm sm:text-base leading-tight">{dateLabel}</p>
+          <p className="text-[11px] text-muted tracking-wide mt-0.5">{date}</p>
+          <input
+            ref={dateInputRef}
+            type="date"
+            max={today}
+            value={date}
+            onChange={(e) => {
+              if (e.target.value) setDate(e.target.value)
+            }}
+            className="sr-only"
+            aria-hidden="true"
+          />
         </div>
 
-        <button
-          onClick={goToNext}
-          disabled={nextDisabled}
-          className="rounded-lg p-2 text-muted hover:text-primary hover:bg-elevated disabled:opacity-30 disabled:pointer-events-none"
-          aria-label="Next day"
-        >
-          <ChevronRight className="h-4 w-4" />
-        </button>
-
-        {!isToday(date, TZ) && (
+        <div className="flex items-center gap-1">
           <button
-            onClick={goToToday}
-            className="ml-1 rounded-lg px-2 py-1 text-xs text-accent hover:text-accent-hover border border-subtle"
+            onClick={goToNext}
+            disabled={nextDisabled}
+            className="rounded-lg h-11 w-11 flex items-center justify-center text-muted hover:text-primary hover:bg-elevated disabled:opacity-30 disabled:pointer-events-none transition-colors"
+            aria-label="Next day"
           >
-            Today
+            <ChevronRight className="h-5 w-5" />
           </button>
-        )}
+
+          {!isToday(date, TZ) && (
+            <button
+              onClick={goToToday}
+              className="rounded-lg h-11 px-3 flex items-center justify-center text-xs font-semibold text-accent hover:text-accent-hover hover:bg-accent/5 transition-colors border border-accent/15"
+            >
+              Today
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Log a meal action */}
@@ -157,9 +197,9 @@ export function TodayView({ initialDate }: Props) {
         <div className="flex justify-end">
           <button
             onClick={() => setShowComposer(true)}
-            className="flex items-center gap-1.5 rounded-lg border border-accent/20 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/10 cursor-pointer"
+            className="flex items-center gap-1.5 rounded-lg border border-accent/20 bg-accent/5 px-4 py-2 text-xs font-semibold text-accent hover:bg-accent/10 transition-colors cursor-pointer"
           >
-            <Plus className="h-3.5 w-3.5" />
+            <Plus className="h-4 w-4" />
             Log a meal
           </button>
         </div>

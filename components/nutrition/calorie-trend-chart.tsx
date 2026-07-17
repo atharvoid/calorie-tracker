@@ -119,14 +119,15 @@ export function CalorieTrendChart({ data, loading = false }: Props) {
             axisLine={false}
             tickFormatter={formatDate}
             interval="preserveStartEnd"
+            minTickGap={25}
           />
           <YAxis
             tick={AXIS_TICK}
             tickLine={false}
             axisLine={false}
-            width={44}
+            width={38}
             tickFormatter={(v: number) =>
-              v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
+              v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
             }
           />
           <Tooltip

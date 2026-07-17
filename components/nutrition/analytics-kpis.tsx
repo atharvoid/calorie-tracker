@@ -63,21 +63,23 @@ export function AnalyticsKpis({ kpi, loading = false }: Props) {
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <div className="grid grid-cols-2 gap-3 max-[349px]:grid-cols-1 md:grid-cols-4">
       {cards.map((card) => (
-        <Panel key={card.label}>
-          <p className="text-xs font-medium uppercase tracking-wide text-muted">
-            {card.label}
-          </p>
-          <p
-            className={cn(
-              "mt-2 font-mono text-2xl font-bold tabular",
-              card.accent ? "text-paid" : "text-primary"
-            )}
-          >
-            {card.value}
-          </p>
-          <p className="mt-1 text-xs text-muted">{card.sub}</p>
+        <Panel key={card.label} className="p-3.5 flex flex-col justify-between min-h-[90px]">
+          <div>
+            <p className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted">
+              {card.label}
+            </p>
+            <p
+              className={cn(
+                "mt-1 font-mono text-xl sm:text-2xl font-extrabold tabular leading-none",
+                card.accent ? "text-paid" : "text-primary"
+              )}
+            >
+              {card.value}
+            </p>
+          </div>
+          <p className="mt-1.5 text-[10px] sm:text-xs text-muted leading-tight">{card.sub}</p>
         </Panel>
       ))}
     </div>

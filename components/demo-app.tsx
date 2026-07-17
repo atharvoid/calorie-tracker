@@ -8,14 +8,19 @@ import { NutritionShell } from "./nutrition/nutrition-shell"
 type DemoAppProps = {
   signedIn?: boolean
   userId?: string
+  user?: {
+    name?: string | null
+    email?: string | null
+    image?: string | null
+  }
 }
 
-export function DemoApp({ signedIn = false, userId }: DemoAppProps) {
+export function DemoApp({ signedIn = false, userId, user }: DemoAppProps) {
   return (
     <div className="w-full">
       {signedIn && userId ? (
         <Suspense fallback={null}>
-          <NutritionShell userId={userId} />
+          <NutritionShell userId={userId} user={user} />
         </Suspense>
       ) : (
         <EmptyState

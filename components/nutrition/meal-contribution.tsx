@@ -86,9 +86,9 @@ export function MealContribution({ data, loading = false }: Props) {
             tick={AXIS_TICK}
             tickLine={false}
             axisLine={false}
-            width={44}
+            width={38}
             tickFormatter={(v: number) =>
-              v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(v)
+              v >= 1000 ? `${(v / 1000).toFixed(0)}k` : String(v)
             }
           />
           <Tooltip cursor={false} content={<TooltipContent />} />

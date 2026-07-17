@@ -97,6 +97,9 @@
   --color-accent-hover: var(--accent-hover);
   --radius-btn:         var(--radius-btn);
   --radius-card:        var(--radius-card);
+  --spacing-mobile-nav: calc(76px + env(safe-area-inset-bottom));
+  --spacing-safe-bottom: env(safe-area-inset-bottom);
+  --spacing-safe-top: env(safe-area-inset-top);
 }
 
 /* Base resets */
@@ -110,7 +113,7 @@ html, body {
   background:
     radial-gradient(60% 40% at 50% 0%, rgba(16, 185, 129, 0.10), transparent 60%),
     var(--bg-base);
-  min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Tabular numbers */
@@ -128,6 +131,15 @@ html, body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* Mobile bottom nav spacing utilities */
+.pb-mobile-nav {
+  padding-bottom: var(--spacing-mobile-nav);
+}
+
+.pb-safe-bottom {
+  padding-bottom: var(--spacing-safe-bottom);
 }
 
 @layer base {
