@@ -1,11 +1,10 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { Loader2, Save, CreditCard, Send, FileSpreadsheet, Download, LogOut } from "lucide-react"
+import { Loader2, Save, CreditCard, Send, FileSpreadsheet, Download, LogOut, RefreshCw, ExternalLink } from "lucide-react"
 import { toast } from "sonner"
 import { Panel } from "@/components/ui/panel"
 import { Button } from "@/components/ui/button"
-import { SheetPanel } from "../sheet-panel"
 import { ConnectTelegram } from "../connect-telegram"
 import { signOutAction } from "../auth-actions"
 
@@ -63,6 +62,47 @@ export function SettingsView() {
     proteinTargetG: "",
     timezone: "Asia/Kolkata",
   })
+
+  // Google Sheets compact state
+  const [sheetId, setSheetId] = useState<string | null>(null)
+  const [sheetRows, setSheetRows] = useState<number | null>(null)
+  const [sheetLoading, setSheetLoading] = useState(true)
+  const [sheetConnecting, setSheetConnecting] = useState(false)
+
+  const loadSheet = useCallback(async () => {
+    setSheetLoading(true)
+    try {
+      const res = await fetch("/api/sheet/preview")
+      if (res.ok) {
+        const data = await res.json() as { spreadsheetId: string | null; rows: string[][] }
+        setSheetId(data.spreadsheetId ?? null)
+        setSheetRows(data.rows?.length ?? null)
+      }
+    } catch {
+      // silent — sheet not connected
+    } finally {
+      setSheetLoading(false)
+    }
+  }, [])
+
+  useEffect(() => { void loadSheet() }, [loadSheet])
+
+  async function connectSheet() {
+    setSheetConnecting(true)
+    try {
+      const res = await fetch("/api/sheet/connect", { method: "POST" })
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}))
+        throw new Error((body as { detail?: string; error?: string })?.detail || (body as { error?: string })?.error || "Unknown error")
+      }
+      toast.success("Google Sheet connected")
+      await loadSheet()
+    } catch (e) {
+      toast.error(`Couldn't connect the sheet: ${(e as Error).message}`)
+    } finally {
+      setSheetConnecting(false)
+    }
+  }
 
   const [billing, setBilling] = useState<EntitlementStatus | null>(null)
   const [billingLoading, setBillingLoading] = useState(true)
@@ -383,16 +423,10 @@ export function SettingsView() {
           <Send className="h-4.5 w-4.5 text-accent" />
           Telegram Bot Log
         </h2>
-        <p className="mb-4 text-xs text-muted leading-relaxed">
-          Connect your Telegram account to instantly log meals using natural language descriptions directly with the bot.
+        <p className="mb-3 text-xs text-muted leading-relaxed">
+          Connect your Telegram account to log meals by sending a message to the bot.
         </p>
-        <div className="border border-subtle/30 bg-elevated/20 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="text-xs text-secondary">
-            <span className="font-semibold text-primary block">Integration Status</span>
-            Syncs logged messages to your database live.
-          </div>
-          <ConnectTelegram />
-        </div>
+        <ConnectTelegram />
       </Panel>
 
       {/* Google Sheets Sync Section */}
@@ -401,10 +435,48 @@ export function SettingsView() {
           <FileSpreadsheet className="h-4.5 w-4.5 text-accent" />
           Google Sheets Sync
         </h2>
-        <p className="mb-4 text-xs text-muted leading-relaxed">
-          Enable Google Sheets integration to mirror your meal details into a spreadsheet in your personal Google Drive account.
+        <p className="mb-3 text-xs text-muted leading-relaxed">
+          Mirror your meal log into a spreadsheet in your Google Drive.
         </p>
-        <SheetPanel />
+
+        {sheetLoading ? (
+          <div className="flex items-center gap-2 text-xs text-muted">
+            <Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking connection…
+          </div>
+        ) : sheetId ? (
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-xs text-muted font-medium tabular">
+              {sheetRows !== null ? `${sheetRows} rows synced` : "Connected"}
+            </span>
+            <button
+              onClick={() => void loadSheet()}
+              className="inline-flex items-center gap-1.5 rounded-lg border border-subtle bg-elevated px-3 py-1.5 text-xs font-semibold text-secondary hover:text-primary hover:bg-surface transition-colors cursor-pointer"
+            >
+              <RefreshCw className="h-3.5 w-3.5" /> Refresh
+            </button>
+            <a
+              href={`https://docs.google.com/spreadsheets/d/${sheetId}`}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-subtle bg-elevated px-3 py-1.5 text-xs font-semibold text-accent hover:bg-surface transition-colors"
+            >
+              Open in Google Sheets <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
+        ) : (
+          <Button
+            onClick={connectSheet}
+            disabled={sheetConnecting}
+            className="flex items-center gap-2 cursor-pointer"
+          >
+            {sheetConnecting ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <FileSpreadsheet className="h-4 w-4" />
+            )}
+            {sheetConnecting ? "Connecting…" : "Connect Google Sheet"}
+          </Button>
+        )}
       </Panel>
 
       {/* Subscription & Billing Section */}
@@ -462,14 +534,14 @@ export function SettingsView() {
                     onClick={() => handleUpgrade("monthly")}
                     className="rounded-btn border border-subtle bg-elevated px-4 py-2.5 text-center text-xs font-bold text-primary hover:bg-surface focus:outline-none transition-colors cursor-pointer"
                   >
-                    Monthly ($2.99)
+                    Monthly — $2.99/mo
                   </button>
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpgrade("annual")}
                     className="rounded-btn bg-accent text-[color:var(--accent-contrast)] px-4 py-2.5 text-center text-xs font-bold hover:bg-accent-hover focus:outline-none transition-all cursor-pointer"
                   >
-                    Annual ($24.00)
+                    Annual — $24.99/yr
                   </button>
                 </div>
                 <p className="text-[10px] text-muted text-center leading-relaxed">
