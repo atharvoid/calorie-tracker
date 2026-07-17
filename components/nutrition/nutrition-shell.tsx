@@ -10,6 +10,7 @@ import { HistoryView } from "./history-view"
 import { AnalyticsView } from "./analytics-view"
 import { SettingsView } from "./settings-view"
 import { PaywallAlert } from "./paywall-alert"
+import Link from "next/link"
 import { signOutAction } from "@/components/auth-actions"
 
 type Tab = "today" | "history" | "analytics" | "settings"
@@ -101,6 +102,13 @@ export function NutritionShell({ userId, user }: Props) {
     }
   }, [activeTab, router, searchParams])
 
+  // Sync URL search params to tab state (handles logo clicks / back button)
+  useEffect(() => {
+    if (tabParam && TABS.some((t) => t.id === tabParam) && tabParam !== activeTab) {
+      setActiveTab(tabParam)
+    }
+  }, [tabParam, activeTab])
+
   // Close avatar menu when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -123,12 +131,14 @@ export function NutritionShell({ userId, user }: Props) {
       {/* Mobile-only Header */}
       <header className="md:hidden sticky top-0 z-30 flex items-center justify-between border-b border-subtle bg-surface/90 backdrop-blur-md px-4 py-2.5">
         <div className="flex items-center gap-1.5">
-          <span className="text-sm font-semibold tracking-tight text-primary">
-            Calorie<span className="text-accent">Tracker</span>
-          </span>
-          <span className="text-muted-foreground text-xs font-medium px-1.5 py-0.5 rounded bg-elevated">
-            {tabTitle}
-          </span>
+          <Link href="/?tab=today" className="flex items-center gap-1.5 focus:outline-none hover:opacity-90">
+            <span className="text-sm font-semibold tracking-tight text-primary">
+              Calorie<span className="text-accent">Tracker</span>
+            </span>
+            <span className="text-muted-foreground text-xs font-medium px-1.5 py-0.5 rounded bg-elevated">
+              {tabTitle}
+            </span>
+          </Link>
         </div>
 
         {/* Header Right Actions */}

@@ -1,5 +1,6 @@
 import { AuthButton } from "@/components/auth-button"
 import { auth, signIn } from "@/auth"
+import Link from "next/link"
 import { DemoApp } from "@/components/demo-app"
 import { PRIMARY_BTN, SECONDARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
@@ -20,11 +21,11 @@ export default async function Home() {
         <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 md:pt-10 sm:px-6 sm:pt-14">
           {/* Top nav bar - hidden on mobile, shown on desktop/tablet */}
           <div className="mb-6 md:mb-10 hidden md:flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link href="/?tab=today" className="flex items-center gap-2 focus:outline-none hover:opacity-90">
               <span className="text-lg font-semibold tracking-tight text-primary">
                 Calorie<span className="text-accent">Tracker</span>
               </span>
-            </div>
+            </Link>
             <AuthButton />
           </div>
 
