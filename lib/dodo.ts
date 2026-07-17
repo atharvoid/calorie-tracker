@@ -1,11 +1,12 @@
 import { DodoPayments } from "dodopayments"
 
-if (!process.env.DODO_PAYMENTS_API_KEY) {
-  if (process.env.NODE_ENV === "production") {
-    console.warn("WARNING: DODO_PAYMENTS_API_KEY is not defined in environment variables!")
-  }
+const dodoEnv = process.env.DODO_ENVIRONMENT || "test"
+
+if (dodoEnv !== "test" && dodoEnv !== "live") {
+  throw new Error(`Invalid DODO_ENVIRONMENT: ${dodoEnv}. Expected 'test' or 'live'.`)
 }
 
 export const dodo = new DodoPayments({
   bearerToken: process.env.DODO_PAYMENTS_API_KEY || "dodo_test_placeholder",
+  environment: dodoEnv === "live" ? "live_mode" : "test_mode",
 })

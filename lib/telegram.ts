@@ -8,6 +8,59 @@ import {
 } from "@/db/schema"
 import { extractNutrition, nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { commitNutrition } from "@/lib/commit"
+import { getSettings } from "@/lib/nutrition-queries"
+import { localDate, addDays, parseLocalDate, formatShortDate, isFuture } from "@/lib/nutrition-date"
+
+export function parseTelegramDate(text: string, timezone: string): { date: string; cleanText: string; label: string } | null {
+  const today = localDate(timezone)
+  const textLower = text.toLowerCase().trim()
+
+  // 1. "yesterday"
+  if (/\byesterday\b/.test(textLower)) {
+    const targetDate = addDays(today, -1)
+    const cleanText = text.replace(/\byesterday\b/gi, "").replace(/\s+/g, " ").trim()
+    return { date: targetDate, cleanText, label: "Yesterday" }
+  }
+
+  // 2. "on YYYY-MM-DD" or just "YYYY-MM-DD" at the beginning/end
+  const ymdMatch = text.match(/\b(?:on\s+)?(\d{4})-(\d{2})-(\d{2})\b/)
+  if (ymdMatch) {
+    const dateStr = ymdMatch[1] + "-" + ymdMatch[2] + "-" + ymdMatch[3]
+    const cleanText = text.replace(ymdMatch[0], "").replace(/\s+/g, " ").trim()
+    try {
+      parseLocalDate(dateStr)
+      return { date: dateStr, cleanText, label: formatShortDate(dateStr) }
+    } catch {
+      return null
+    }
+  }
+
+  // 3. "on DD Month" or "on Month DD"
+  const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
+  const fullMonths = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
+  
+  const dmMatch = text.match(/\b(?:on\s+)?(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]{3,9})\b/i)
+  if (dmMatch) {
+    const day = parseInt(dmMatch[1], 10)
+    const monthStr = dmMatch[2].toLowerCase()
+    let mIdx = months.indexOf(monthStr.substring(0, 3))
+    if (mIdx === -1) mIdx = fullMonths.indexOf(monthStr)
+    
+    if (mIdx !== -1 && day >= 1 && day <= 31) {
+      const currentYear = parseInt(today.split("-")[0], 10)
+      const dateStr = `${currentYear}-${String(mIdx + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+      const cleanText = text.replace(dmMatch[0], "").replace(/\s+/g, " ").trim()
+      try {
+        parseLocalDate(dateStr)
+        return { date: dateStr, cleanText, label: formatShortDate(dateStr) }
+      } catch {
+        return null
+      }
+    }
+  }
+
+  return null
+}
 
 export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN || "123456:dummy-token")
 
@@ -82,19 +135,22 @@ function summarizeMeals(nutrition: NutritionResult): string {
 async function presentNutritionConfirm(
 	ctx: Context,
 	userId: string,
-	nutrition: NutritionResult
+	nutrition: NutritionResult,
+	logDate?: string
 ): Promise<void> {
 	const pending = await withRetry(async () => {
 		const [row] = await db
 			.insert(pendingCaptures)
-			.values({ userId, payload: nutrition })
+			.values({ userId, payload: { ...nutrition, logDate } as any })
 			.returning({ id: pendingCaptures.id })
 		return row
 	})
 	const kb = new InlineKeyboard()
 		.text("✓ Save", `confirm:${pending.id}`)
 		.text("✏️ Fix", `edit:${pending.id}`)
-	await ctx.reply(summarizeMeals(nutrition), {
+	
+	const dateLabel = logDate ? `\n\n📅 *Target Date: ${formatShortDate(logDate)}*` : ""
+	await ctx.reply(summarizeMeals(nutrition) + dateLabel, {
 		parse_mode: "Markdown",
 		reply_markup: kb,
 	})
@@ -165,12 +221,29 @@ bot.on("message:text", async (ctx) => {
 		return
 	}
 
+	const settings = await getSettings(userId).catch(() => null)
+	const timezone = settings?.timezone || "Asia/Kolkata"
+
+	const parsed = parseTelegramDate(ctx.message.text, timezone)
+	const targetDate = parsed ? parsed.date : localDate(timezone)
+	const cleanText = parsed ? parsed.cleanText : ctx.message.text
+
+	if (isFuture(targetDate, timezone)) {
+		await ctx.reply("❌ Date cannot be in the future.")
+		return
+	}
+	const oldestAllowed = addDays(localDate(timezone), -366)
+	if (targetDate < oldestAllowed) {
+		await ctx.reply("❌ Date is too far in the past (max 366 days).")
+		return
+	}
+
 	const thinking = await ctx.reply("🧮 Estimating macros…")
 	try {
-		const nutrition = await extractNutrition(ctx.message.text, userId, requestId, "telegram")
+		const nutrition = await extractNutrition(cleanText, userId, requestId, "telegram")
 		// Delete the "thinking" message before showing results
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
-		await presentNutritionConfirm(ctx, userId, nutrition)
+		await presentNutritionConfirm(ctx, userId, nutrition, targetDate)
 	} catch (err: any) {
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		console.error("[telegram] extractNutrition failed:", err)
@@ -227,6 +300,9 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 		return
 	}
 
+	const rawPayload = pending.payload as any
+	const logDate = rawPayload.logDate as string | undefined
+
 	const nutrition = validationResult.data
 	try {
 		const { rowCount, syncWarning } = await commitNutrition({
@@ -235,6 +311,7 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 			source: "telegram",
 			captureId: id,
 			timezone: "Asia/Kolkata",
+			logDate,
 		})
 
 		// Delete pending capture AFTER confirmed DB insert

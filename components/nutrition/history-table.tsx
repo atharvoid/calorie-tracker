@@ -28,6 +28,7 @@ type Props = {
   filter: FilterOption
   onSortChange: (sort: SortOption) => void
   onFilterChange: (filter: FilterOption) => void
+  onSelectDate?: (date: string) => void
 }
 
 export function HistoryTable({
@@ -36,6 +37,7 @@ export function HistoryTable({
   filter,
   onSortChange,
   onFilterChange,
+  onSelectDate,
 }: Props) {
   const SORT_OPTIONS: { value: SortOption; label: string }[] = [
     { value: "newest", label: "Newest first" },
@@ -102,7 +104,8 @@ export function HistoryTable({
             {summaries.map((s) => (
               <tr
                 key={s.date}
-                className="border-b border-subtle last:border-0 hover:bg-elevated/20"
+                onClick={() => onSelectDate?.(s.date)}
+                className="border-b border-subtle last:border-0 hover:bg-elevated/20 cursor-pointer transition-colors"
               >
                 <td className="px-3 py-2 text-secondary">{s.date}</td>
                 <td className="px-3 py-2 font-mono tabular text-primary">
@@ -137,7 +140,8 @@ export function HistoryTable({
         {summaries.map((s) => (
           <div
             key={s.date}
-            className="rounded-xl border border-subtle bg-surface p-3"
+            onClick={() => onSelectDate?.(s.date)}
+            className="rounded-xl border border-subtle bg-surface p-3 cursor-pointer hover:bg-elevated/10 transition-colors"
           >
             <div className="flex items-start justify-between">
               <div>

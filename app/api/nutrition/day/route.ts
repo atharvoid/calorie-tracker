@@ -11,6 +11,8 @@ import {
   numericToNumber,
 } from "@/lib/nutrition-calculations"
 import type { MealGroupDTO, MealItemDTO } from "@/lib/nutrition-types"
+import { commitNutrition } from "@/lib/commit"
+import { isFuture, addDays, localDate } from "@/lib/nutrition-date"
 
 export const runtime = "nodejs"
 
@@ -107,4 +109,47 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
   }
 
   return NextResponse.json({ summary, mealGroups, insights })
+}
+
+export async function POST(req: NextRequest): Promise<NextResponse> {
+  const session = await auth()
+  if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
+
+  let body: any
+  try {
+    body = await req.json()
+  } catch {
+    return errResponse("INVALID_JSON", "Invalid JSON body", 400)
+  }
+
+  const { nutrition, logDate } = body
+
+  if (!logDate || !/^\d{4}-\d{2}-\d{2}$/.test(logDate)) {
+    return errResponse("INVALID_DATE", "logDate must be YYYY-MM-DD", 400)
+  }
+
+  const userId = session.user.id
+  const settings = await getSettings(userId)
+  const timezone = settings?.timezone || "Asia/Kolkata"
+
+  if (isFuture(logDate, timezone)) {
+    return errResponse("INVALID_DATE", "Date cannot be in the future", 400)
+  }
+  const oldestAllowed = addDays(localDate(timezone), -366)
+  if (logDate < oldestAllowed) {
+    return errResponse("INVALID_DATE", "Date is too far in the past", 400)
+  }
+
+  try {
+    const result = await commitNutrition({
+      userId,
+      nutrition,
+      source: "web",
+      logDate,
+      timezone,
+    })
+    return NextResponse.json(result)
+  } catch (err: any) {
+    return errResponse("COMMIT_FAILED", err.message || "Failed to commit", 500)
+  }
 }

@@ -89,6 +89,14 @@ export function HistoryView() {
     setSelectedDate(nonFuture)
   }
 
+  function handleSelectDate(d: string) {
+    setSelectedDate(d)
+    const newMonday = mondayOfWeek(d)
+    if (newMonday !== weekMonday) {
+      setWeekMonday(newMonday)
+    }
+  }
+
   return (
     <div className="space-y-6">
       {/* Week navigator */}
@@ -102,7 +110,7 @@ export function HistoryView() {
             weekMonday={weekMonday}
             summaries={weekSummaries}
             selectedDate={selectedDate}
-            onSelectDate={setSelectedDate}
+            onSelectDate={handleSelectDate}
             onWeekChange={handleWeekChange}
           />
         )}
@@ -111,7 +119,7 @@ export function HistoryView() {
       {/* Selected day detail */}
       {selectedDate && (
         <div>
-          <TodayView initialDate={selectedDate} />
+          <TodayView key={selectedDate} initialDate={selectedDate} />
         </div>
       )}
 
@@ -129,6 +137,7 @@ export function HistoryView() {
             filter={filter}
             onSortChange={setSort}
             onFilterChange={setFilter}
+            onSelectDate={handleSelectDate}
           />
         )}
       </div>

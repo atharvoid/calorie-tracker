@@ -73,6 +73,17 @@ export function NutritionShell({ userId }: Props) {
     void loadBilling()
   }, [loadBilling])
 
+  // Listen for local browser events to trigger instant updates across components
+  useEffect(() => {
+    const handler = () => {
+      handleNutritionChanged()
+    }
+    window.addEventListener("local_nutrition_changed", handler)
+    return () => {
+      window.removeEventListener("local_nutrition_changed", handler)
+    }
+  }, [handleNutritionChanged])
+
   // Sync tab to URL without full navigation
   useEffect(() => {
     const current = searchParams.get("tab")

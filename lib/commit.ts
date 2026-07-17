@@ -12,6 +12,7 @@ type CommitInput = {
   source?: string
   captureId?: string
   timezone?: string
+  logDate?: string
 }
 
 type CommitResult = {
@@ -28,6 +29,7 @@ export async function commitNutrition({
   source = "telegram",
   captureId,
   timezone = "Asia/Kolkata",
+  logDate,
 }: CommitInput): Promise<CommitResult> {
   // Runtime validation — reject if nutrition data is malformed
   const validated = nutritionSchema.safeParse(nutrition)
@@ -37,7 +39,7 @@ export async function commitNutrition({
     )
   }
 
-  const date = localDate(timezone)
+  const date = logDate || localDate(timezone)
   const dbRows: (typeof mealItems.$inferInsert)[] = []
 
   // Intermediate shape before we have IDs

@@ -49,9 +49,18 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ url: checkoutSession.checkout_url })
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err)
-    console.error("[billing-checkout] failed to create checkout session:", msg)
-    return NextResponse.json({ error: msg }, { status: 500 })
+  } catch (err: any) {
+    const status = err.status || 500
+    const msg = err.message || String(err)
+    console.error("[billing-checkout] failed to create checkout session. Status:", status, "Message:", msg)
+    if (err.error) {
+      console.error("[billing-checkout] Provider error body:", JSON.stringify(err.error))
+    }
+
+    let friendlyMessage = msg
+    if (status === 403 || msg.toLowerCase().includes("merchant") || msg.toLowerCase().includes("live")) {
+      friendlyMessage = "Payments are still in test mode. No charge was created."
+    }
+    return NextResponse.json({ error: friendlyMessage }, { status: 500 })
   }
 }

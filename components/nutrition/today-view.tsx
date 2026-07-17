@@ -1,12 +1,14 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import { ChevronLeft, ChevronRight, Loader2, Lightbulb } from "lucide-react"
+import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
 import { CalorieProgress } from "./calorie-progress"
 import { MacroSummary } from "./macro-summary"
 import { MealGroup } from "./meal-group"
+import { MealComposer } from "./meal-composer"
+import { toast } from "sonner"
 import {
   localDate,
   addDays,
@@ -34,6 +36,7 @@ export function TodayView({ initialDate }: Props) {
   const [data, setData] = useState<DayData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [showComposer, setShowComposer] = useState(false)
 
   const load = useCallback(async (d: string) => {
     setLoading(true)
@@ -61,6 +64,25 @@ export function TodayView({ initialDate }: Props) {
   const refresh = useCallback(() => {
     void load(date)
   }, [date, load])
+
+  function handleCommitted(result: any) {
+    setShowComposer(false)
+    
+    // If sheets failed but DB succeeded, show warning
+    if (result.syncWarning) {
+      toast.warning("Meal saved, but Google Sheet sync failed.", {
+        description: result.syncWarning,
+      })
+    } else {
+      toast.success(`Meal saved to ${formatShortDate(date)}.`)
+    }
+    
+    // Dispatch local event for instant sibling/parent update
+    window.dispatchEvent(new CustomEvent("local_nutrition_changed", { detail: { date } }))
+    
+    // Reload local day data
+    void load(date)
+  }
 
   function goToPrev() {
     setDate((d) => addDays(d, -1))
@@ -129,6 +151,28 @@ export function TodayView({ initialDate }: Props) {
           </button>
         )}
       </div>
+
+      {/* Log a meal action */}
+      {!showComposer && (
+        <div className="flex justify-end">
+          <button
+            onClick={() => setShowComposer(true)}
+            className="flex items-center gap-1.5 rounded-lg border border-accent/20 bg-accent/5 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/10 cursor-pointer"
+          >
+            <Plus className="h-3.5 w-3.5" />
+            Log a meal
+          </button>
+        </div>
+      )}
+
+      {showComposer && (
+        <MealComposer
+          logDate={date}
+          sourceContext={initialDate ? "history" : "today"}
+          onCommitted={handleCommitted}
+          onCancel={() => setShowComposer(false)}
+        />
+      )}
 
       {/* Loading state */}
       {loading && (
