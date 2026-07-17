@@ -156,7 +156,7 @@ export function TodayView({ initialDate }: Props) {
           role="button"
           aria-label="Select date"
         >
-          <p className="font-semibold text-primary text-sm sm:text-base leading-tight">{dateLabel}</p>
+          <p className="font-semibold text-white text-sm sm:text-base leading-tight">{dateLabel}</p>
           <p className="text-[11px] text-muted tracking-wide mt-0.5">{date}</p>
           <input
             ref={dateInputRef}
@@ -250,7 +250,7 @@ export function TodayView({ initialDate }: Props) {
             <Panel>
               <div className="flex items-center gap-2 mb-3">
                 <Lightbulb className="h-4 w-4 text-accent" />
-                <p className="text-sm font-medium text-primary">Insights</p>
+                <p className="text-sm font-medium text-white">Insights</p>
               </div>
               <ul className="space-y-2">
                 {data.insights.slice(0, 2).map((insight, i) => (

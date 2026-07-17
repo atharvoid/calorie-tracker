@@ -185,9 +185,9 @@ export function WeekNavigator({
       {selectedSummary && (
         <div className="mt-3 flex items-center justify-between border-t border-subtle/50 pt-2 text-xs sm:hidden">
           <span className="text-secondary font-medium">
-            Selected: <span className="text-primary font-semibold">{selectedDate}</span>
+            Selected: <span className="text-white font-semibold">{selectedDate}</span>
           </span>
-          <span className="font-mono tabular text-primary font-bold">
+          <span className="font-mono tabular text-white font-bold">
             {selectedSummary.totals !== null ? (
               <>
                 {selectedSummary.totals.kcal.toLocaleString("en-IN")} kcal
