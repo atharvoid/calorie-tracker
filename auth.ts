@@ -11,6 +11,7 @@ process.env.NEXTAUTH_URL = "https://logcals.vercel.app"
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	basePath: "/api/auth",
 	trustHost: true,
+	redirectProxyUrl: "https://logcals.vercel.app/api/auth",
 	adapter: DrizzleAdapter(db, {
 		usersTable: users,
 		accountsTable: accounts,
