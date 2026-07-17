@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Data Assistant — Turn messy records into clean data",
-  description: "Paste, snap, or upload — get a structured table and instant insights. Works with text, photos and Excel files.",
+  title: "Calorie Tracker — Log food, track macros, stay on target",
+  description: "Track calories and macros through Telegram or the web. Powered by Gemini AI. Log a meal in seconds.",
 }
 
 export default function RootLayout({
