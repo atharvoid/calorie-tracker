@@ -254,7 +254,7 @@ export function NutritionShell({ userId, user }: Props) {
       {/* Tab content */}
       <div role="tabpanel" className="px-2 md:px-0 mt-4 md:mt-0">
         {activeTab === "today" && (
-          <div className="space-y-4">
+          <div className="space-y-4 animate-tab-fade">
             {billing && (billing.accessState === "expired" || billing.accessState === "blocked") && (
               <PaywallAlert
                 trialUsed={billing.trialAiLogsUsed}
@@ -265,10 +265,18 @@ export function NutritionShell({ userId, user }: Props) {
             <TodayView key={`today-${refreshKey}`} />
           </div>
         )}
-        {activeTab === "history" && <HistoryView key={`history-${refreshKey}`} />}
-        {activeTab === "analytics" && <AnalyticsView key={`analytics-${refreshKey}`} />}
+        {activeTab === "history" && (
+          <div className="animate-tab-fade">
+            <HistoryView key={`history-${refreshKey}`} />
+          </div>
+        )}
+        {activeTab === "analytics" && (
+          <div className="animate-tab-fade">
+            <AnalyticsView key={`analytics-${refreshKey}`} />
+          </div>
+        )}
         {activeTab === "settings" && (
-          <div className="space-y-6">
+          <div className="space-y-6 animate-tab-fade">
             <SettingsView key={`settings-${refreshKey}`} />
           </div>
         )}
