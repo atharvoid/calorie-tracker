@@ -28,7 +28,7 @@ export function HistoryView() {
   const [weekSummaries, setWeekSummaries] = useState<DailyNutritionSummary[]>([])
   const [weekLoading, setWeekLoading] = useState(true)
   const [sort, setSort] = useState<SortOption>("newest")
-  const [filter, setFilter] = useState<FilterOption>("all")
+  const [filter, setFilter] = useState<FilterOption>("logged")
   const [historyData, setHistoryData] = useState<DailyNutritionSummary[]>([])
   const [historyLoading, setHistoryLoading] = useState(true)
 

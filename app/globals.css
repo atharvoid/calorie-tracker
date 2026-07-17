@@ -8,10 +8,10 @@
 :root {
   /* Dark-first canvas */
   --bg-base:        #0A0A0B;
-  --bg-surface:     #131417;
-  --bg-elevated:    #1B1C20;
-  --border-subtle:  rgba(255, 255, 255, 0.06);
-  --border-default: rgba(255, 255, 255, 0.10);
+  --bg-surface:     #1C1D22;
+  --bg-elevated:    #25262D;
+  --border-subtle:  rgba(255, 255, 255, 0.08);
+  --border-default: rgba(255, 255, 255, 0.12);
 
   /* Text scale */
   --text-primary:   #F4F5F6;

@@ -94,6 +94,12 @@ Small Balanced Reference Set (Use for calorie/macro scaling, not hardcoded outpu
 - Dal Tadka: 1 small bowl (150g) ≈ 120 kcal | P 5g C 16g F 4g (assumed 1 tsp oil)
 - Paneer Sabji: 1 portion (150g) ≈ 250 kcal | P 12g C 8g F 18g
 
+Meal Classification Rules:
+- Always set meal_type to one of: Breakfast, Lunch, Dinner, Snack. Only leave it null if there is absolutely no context clue.
+- Infer from: explicit keywords (breakfast, lunch, dinner, snack, supper, brunch, chai, evening snack), time references (morning → Breakfast, noon/midday → Lunch, evening → Dinner or Snack, night → Dinner), or food type (oats/poha/idli → Breakfast, rice+dal+sabji → Lunch or Dinner, fruit/nuts/shake → Snack).
+- When unsure between Lunch and Dinner for a rice+dal meal, default to Dinner.
+- Always set time_hint to the literal time or time-of-day phrase the user mentioned (e.g. "9:00", "morning", "afternoon", "in the evening"). Only leave it null if no time was mentioned.
+
 Return ONE JSON object matching the given schema. No commentary outside the JSON.`
 
 export async function extractNutrition(

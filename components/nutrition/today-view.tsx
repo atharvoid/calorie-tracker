@@ -245,6 +245,24 @@ export function TodayView({ initialDate }: Props) {
             <MacroSummary totals={data.summary.totals} goal={data.summary.goal} />
           </Panel>
 
+          {/* Insights — below macros */}
+          {data.insights.length > 0 && (
+            <Panel>
+              <div className="flex items-center gap-2 mb-3">
+                <Lightbulb className="h-4 w-4 text-accent" />
+                <p className="text-sm font-medium text-primary">Insights</p>
+              </div>
+              <ul className="space-y-2">
+                {data.insights.slice(0, 2).map((insight, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-secondary">
+                    <span className="text-accent mt-0.5">•</span>
+                    <span>{insight}</span>
+                  </li>
+                ))}
+              </ul>
+            </Panel>
+          )}
+
           {/* Meal groups */}
           {data.mealGroups.length > 0 ? (
             <div className="space-y-2">
@@ -269,24 +287,6 @@ export function TodayView({ initialDate }: Props) {
               }
               className="h-[160px]"
             />
-          )}
-
-          {/* Insights */}
-          {data.insights.length > 0 && (
-            <Panel>
-              <div className="flex items-center gap-2 mb-3">
-                <Lightbulb className="h-4 w-4 text-accent" />
-                <p className="text-sm font-medium text-primary">Insights</p>
-              </div>
-              <ul className="space-y-2">
-                {data.insights.slice(0, 2).map((insight, i) => (
-                  <li key={i} className="flex gap-2 text-sm text-secondary">
-                    <span className="text-accent mt-0.5">•</span>
-                    <span>{insight}</span>
-                  </li>
-                ))}
-              </ul>
-            </Panel>
           )}
         </>
       )}

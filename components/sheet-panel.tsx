@@ -4,7 +4,6 @@ import { useCallback, useEffect, useState } from "react"
 import { Loader2, ExternalLink, RefreshCw, FileSpreadsheet } from "lucide-react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { ConnectTelegram } from "./connect-telegram"
 import { Panel } from "./ui/panel"
 import { EmptyState } from "./ui/empty-state"
 import { PRIMARY_BTN, GHOST_BTN } from "@/lib/ui"
@@ -92,7 +91,6 @@ export function SheetPanel() {
 			<div className="flex flex-wrap items-center justify-between gap-4">
 				<p className="text-sm text-secondary font-mono tabular">{preview.rows.length} rows synced</p>
 				<div className="flex flex-wrap items-center gap-3">
-					<ConnectTelegram />
 					<button
 						onClick={() => void load()}
 						className={cn("inline-flex items-center gap-1 text-sm rounded px-1.5 py-0.5", GHOST_BTN)}

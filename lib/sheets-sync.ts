@@ -113,7 +113,7 @@ export async function readMealRows(userId: string, limit = 100) {
 	const sheets = sheetsClient(await getGoogleAuth(userId))
 	const res = await sheets.spreadsheets.values.get({
 		spreadsheetId: conn.spreadsheetId,
-		range: "Meals!A1:K",
+		range: "Meals!A1:L",
 	})
 	const all = res.data.values ?? []
 	const body = all.slice(1)
