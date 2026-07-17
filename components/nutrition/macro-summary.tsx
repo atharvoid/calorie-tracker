@@ -64,10 +64,10 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
             : null
 
           return (
-            <div key={label} className="rounded-xl bg-elevated/30 border border-subtle/30 p-2 sm:p-3 flex flex-col justify-between">
+            <div key={label} className="rounded-xl bg-elevated border border-subtle p-2 sm:p-3 flex flex-col justify-between">
               <div>
                 <p className="text-[11px] font-medium text-muted uppercase tracking-wider">{label}</p>
-                <p className="mt-1 font-mono text-sm sm:text-base font-bold tabular text-primary whitespace-nowrap">
+                <p className="mt-1 font-mono text-sm sm:text-base font-bold tabular text-white whitespace-nowrap">
                   {value.toFixed(1)}
                   <span className="text-[10px] text-muted font-normal ml-0.5">{unit}</span>
                 </p>
@@ -80,7 +80,7 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
               
               {pct !== null && (
                 <div className="mt-2">
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-elevated">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-base">
                     <div
                       className={cn("h-full rounded-full transition-all duration-500", color)}
                       style={{ width: `${pct}%` }}
