@@ -7,7 +7,12 @@ import { BarChart3, Bot, Calendar, Database, ShieldAlert } from "lucide-react"
 
 async function handleSignIn() {
   "use server"
-  await signIn("google", { redirectTo: "/?tab=today" })
+  try {
+    const url = await signIn("google", { redirect: false })
+    console.log("CONSTRUCTED_SIGNIN_URL:", url)
+  } catch (err) {
+    console.error("SIGNIN_ERROR:", err)
+  }
 }
 
 export default async function Home() {
