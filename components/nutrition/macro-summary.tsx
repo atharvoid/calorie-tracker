@@ -80,7 +80,7 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
               
               {pct !== null && (
                 <div className="mt-2">
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-base">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-canvas">
                     <div
                       className={cn("h-full rounded-full transition-all duration-500", color)}
                       style={{ width: `${pct}%` }}

@@ -82,7 +82,7 @@ export function MealComposer({
   return (
     <div className="fixed inset-0 z-50 md:relative md:inset-auto md:z-0 flex flex-col bg-background md:bg-transparent min-h-dvh md:min-h-0 overflow-hidden md:overflow-visible">
       {/* Scrollable Content Container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 md:p-5 pb-28 md:pb-0 bg-base/40 md:bg-surface border border-subtle md:rounded-card shadow-lg md:relative">
+      <div className="flex-1 overflow-y-auto px-4 py-6 md:p-5 pb-28 md:pb-0 bg-canvas/40 md:bg-surface border border-subtle md:rounded-card shadow-lg md:relative">
         <button
           onClick={onCancel}
           className="absolute right-4 top-4 rounded-lg p-1.5 text-muted hover:text-primary hover:bg-elevated transition-colors"

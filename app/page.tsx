@@ -35,7 +35,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="app-backdrop min-h-screen bg-base text-primary">
+    <main className="app-backdrop min-h-screen bg-canvas text-primary">
       <div className="mx-auto max-w-5xl px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
         {/* Top nav bar */}
         <div className="mb-16 flex items-center justify-between">
