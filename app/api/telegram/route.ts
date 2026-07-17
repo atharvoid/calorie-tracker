@@ -19,10 +19,8 @@ export async function POST(req: NextRequest) {
 			await bot.init()
 		}
 
-		// Process the update in the background, DO NOT await to prevent Telegram/Next.js timeouts & duplicate retries
-		void bot.handleUpdate(update).catch((err) => {
-			console.error("[telegram] background update handler error:", err)
-		})
+		// Await the update processing to ensure it completes before Vercel freezes the execution context
+		await bot.handleUpdate(update)
 		
 		// Return 200 OK immediately
 		return NextResponse.json({ ok: true })

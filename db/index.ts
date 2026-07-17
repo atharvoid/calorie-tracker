@@ -7,7 +7,10 @@ declare global {
 }
 
 const connectionString = process.env.DATABASE_URL as string
-const client = globalThis.postgresClient ?? postgres(connectionString, { prepare: false })
+const client = globalThis.postgresClient ?? postgres(connectionString, {
+	prepare: false,
+	max: process.env.NODE_ENV === "production" ? 1 : undefined,
+})
 
 if (process.env.NODE_ENV !== "production") {
 	globalThis.postgresClient = client
