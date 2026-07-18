@@ -1,5 +1,3 @@
-"use client"
-
 export type ExperienceMode = "off" | "preview" | "on"
 
 export function getExperienceMode(): ExperienceMode {
