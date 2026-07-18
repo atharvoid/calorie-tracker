@@ -532,16 +532,16 @@ export function SettingsView() {
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpgrade("monthly")}
-                    className="rounded-btn border border-subtle bg-elevated px-4 py-2.5 text-center text-xs font-bold text-primary hover:bg-surface focus:outline-none transition-colors cursor-pointer"
+                    className="rounded-btn border border-subtle bg-surface px-4 py-2.5 text-center text-xs font-bold text-primary hover:bg-elevated hover:border-default focus:outline-none transition-all cursor-pointer shadow-sm"
                   >
-                    Monthly — $2.99/mo
+                    Personal Monthly — $2.99/mo
                   </button>
                   <button
                     disabled={actionLoading}
                     onClick={() => handleUpgrade("annual")}
-                    className="rounded-btn bg-accent text-[color:var(--accent-contrast)] px-4 py-2.5 text-center text-xs font-bold hover:bg-accent-hover focus:outline-none transition-all cursor-pointer"
+                    className="rounded-btn bg-accent text-[color:var(--accent-contrast)] px-4 py-2.5 text-center text-xs font-bold hover:bg-accent-hover focus:outline-none transition-all cursor-pointer shadow-sm"
                   >
-                    Annual — $24.99/yr
+                    Personal Annual — $24.99/yr
                   </button>
                 </div>
                 <p className="text-[10px] text-muted text-center leading-relaxed">

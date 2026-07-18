@@ -2,22 +2,36 @@ import { AuthButton } from "@/components/auth-button"
 import { auth, signIn } from "@/auth"
 import Link from "next/link"
 import { DemoApp } from "@/components/demo-app"
-import { PRIMARY_BTN, SECONDARY_BTN } from "@/lib/ui"
+import { PRIMARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
-import { BarChart3, Bot, Calendar, Database, ShieldAlert } from "lucide-react"
+import { ShieldAlert } from "lucide-react"
+import { HeroDemo } from "@/components/landing/hero-demo"
+import { getActiveExperience } from "@/lib/experience-mode"
 
 async function handleSignIn() {
   "use server"
   await signIn("google", { redirectTo: "/?tab=today" })
 }
 
-export default async function Home() {
+export default async function Home(props: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const resolvedParams = props.searchParams ? await props.searchParams : undefined
+  const searchUrlParams = new URLSearchParams()
+  if (resolvedParams) {
+    for (const [key, value] of Object.entries(resolvedParams)) {
+      if (typeof value === "string") searchUrlParams.set(key, value)
+    }
+  }
+
   const session = await auth()
   const signedIn = !!session?.user
+  const experience = getActiveExperience(searchUrlParams)
+  const isImprint = experience === "imprint"
 
   if (signedIn) {
     return (
-      <main className="app-backdrop">
+      <main className={cn("app-backdrop", isImprint && "theme-imprint")}>
         <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 md:pt-10 sm:px-6 sm:pt-14">
           {/* Top nav bar - hidden on mobile, shown on desktop/tablet */}
           <div className="mb-6 md:mb-10 hidden md:flex items-center justify-between">
@@ -36,7 +50,7 @@ export default async function Home() {
   }
 
   return (
-    <main className="app-backdrop min-h-screen bg-canvas text-primary">
+    <main className={cn("app-backdrop min-h-screen bg-canvas text-primary", isImprint && "theme-imprint")}>
       <div className="mx-auto max-w-5xl px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
         {/* Top nav bar */}
         <div className="mb-16 flex items-center justify-between">
@@ -49,86 +63,83 @@ export default async function Home() {
         </div>
 
         {/* Hero Section */}
-        <section className="mb-20 text-center">
-          <div className="mb-4 inline-flex items-center rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
-            Simple meal tracking
-          </div>
-          <h1 className="mb-6 text-4xl font-semibold tracking-tight text-primary sm:text-6xl max-w-3xl mx-auto leading-tight">
-            Track what you eat without searching a food database.
-          </h1>
-          <p className="mb-8 text-base text-secondary sm:text-lg max-w-2xl mx-auto">
-            Describe your meal in your own words. Review the estimated calories and macros, then save it to your daily log.
-          </p>
+        <section className="mb-20 flex flex-col md:flex-row gap-12 items-center justify-between">
+          <div className="flex-1 text-left space-y-6">
+            <div className="inline-flex items-center rounded-full bg-accent/10 px-3 py-1 text-xs font-medium text-accent">
+              Your food, rendered as a day.
+            </div>
+            <h1 className="text-4xl font-semibold tracking-tight text-primary sm:text-6xl leading-tight">
+              Track naturally. Visualise daily.
+            </h1>
+            <p className="text-base text-secondary sm:text-lg leading-relaxed">
+              Describe what you ate in your own words. Confirm the estimation, and build a beautiful, personal archive of your daily eating patterns.
+            </p>
 
-          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <form action={handleSignIn}>
-              <button
-                type="submit"
-                className={cn("rounded-btn px-6 py-3 text-base font-medium shadow-sm transition-all cursor-pointer", PRIMARY_BTN)}
-              >
-                Start free for 7 days
-              </button>
-            </form>
-            <a
-              href="#features"
-              className={cn("rounded-btn px-6 py-3 text-base font-medium transition-all text-center", SECONDARY_BTN)}
-            >
-              See how it works
-            </a>
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <form action={handleSignIn}>
+                <button
+                  type="submit"
+                  className={cn("w-full sm:w-auto rounded-btn px-6 py-3 text-sm font-bold shadow-sm transition-all cursor-pointer text-center", PRIMARY_BTN)}
+                >
+                  Start free for 7 days
+                </button>
+              </form>
+            </div>
           </div>
 
-          <p className="mt-4 text-xs text-muted">
-            No card required. Cancel anytime after upgrading.
-          </p>
+          <div className="flex-1 w-full max-w-md">
+            <HeroDemo />
+          </div>
         </section>
 
-        {/* Features Grid */}
-        <section id="features" className="mb-24 scroll-mt-20">
-          <div className="grid gap-6 sm:grid-cols-2">
-            {/* Telegram feature */}
-            <div className="rounded-card border border-subtle bg-surface p-6 flex flex-col gap-3">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                <Bot className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-primary">Log meals from Telegram</h3>
+        {/* Narrative Sections */}
+        <section id="features" className="mb-24 scroll-mt-20 space-y-20 border-t border-subtle/40 pt-16">
+          <div className="max-w-2xl mx-auto space-y-16">
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-accent font-mono uppercase tracking-wider">01 · Input</span>
+              <h2 className="text-xl font-bold text-primary">Say it naturally.</h2>
               <p className="text-sm text-secondary leading-relaxed">
-                Send a message with what you ate. The bot returns an estimate for you to review before anything is saved.
-              </p>
-              <p className="text-xs text-muted italic mt-auto">
-                Write naturally in English or Hinglish. Food names from different cuisines can stay in their original form.
+                No complex database searches or rigid food lookups. Describe mixed meals, home cooking, or restaurant dishes in plain English or Hinglish.
               </p>
             </div>
 
-            {/* Dashboard feature */}
-            <div className="rounded-card border border-subtle bg-surface p-6 flex flex-col gap-3">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                <BarChart3 className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-primary">See the whole day clearly</h3>
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-accent font-mono uppercase tracking-wider">02 · Resolution</span>
+              <h2 className="text-xl font-bold text-primary">See what was understood.</h2>
               <p className="text-sm text-secondary leading-relaxed">
-                Follow calories, protein, carbs, and fat across meals. Compare your intake with your daily target and maintenance estimate.
+                Your descriptions resolve instantly into clean, structured food items with estimated calories and macros. Edit and customize quantities or notes at any time.
               </p>
             </div>
 
-            {/* History feature */}
-            <div className="rounded-card border border-subtle bg-surface p-6 flex flex-col gap-3">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                <Calendar className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-primary">Understand your routine over time</h3>
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-accent font-mono uppercase tracking-wider">03 · Representation</span>
+              <h2 className="text-xl font-bold text-primary">Watch the day take shape.</h2>
               <p className="text-sm text-secondary leading-relaxed">
-                Review any day, browse complete weeks, and see trends without turning missing days into fake zero-calorie entries.
+                Every confirmed day creates a unique visual imprint. Calorie counts scale the shapes, protein levels nested contours, and fat share the color opacity.
               </p>
             </div>
 
-            {/* Google Sheets feature */}
-            <div className="rounded-card border border-subtle bg-surface p-6 flex flex-col gap-3">
-              <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 text-accent">
-                <Database className="h-5 w-5" />
-              </div>
-              <h3 className="text-lg font-semibold text-primary">Keep a copy in Google Sheets</h3>
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-accent font-mono uppercase tracking-wider">04 · Archive</span>
+              <h2 className="text-xl font-bold text-primary">Return to an archive of days.</h2>
               <p className="text-sm text-secondary leading-relaxed">
-                Your meal history can be mirrored to a spreadsheet you control. The dashboard continues to use the faster, structured product database.
+                Navigate back in time to review past imprints, add entries, or edit historical logs. Missing days remain unlogged, preventing false zero statistics.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-accent font-mono uppercase tracking-wider">05 · Observations</span>
+              <h2 className="text-xl font-bold text-primary">Notice patterns.</h2>
+              <p className="text-sm text-secondary leading-relaxed">
+                See macro balances, rhythmic logging trends, and recurring items over weeks or months, structured into clean, deterministic summaries.
+              </p>
+            </div>
+
+            <div className="space-y-3">
+              <span className="text-[10px] font-bold text-accent font-mono uppercase tracking-wider">06 · Mobile Companion</span>
+              <h2 className="text-xl font-bold text-primary">Log on the go with Telegram.</h2>
+              <p className="text-sm text-secondary leading-relaxed">
+                Connect your account to the companion bot. Log your meals by sending a quick message on the run, and watch it sync to your dashboard instantly.
               </p>
             </div>
           </div>

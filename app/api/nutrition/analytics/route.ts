@@ -94,9 +94,43 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 
   const weeklyAvg = computeWeeklyAverage(summaries)
 
-  // KPI summary
+  // KPI summary — range-aware: averages over days that have both intake and a configured target
   const loggedSummaries = summaries.filter((s) => s.totals !== null)
-  const avgTarget = settings?.targetKcal ?? null
+
+  // Days where a target was actually configured (not unconfigured / no-data)
+  const targetEligibleSummaries = loggedSummaries.filter(
+    (s) => s.goal.targetKcal !== null
+  )
+
+  const sumIntake = loggedSummaries.reduce((acc, s) => acc + (s.totals?.kcal ?? 0), 0)
+  const averageIntakeKcal =
+    loggedSummaries.length > 0 ? Math.round(sumIntake / loggedSummaries.length) : null
+
+  const sumTarget = targetEligibleSummaries.reduce((acc, s) => acc + (s.goal.targetKcal ?? 0), 0)
+  const averageTargetKcal =
+    targetEligibleSummaries.length > 0
+      ? Math.round(sumTarget / targetEligibleSummaries.length)
+      : null
+
+  // Delta averaged only over days where both intake and target are available
+  const targetEligibleIntakeSummaries = targetEligibleSummaries.filter((s) => s.totals !== null)
+  const sumDelta = targetEligibleIntakeSummaries.reduce(
+    (acc, s) => acc + ((s.totals?.kcal ?? 0) - (s.goal.targetKcal ?? 0)),
+    0
+  )
+  const averageTargetDeltaKcal =
+    targetEligibleIntakeSummaries.length > 0
+      ? Math.round(sumDelta / targetEligibleIntakeSummaries.length)
+      : null
+
+  // Tolerance: averaged over days with an explicit toleranceKcal value
+  const toleranceSummaries = targetEligibleSummaries.filter((s) => s.goal.toleranceKcal !== null)
+  const sumTolerance = toleranceSummaries.reduce((acc, s) => acc + (s.goal.toleranceKcal ?? 0), 0)
+  const averageToleranceKcal =
+    toleranceSummaries.length > 0
+      ? Math.round(sumTolerance / toleranceSummaries.length)
+      : null
+
   const adherentDays = loggedSummaries.filter((s) => s.status === "within").length
   const overDays = loggedSummaries.filter((s) => s.status === "over").length
   const underDays = loggedSummaries.filter((s) => s.status === "under").length
@@ -115,8 +149,9 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       : null
 
   const kpi = {
+    // Legacy fields (retained for backwards-compat with existing chart/kpi components)
     avgKcal: weeklyAvg.avgKcal,
-    avgTarget,
+    avgTarget: averageTargetKcal,
     loggedDays: weeklyAvg.loggedDays,
     rangeDays: weeklyAvg.rangeDays,
     coverageLabel: `${weeklyAvg.loggedDays} of ${weeklyAvg.rangeDays} days logged`,
@@ -125,6 +160,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
     overDays,
     underDays,
     avgProteinG: avgProtein,
+    // Range-aware fields for Patterns observation text
+    averageIntakeKcal,
+    averageTargetKcal,
+    averageTargetDeltaKcal,
+    averageToleranceKcal,
+    targetEligibleDays: targetEligibleSummaries.length,
   }
 
   // Trend points for chart
