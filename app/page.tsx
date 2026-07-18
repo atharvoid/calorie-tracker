@@ -214,6 +214,15 @@ export default async function Home(props: {
           <div>
             &copy; {new Date().getFullYear()} CalorieTracker. All rights reserved.
           </div>
+          <div className="flex justify-center gap-4 text-[11px] text-muted">
+            <Link href="/privacy" className="hover:text-secondary transition-colors hover:underline">
+              Privacy Policy
+            </Link>
+            <span>·</span>
+            <Link href="/terms" className="hover:text-secondary transition-colors hover:underline">
+              Terms of Service
+            </Link>
+          </div>
         </footer>
       </div>
     </main>
