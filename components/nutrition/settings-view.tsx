@@ -47,7 +47,11 @@ function parseNum(v: string | number | null | undefined): number | null {
   return Number.isFinite(n) ? n : null
 }
 
-export function SettingsView() {
+type Props = {
+  refreshKey?: number
+}
+
+export function SettingsView({ refreshKey }: Props) {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [exporting, setExporting] = useState(false)
@@ -166,8 +170,8 @@ export function SettingsView() {
     }
   }
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const load = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true)
     try {
       const res = await fetch("/api/nutrition/settings")
       if (!res.ok) return
@@ -189,6 +193,14 @@ export function SettingsView() {
   useEffect(() => {
     void load()
   }, [load])
+
+  useEffect(() => {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      void load(true)
+      void loadBilling()
+      void loadSheet()
+    }
+  }, [refreshKey, load, loadBilling, loadSheet])
 
   async function handleSave() {
     const maintenance = parseNum(form.maintenanceKcal)

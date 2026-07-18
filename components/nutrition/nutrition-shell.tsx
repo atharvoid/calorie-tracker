@@ -49,14 +49,37 @@ export function NutritionShell({ userId, user }: Props) {
   const searchParams = useSearchParams()
   const router = useRouter()
 
-  const tabParam = searchParams.get("tab") as Tab | null
-  const activeTab: Tab = TABS.some((t) => t.id === tabParam) ? (tabParam as Tab) : "today"
+  const [activeTab, setActiveTab] = useState<Tab>(() => {
+    if (typeof window !== "undefined") {
+      const tab = new URLSearchParams(window.location.search).get("tab") as Tab | null
+      if (tab && TABS.some((t) => t.id === tab)) return tab
+    }
+    const tabParam = searchParams.get("tab") as Tab | null
+    return TABS.some((t) => t.id === tabParam) ? (tabParam as Tab) : "today"
+  })
+
+  // Sync back/forward button clicks
+  useEffect(() => {
+    const handlePopState = () => {
+      const tab = new URLSearchParams(window.location.search).get("tab") as Tab | null
+      if (tab && TABS.some((t) => t.id === tab)) {
+        setActiveTab(tab)
+      } else {
+        setActiveTab("today")
+      }
+    }
+    window.addEventListener("popstate", handlePopState)
+    return () => window.removeEventListener("popstate", handlePopState)
+  }, [])
 
   const handleTabChange = useCallback((id: Tab) => {
-    const params = new URLSearchParams(searchParams.toString())
-    params.set("tab", id)
-    router.replace(`?${params.toString()}`, { scroll: false })
-  }, [searchParams, router])
+    setActiveTab(id)
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search)
+      params.set("tab", id)
+      window.history.replaceState(null, "", `?${params.toString()}`)
+    }
+  }, [])
 
   const [refreshKey, setRefreshKey] = useState(0)
   const [billing, setBilling] = useState<EntitlementStatus | null>(null)
@@ -271,34 +294,29 @@ export function NutritionShell({ userId, user }: Props) {
       </nav>
 
       {/* Tab content */}
-      <div role="tabpanel" key={activeTab} className="px-2 md:px-0 mt-4 md:mt-0 animate-tab-enter">
-        {activeTab === "today" && (
-          <div className="space-y-4">
-            {billing && (billing.accessState === "expired" || billing.accessState === "blocked") && (
-              <PaywallAlert
-                trialUsed={billing.trialAiLogsUsed}
-                trialLimit={billing.trialAiLogLimit}
-                isLimitReached={billing.trialAiLogsUsed >= billing.trialAiLogLimit}
-              />
-            )}
-            <TodayView key={`today-${refreshKey}`} />
-          </div>
-        )}
-        {activeTab === "history" && (
-          <div>
-            <HistoryView key={`history-${refreshKey}`} />
-          </div>
-        )}
-        {activeTab === "analytics" && (
-          <div>
-            <AnalyticsView key={`analytics-${refreshKey}`} />
-          </div>
-        )}
-        {activeTab === "settings" && (
-          <div className="space-y-6">
-            <SettingsView key={`settings-${refreshKey}`} />
-          </div>
-        )}
+      <div role="tabpanel" className="px-2 md:px-0 mt-4 md:mt-0">
+        <div className={cn(activeTab === "today" ? "animate-tab-enter space-y-4" : "hidden")}>
+          {billing && (billing.accessState === "expired" || billing.accessState === "blocked") && (
+            <PaywallAlert
+              trialUsed={billing.trialAiLogsUsed}
+              trialLimit={billing.trialAiLogLimit}
+              isLimitReached={billing.trialAiLogsUsed >= billing.trialAiLogLimit}
+            />
+          )}
+          <TodayView refreshKey={refreshKey} />
+        </div>
+
+        <div className={cn(activeTab === "history" ? "animate-tab-enter" : "hidden")}>
+          <HistoryView refreshKey={refreshKey} />
+        </div>
+
+        <div className={cn(activeTab === "analytics" ? "animate-tab-enter" : "hidden")}>
+          <AnalyticsView refreshKey={refreshKey} />
+        </div>
+
+        <div className={cn(activeTab === "settings" ? "animate-tab-enter space-y-6" : "hidden")}>
+          <SettingsView refreshKey={refreshKey} />
+        </div>
       </div>
 
       {/* Mobile-only Bottom Navigation Bar */}

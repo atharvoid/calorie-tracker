@@ -65,7 +65,11 @@ const RANGE_OPTIONS: { value: RangeOption; label: string }[] = [
   { value: "3m", label: "3M" },
 ]
 
-export function AnalyticsView() {
+type Props = {
+  refreshKey?: number
+}
+
+export function AnalyticsView({ refreshKey }: Props) {
   const searchParams = useSearchParams()
   const experience = getActiveExperience(searchParams)
   const isImprint = experience === "imprint"
@@ -75,8 +79,8 @@ export function AnalyticsView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async (r: RangeOption) => {
-    setLoading(true)
+  const load = useCallback(async (r: RangeOption, silent = false) => {
+    if (!silent) setLoading(true)
     setError(null)
     try {
       const res = await fetch(`/api/nutrition/analytics?range=${r}`)
@@ -96,6 +100,12 @@ export function AnalyticsView() {
   useEffect(() => {
     void load(range)
   }, [range, load])
+
+  useEffect(() => {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      void load(range, true)
+    }
+  }, [refreshKey, range, load])
 
   return (
     <div className="space-y-6">

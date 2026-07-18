@@ -21,7 +21,11 @@ type FilterOption = "all" | "logged" | "under" | "within" | "over"
 
 type ApiResponse = { summaries: DailyNutritionSummary[]; total: number }
 
-export function HistoryView() {
+type Props = {
+  refreshKey?: number
+}
+
+export function HistoryView({ refreshKey }: Props) {
   const today = localDate(TZ)
   const [weekMonday, setWeekMonday] = useState(() => mondayOfWeek(today))
   const [selectedDate, setSelectedDate] = useState<string | null>(today)
@@ -33,9 +37,9 @@ export function HistoryView() {
   const [historyLoading, setHistoryLoading] = useState(true)
 
   // Load current week summaries
-  const loadWeek = useCallback(async (monday: string) => {
+  const loadWeek = useCallback(async (monday: string, silent = false) => {
     const sunday = sundayOfWeek(monday)
-    setWeekLoading(true)
+    if (!silent) setWeekLoading(true)
     try {
       const res = await fetch(
         `/api/nutrition/history?start=${monday}&end=${sunday}&sort=oldest&status=all`
@@ -49,18 +53,19 @@ export function HistoryView() {
   }, [])
 
   useEffect(() => {
-    void loadWeek(weekMonday)
-  }, [weekMonday, loadWeek])
+    const isSilent = refreshKey !== undefined && refreshKey > 0
+    void loadWeek(weekMonday, isSilent)
+  }, [weekMonday, loadWeek, refreshKey])
 
   // Load last 4 weeks history for table
-  const loadHistory = useCallback(async (s: SortOption, f: FilterOption) => {
+  const loadHistory = useCallback(async (s: SortOption, f: FilterOption, silent = false) => {
     const end = today
     // Go back 28 days
     const start = new Date()
     start.setDate(start.getDate() - 28)
     const startStr = start.toLocaleDateString("en-CA", { timeZone: TZ })
 
-    setHistoryLoading(true)
+    if (!silent) setHistoryLoading(true)
     try {
       const res = await fetch(
         `/api/nutrition/history?start=${startStr}&end=${end}&sort=${s}&status=${f}`
@@ -74,8 +79,9 @@ export function HistoryView() {
   }, [today])
 
   useEffect(() => {
-    void loadHistory(sort, filter)
-  }, [sort, filter, loadHistory])
+    const isSilent = refreshKey !== undefined && refreshKey > 0
+    void loadHistory(sort, filter, isSilent)
+  }, [sort, filter, loadHistory, refreshKey])
 
   function handleWeekChange(monday: string) {
     setWeekMonday(monday)
@@ -101,9 +107,15 @@ export function HistoryView() {
     <div className="space-y-6">
       {/* Week navigator */}
       <Panel>
-        {weekLoading ? (
-          <div className="flex h-24 items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-accent" />
+        {weekLoading && weekSummaries.length === 0 ? (
+          <div className="flex h-24 items-center justify-around animate-pulse">
+            {[...Array(7)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center gap-1.5">
+                <div className="h-2 w-4 bg-elevated/40 rounded" />
+                <div className="h-10 w-12 bg-elevated/40 rounded-lg" />
+                <div className="h-2 w-3 bg-elevated/40 rounded" />
+              </div>
+            ))}
           </div>
         ) : (
           <WeekNavigator
@@ -119,16 +131,20 @@ export function HistoryView() {
       {/* Selected day detail */}
       {selectedDate && (
         <div>
-          <TodayView key={selectedDate} initialDate={selectedDate} />
+          <TodayView key={selectedDate} initialDate={selectedDate} refreshKey={refreshKey} />
         </div>
       )}
 
       {/* History table */}
       <div>
         <p className="mb-3 text-sm font-medium text-primary">Last 28 days</p>
-        {historyLoading ? (
-          <div className="flex h-24 items-center justify-center">
-            <Loader2 className="h-5 w-5 animate-spin text-accent" />
+        {historyLoading && historyData.length === 0 ? (
+          <div className="space-y-2.5 animate-pulse">
+            <div className="h-10 bg-elevated/40 rounded-lg" />
+            <div className="h-12 bg-elevated/40 rounded-lg" />
+            <div className="h-12 bg-elevated/40 rounded-lg" />
+            <div className="h-12 bg-elevated/40 rounded-lg" />
+            <div className="h-12 bg-elevated/40 rounded-lg" />
           </div>
         ) : (
           <HistoryTable

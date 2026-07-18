@@ -31,9 +31,10 @@ type DayData = {
 
 type Props = {
   initialDate?: string
+  refreshKey?: number
 }
 
-export function TodayView({ initialDate }: Props) {
+export function TodayView({ initialDate, refreshKey }: Props) {
   const searchParams = useSearchParams()
   const experience = getActiveExperience(searchParams)
   const isImprint = experience === "imprint"
@@ -46,8 +47,11 @@ export function TodayView({ initialDate }: Props) {
   const [showComposer, setShowComposer] = useState(false)
   const dateInputRef = useRef<HTMLInputElement>(null)
 
-  const load = useCallback(async (d: string) => {
-    setLoading(true)
+  const load = useCallback(async (d: string, silent = false) => {
+    if (!silent) {
+      setData(null)
+      setLoading(true)
+    }
     setError(null)
     try {
       const res = await fetch(`/api/nutrition/day?date=${d}`)
@@ -67,6 +71,12 @@ export function TodayView({ initialDate }: Props) {
   useEffect(() => {
     void load(date)
   }, [date, load])
+
+  useEffect(() => {
+    if (refreshKey !== undefined && refreshKey > 0) {
+      void load(date, true)
+    }
+  }, [refreshKey, date, load])
 
   // Listen to mobile header event to open meal composer
   useEffect(() => {
@@ -222,10 +232,19 @@ export function TodayView({ initialDate }: Props) {
       )}
 
       {/* Loading state */}
-      {loading && (
-        <Panel className="flex h-[280px] items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-accent" />
-        </Panel>
+      {loading && !data && (
+        <div className="space-y-4 animate-pulse">
+          {isImprint && (
+            <div className="h-[220px] bg-elevated/40 rounded-xl" />
+          )}
+          <div className="h-[76px] bg-elevated/40 rounded-xl" />
+          <div className="h-[96px] bg-elevated/40 rounded-xl" />
+          <div className="space-y-2">
+            <div className="h-3 w-16 bg-elevated/40 rounded" />
+            <div className="h-[56px] bg-elevated/40 rounded-xl" />
+            <div className="h-[56px] bg-elevated/40 rounded-xl" />
+          </div>
+        </div>
       )}
 
       {/* Error state */}
