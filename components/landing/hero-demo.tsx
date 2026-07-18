@@ -119,11 +119,11 @@ export function HeroDemo() {
 
         {step === "extracted" && (
           <div className="space-y-4">
-            <div className="border border-dashed border-accent/30 rounded-lg p-3 bg-accent/5">
-              <span className="inline-block border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold text-accent font-mono uppercase rounded-sm mb-2">
+            <div className="border border-dashed border-accent/40 rounded-lg p-3.5 bg-surface text-primary shadow-sm">
+              <span className="inline-block border border-accent/30 bg-accent/10 px-2 py-0.5 text-[9px] font-bold text-accent font-mono uppercase tracking-wider rounded-md mb-2">
                 Draft Imprint forming
               </span>
-              <p className="text-xs text-primary leading-relaxed font-sans font-medium mb-3">&ldquo;{SAMPLE_LOG}&rdquo;</p>
+              <p className="text-xs font-sans font-semibold text-primary leading-relaxed mb-3">&ldquo;{SAMPLE_LOG}&rdquo;</p>
               
               {/* Draft Foods List */}
               <div className="space-y-2 border-t border-subtle/40 pt-2 text-xs">

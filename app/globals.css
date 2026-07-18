@@ -151,10 +151,6 @@
   --spacing-safe-bottom: env(safe-area-inset-bottom);
   --spacing-safe-top: env(safe-area-inset-top);
 
-  /* ── Force text-primary / text-secondary / text-muted to our text scale ── */
-  --color-primary:      #F4F5F6;
-  --color-secondary:    #A1A1AA;
-  --color-muted:        #6B6C72;
 }
 
 /* Base resets */
