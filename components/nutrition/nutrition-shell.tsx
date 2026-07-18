@@ -12,6 +12,7 @@ import { SettingsView } from "./settings-view"
 import { PaywallAlert } from "./paywall-alert"
 import Link from "next/link"
 import { signOutAction } from "@/components/auth-actions"
+import { getActiveExperience } from "@/lib/experience-mode"
 
 type Tab = "today" | "history" | "analytics" | "settings"
 
@@ -122,10 +123,36 @@ export function NutritionShell({ userId, user }: Props) {
     };
   }, []);
 
-  const tabTitle = TABS.find((t) => t.id === activeTab)?.label ?? "Calorie Tracker"
+  const experience = getActiveExperience(searchParams)
+  const isImprint = experience === "imprint"
+
+  // Apply warm-paper theme to document.documentElement so Radix portals, toasts,
+  // date pickers and billing modals inherit the correct tokens.
+  // Ownership-safe: saves and restores the previous attribute value on cleanup.
+  useEffect(() => {
+    const previous = document.documentElement.dataset.experience
+
+    if (isImprint) {
+      document.documentElement.dataset.experience = "imprint"
+    } else {
+      delete document.documentElement.dataset.experience
+    }
+
+    return () => {
+      if (previous !== undefined) {
+        document.documentElement.dataset.experience = previous
+      } else {
+        delete document.documentElement.dataset.experience
+      }
+    }
+  }, [isImprint])
+
+
+  const rawTabTitle = TABS.find((t) => t.id === activeTab)?.label ?? "Calorie Tracker"
+  const tabTitle = isImprint && activeTab === "analytics" ? "Patterns" : rawTabTitle
 
   return (
-    <div className="w-full pb-mobile-nav md:pb-0">
+    <div className={cn("w-full pb-mobile-nav md:pb-0", isImprint && "theme-imprint")}>
       <RealtimeListener userId={userId} onNutritionChanged={handleNutritionChanged} />
 
       {/* Mobile-only Header */}
@@ -231,24 +258,27 @@ export function NutritionShell({ userId, user }: Props) {
 
       {/* Desktop navigation only */}
       <nav className="mb-6 hidden md:flex overflow-x-auto rounded-xl border border-subtle bg-surface p-1">
-        {TABS.map(({ id, label, Icon }) => (
-          <button
-            key={id}
-            onClick={() => setActiveTab(id)}
-            className={cn(
-              "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
-              activeTab === id
-                ? "bg-elevated text-primary shadow-sm"
-                : "text-muted hover:text-secondary"
-            )}
-            aria-selected={activeTab === id}
-            role="tab"
-          >
-            <Icon className="h-4 w-4 shrink-0" />
-            <span className="hidden sm:inline">{label}</span>
-            <span className="sm:hidden text-xs">{label}</span>
-          </button>
-        ))}
+        {TABS.map(({ id, label, Icon }) => {
+          const displayLabel = isImprint && id === "analytics" ? "Patterns" : label
+          return (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className={cn(
+                "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
+                activeTab === id
+                  ? "bg-elevated text-primary shadow-sm"
+                  : "text-muted hover:text-secondary"
+              )}
+              aria-selected={activeTab === id}
+              role="tab"
+            >
+              <Icon className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">{displayLabel}</span>
+              <span className="sm:hidden text-xs">{displayLabel}</span>
+            </button>
+          )
+        })}
       </nav>
 
       {/* Tab content */}
@@ -287,6 +317,7 @@ export function NutritionShell({ userId, user }: Props) {
         <div className="flex h-14 items-center justify-around">
           {TABS.map(({ id, label, Icon }) => {
             const active = activeTab === id
+            const displayLabel = isImprint && id === "analytics" ? "Patterns" : label
             return (
               <button
                 key={id}
@@ -304,7 +335,7 @@ export function NutritionShell({ userId, user }: Props) {
                 )}>
                   <Icon className="h-5 w-5" />
                 </div>
-                <span className="text-[10px] tracking-wide mt-0.5">{label}</span>
+                <span className="text-[10px] tracking-wide mt-0.5">{displayLabel}</span>
               </button>
             )
           })}

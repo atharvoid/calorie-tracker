@@ -19,6 +19,14 @@ const STATUS_COLOR: Record<string, string> = {
   over: "text-danger",
 }
 
+const STATUS_DOT: Record<string, string> = {
+  "no-data": "bg-elevated",
+  unconfigured: "bg-muted",
+  under: "bg-partial",
+  within: "bg-paid",
+  over: "bg-danger",
+}
+
 type SortOption = "newest" | "oldest" | "kcal-high" | "kcal-low"
 type FilterOption = "all" | "logged" | "under" | "within" | "over"
 
@@ -115,7 +123,13 @@ export function HistoryTable({
                   {s.goal.targetKcal !== null ? s.goal.targetKcal.toLocaleString("en-IN") : "—"}
                 </td>
                 <td className={cn("px-3 py-2 text-xs font-medium", STATUS_COLOR[s.status] ?? "text-muted")}>
-                  {STATUS_LABEL[s.status] ?? s.status}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={cn("h-1.5 w-1.5 rounded-full shrink-0", STATUS_DOT[s.status] ?? "bg-elevated")}
+                      aria-hidden
+                    />
+                    <span>{STATUS_LABEL[s.status] ?? s.status}</span>
+                  </div>
                 </td>
                 <td className="px-3 py-2 font-mono tabular text-secondary">
                   {s.totals !== null ? `${s.totals.proteinG.toFixed(1)}g` : "—"}
@@ -135,7 +149,7 @@ export function HistoryTable({
         </table>
       </div>
 
-      {/* Mobile cards */}
+      {/* Mobile cards — no SVG, status badge only */}
       <div className="sm:hidden space-y-2.5">
         {summaries.map((s) => (
           <div
@@ -155,7 +169,7 @@ export function HistoryTable({
                   {STATUS_LABEL[s.status] ?? s.status}
                 </span>
               </div>
-              
+
               <div className="text-right">
                 <p className="font-mono text-base font-extrabold tabular text-primary leading-none">
                   {s.totals !== null ? `${s.totals.kcal.toLocaleString("en-IN")}` : "—"}{" "}
@@ -176,13 +190,13 @@ export function HistoryTable({
                   <span>C: <strong className="text-secondary">{s.totals.carbsG.toFixed(0)}g</strong></span>
                   <span>F: <strong className="text-secondary">{s.totals.fatG.toFixed(0)}g</strong></span>
                 </div>
-                
+
                 <span className="text-[9px] text-muted bg-elevated/80 px-2 py-0.5 rounded font-bold uppercase tracking-wider">
                   {s.mealCount} {s.mealCount === 1 ? "meal" : "meals"}
                 </span>
               </div>
             )}
-            
+
             {s.totals === null && (
               <div className="border-t border-subtle/50 pt-2 text-[10px] text-muted italic">
                 No meals logged for this date. Tap to log.

@@ -55,6 +55,56 @@
   --radius:              0.625rem;
 }
 
+.theme-imprint,
+[data-experience="imprint"] {
+  --bg-base:        #F3EFE6;
+  --bg-surface:     #FAF7F0;
+  --bg-elevated:    #EAE5D9;
+  --border-subtle:  #CBC4B7;
+  --border-default: #BDB4A3;
+
+  --text-primary:   #171713;
+  --text-secondary: #6E6A61;
+  --text-muted:     #8C877E;
+
+  --accent:          #E5673F;
+  --accent-hover:    #CE532D;
+  --accent-contrast: #F3EFE6;
+
+  --paid:    #69765B;
+  --pending: #E5673F;
+  --partial: #555A8C;
+  --danger:  #A23E36;
+
+  /* ── Meal identity tokens — separate from semantic status tokens ── */
+  /* Dinner uses warm terracotta, distinct from --danger (error/failure red). */
+  /* Meal categories must remain identifiable through labels, not color alone. */
+  --meal-breakfast: #69765B;  /* Moss Green  — same as --paid */
+  --meal-lunch:     #555A8C;  /* Indigo Blue — same as --partial */
+  --meal-dinner:    #9B6252;  /* Warm Terracotta — NOT aliased to --danger */
+  --meal-snack:     #E5673F;  /* Accent Orange   — same as --accent */
+  --meal-other:     #6E6A61;  /* Ink Muted */
+
+  --background:          var(--bg-base);
+  --foreground:          var(--text-primary);
+  --card:                var(--bg-surface);
+  --card-foreground:     var(--text-primary);
+  --popover:             var(--bg-elevated);
+  --popover-foreground:  var(--text-primary);
+  --primary:             var(--accent);
+  --primary-foreground:  var(--accent-contrast);
+  --secondary:           var(--bg-elevated);
+  --secondary-foreground: var(--text-primary);
+  --muted:               var(--bg-elevated);
+  --muted-foreground:    var(--text-muted);
+  --accent-base:         var(--bg-elevated);
+  --accent-foreground:   var(--text-primary);
+  --destructive:         var(--danger);
+  --border:              var(--border-default);
+  --input:               var(--bg-elevated);
+  --ring:                var(--accent);
+}
+
 @theme {
   /* Shadcn standard slot mappings */
   --color-background:        var(--background);
@@ -119,6 +169,10 @@ html, body {
     radial-gradient(60% 40% at 50% 0%, rgba(16, 185, 129, 0.10), transparent 60%),
     var(--bg-base);
   min-height: 100dvh;
+}
+
+.theme-imprint .app-backdrop {
+  background: var(--bg-base);
 }
 
 /* Tabular numbers */

@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState, useRef } from "react"
+import { useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -8,6 +9,8 @@ import { CalorieProgress } from "./calorie-progress"
 import { MacroSummary } from "./macro-summary"
 import { MealGroup } from "./meal-group"
 import { MealComposer } from "./meal-composer"
+import { DayImprint } from "../imprint/day-imprint"
+import { getActiveExperience } from "@/lib/experience-mode"
 import { toast } from "sonner"
 import {
   localDate,
@@ -31,6 +34,10 @@ type Props = {
 }
 
 export function TodayView({ initialDate }: Props) {
+  const searchParams = useSearchParams()
+  const experience = getActiveExperience(searchParams)
+  const isImprint = experience === "imprint"
+
   const today = localDate(TZ)
   const [date, setDate] = useState(initialDate ?? today)
   const [data, setData] = useState<DayData | null>(null)
@@ -156,7 +163,7 @@ export function TodayView({ initialDate }: Props) {
           role="button"
           aria-label="Select date"
         >
-          <p className="font-semibold text-white text-sm sm:text-base leading-tight">{dateLabel}</p>
+          <p className="font-semibold text-primary text-sm sm:text-base leading-tight">{dateLabel}</p>
           <p className="text-[11px] text-muted tracking-wide mt-0.5">{date}</p>
           <input
             ref={dateInputRef}
@@ -237,6 +244,14 @@ export function TodayView({ initialDate }: Props) {
       {/* Main content */}
       {!loading && !error && data && (
         <>
+          {isImprint && (
+            <DayImprint
+              summary={data.summary}
+              mealGroups={data.mealGroups}
+              onLogMeal={() => setShowComposer(true)}
+            />
+          )}
+
           <Panel>
             <CalorieProgress summary={data.summary} />
           </Panel>
@@ -250,7 +265,7 @@ export function TodayView({ initialDate }: Props) {
             <Panel>
               <div className="flex items-center gap-2 mb-3">
                 <Lightbulb className="h-4 w-4 text-accent" />
-                <p className="text-sm font-medium text-white">Insights</p>
+                <p className="text-sm font-medium text-primary">Insights</p>
               </div>
               <ul className="space-y-2">
                 {data.insights.slice(0, 2).map((insight, i) => (
