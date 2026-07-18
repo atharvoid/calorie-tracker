@@ -1,4 +1,5 @@
 import { AuthButton } from "@/components/auth-button"
+import { ThemeToggle } from "@/components/theme-toggle"
 import { auth, signIn } from "@/auth"
 import Link from "next/link"
 import { DemoApp } from "@/components/demo-app"
@@ -40,7 +41,10 @@ export default async function Home(props: {
                 Calorie<span className="text-accent">Tracker</span>
               </span>
             </Link>
-            <AuthButton />
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <AuthButton />
+            </div>
           </div>
 
           <DemoApp signedIn={true} userId={session?.user?.id} user={session?.user} />

@@ -13,6 +13,7 @@ import { PaywallAlert } from "./paywall-alert"
 import Link from "next/link"
 import { signOutAction } from "@/components/auth-actions"
 import { getActiveExperience } from "@/lib/experience-mode"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 type Tab = "today" | "history" | "analytics" | "settings"
 
@@ -157,6 +158,7 @@ export function NutritionShell({ userId, user }: Props) {
 
         {/* Header Right Actions */}
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           {activeTab === "today" && (
             <button
               onClick={() => window.dispatchEvent(new CustomEvent("open_meal_composer"))}
@@ -269,9 +271,9 @@ export function NutritionShell({ userId, user }: Props) {
       </nav>
 
       {/* Tab content */}
-      <div role="tabpanel" className="px-2 md:px-0 mt-4 md:mt-0">
+      <div role="tabpanel" key={activeTab} className="px-2 md:px-0 mt-4 md:mt-0 animate-tab-enter">
         {activeTab === "today" && (
-          <div className="space-y-4 animate-tab-fade">
+          <div className="space-y-4">
             {billing && (billing.accessState === "expired" || billing.accessState === "blocked") && (
               <PaywallAlert
                 trialUsed={billing.trialAiLogsUsed}
@@ -283,17 +285,17 @@ export function NutritionShell({ userId, user }: Props) {
           </div>
         )}
         {activeTab === "history" && (
-          <div className="animate-tab-fade">
+          <div>
             <HistoryView key={`history-${refreshKey}`} />
           </div>
         )}
         {activeTab === "analytics" && (
-          <div className="animate-tab-fade">
+          <div>
             <AnalyticsView key={`analytics-${refreshKey}`} />
           </div>
         )}
         {activeTab === "settings" && (
-          <div className="space-y-6 animate-tab-fade">
+          <div className="space-y-6">
             <SettingsView key={`settings-${refreshKey}`} />
           </div>
         )}

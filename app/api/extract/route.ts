@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from "next/server"
 import { generateObject } from "ai"
 import { extractionSchema, EXTRACTION_SYSTEM_PROMPT } from "@/lib/extraction"

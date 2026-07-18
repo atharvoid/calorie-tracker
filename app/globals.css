@@ -5,7 +5,10 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ── App design tokens ── */
-:root {
+
+/* Default / Dark Theme Tokens */
+:root,
+:root[data-theme="dark"] {
   /* Dark-first canvas */
   --bg-base:        #0A0A0B;
   --bg-surface:     #1C1D22;
@@ -18,10 +21,16 @@
   --text-secondary: #A1A1AA;
   --text-muted:     #6B6C72;
 
-  /* Accent – single emerald */
-  --accent:          #10B981;
-  --accent-hover:    #34D399;
-  --accent-contrast: #08110D;
+  /* Functional Emerald Action System */
+  --action-accent:            #10B981;  /* Emerald 500 */
+  --action-accent-hover:      #34D399;  /* Emerald 400 */
+  --action-accent-strong:     #047857;  /* Emerald 700 - WCAG AA compliant */
+  --action-accent-strong-foreground: #FFFFFF;
+  --action-accent-foreground: #052E24;
+
+  --accent:          var(--action-accent);
+  --accent-hover:    var(--action-accent-hover);
+  --accent-contrast: var(--action-accent-foreground);
 
   /* Status */
   --paid:    #10B981;
@@ -33,7 +42,7 @@
   --radius-btn:  10px;
   --radius-card: 16px;
 
-  /* ── Remap shadcn base vars to our dark palette ── */
+  /* Remap shadcn base vars to dark palette */
   --background:          var(--bg-base);
   --foreground:          var(--text-primary);
   --card:                var(--bg-surface);
@@ -55,8 +64,8 @@
   --radius:              0.625rem;
 }
 
-.theme-imprint,
-[data-experience="imprint"] {
+/* Warm Paper Light Theme Tokens */
+:root[data-theme="light"] {
   --bg-base:        #F3EFE6;
   --bg-surface:     #FAF7F0;
   --bg-elevated:    #EAE5D9;
@@ -67,23 +76,21 @@
   --text-secondary: #6E6A61;
   --text-muted:     #8C877E;
 
-  --accent:          #E5673F;
-  --accent-hover:    #CE532D;
-  --accent-contrast: #F3EFE6;
+  /* Functional Emerald Action System */
+  --action-accent:            #10B981;  /* Emerald 500 */
+  --action-accent-hover:      #059669;  /* Emerald 600 */
+  --action-accent-strong:     #047857;  /* Emerald 700 */
+  --action-accent-strong-foreground: #FFFFFF;
+  --action-accent-foreground: #052E24;
+
+  --accent:          var(--action-accent);
+  --accent-hover:    var(--action-accent-hover);
+  --accent-contrast: var(--action-accent-foreground);
 
   --paid:    #69765B;
   --pending: #E5673F;
   --partial: #555A8C;
   --danger:  #A23E36;
-
-  /* ── Meal identity tokens — separate from semantic status tokens ── */
-  /* Dinner uses warm terracotta, distinct from --danger (error/failure red). */
-  /* Meal categories must remain identifiable through labels, not color alone. */
-  --meal-breakfast: #69765B;  /* Moss Green  — same as --paid */
-  --meal-lunch:     #555A8C;  /* Indigo Blue — same as --partial */
-  --meal-dinner:    #9B6252;  /* Warm Terracotta — NOT aliased to --danger */
-  --meal-snack:     #E5673F;  /* Accent Orange   — same as --accent */
-  --meal-other:     #6E6A61;  /* Ink Muted */
 
   --background:          var(--bg-base);
   --foreground:          var(--text-primary);
@@ -136,6 +143,20 @@
   --color-accent-hover: var(--accent-hover);
 }
 
+/* Imprint Experience Layout Tokens (independent of color theme) */
+:root[data-experience="imprint"],
+.theme-imprint {
+  --radius-card: 16px;
+  --radius-btn:  12px;
+
+  /* ── Meal identity tokens — separate from semantic action tokens ── */
+  --meal-breakfast: #69765B;  /* Moss Green */
+  --meal-lunch:     #555A8C;  /* Indigo Blue */
+  --meal-dinner:    #9B6252;  /* Warm Terracotta */
+  --meal-snack:     #10B981;  /* Emerald */
+  --meal-other:     #6E6A61;  /* Ink Muted */
+}
+
 @theme {
   /* Shadcn standard slot mappings */
   --color-background:        var(--background);
@@ -176,18 +197,37 @@
   --color-partial:      var(--partial);
   --color-danger:       var(--danger);
   --color-accent-hover: var(--accent-hover);
+
+  --color-action-accent:            var(--action-accent);
+  --color-action-accent-hover:      var(--action-accent-hover);
+  --color-action-accent-strong:     var(--action-accent-strong);
+  --color-action-accent-strong-fg:  var(--action-accent-strong-foreground);
+
   --radius-btn:         var(--radius-btn);
   --radius-card:        var(--radius-card);
   --spacing-mobile-nav: calc(76px + env(safe-area-inset-bottom));
   --spacing-safe-bottom: env(safe-area-inset-bottom);
   --spacing-safe-top: env(safe-area-inset-top);
-
 }
 
 /* Base resets */
 html, body {
   background: var(--bg-base);
   color: var(--text-primary);
+}
+
+/* View Transition Duration & Timing */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
 }
 
 /* Premium hero backdrop: subtle emerald radial glow */
@@ -198,7 +238,7 @@ html, body {
   min-height: 100dvh;
 }
 
-.theme-imprint .app-backdrop {
+:root[data-theme="light"] .app-backdrop {
   background: var(--bg-base);
 }
 
@@ -248,10 +288,11 @@ html, body {
   color: var(--text-secondary) !important;
 }
 
-@keyframes tab-slide-in {
+/* ── Restrained Tab Entrance Keyframes ── */
+@keyframes tab-enter {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -259,6 +300,12 @@ html, body {
   }
 }
 
-.animate-tab-fade {
-  animation: tab-slide-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-tab-enter {
+  animation: tab-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tab-enter {
+    animation: none;
+  }
 }

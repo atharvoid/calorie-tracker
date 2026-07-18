@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
 import { Toaster } from "sonner"
+import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -31,21 +32,35 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`dark ${geistSans.variable} ${geistMono.variable}`}>
-      <body className="font-sans antialiased">
-        {children}
-        <Toaster
-          theme="dark"
-          position="bottom-right"
-          richColors
-          toastOptions={{
-            style: {
-              background: "var(--bg-elevated)",
-              border: "1px solid var(--border-default)",
-              color: "var(--text-primary)",
-            },
+    <html
+      lang="en"
+      data-theme="dark"
+      suppressHydrationWarning
+      className={`dark ${geistSans.variable} ${geistMono.variable}`}
+    >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('logcals-theme');if(t==='light'||t==='dark'){document.documentElement.dataset.theme=t;document.documentElement.classList.toggle('dark',t==='dark');document.documentElement.style.colorScheme=t;}else{document.documentElement.dataset.theme='dark';document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){document.documentElement.dataset.theme='dark';document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}})();`,
           }}
         />
+      </head>
+      <body className="font-sans antialiased">
+        <ThemeProvider>
+          {children}
+          <Toaster
+            theme="dark"
+            position="bottom-right"
+            richColors
+            toastOptions={{
+              style: {
+                background: "var(--bg-elevated)",
+                border: "1px solid var(--border-default)",
+                color: "var(--text-primary)",
+              },
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   )
