@@ -35,8 +35,8 @@ function percentile(sorted: number[], p: number): number {
 }
 
 function measureFixture(name: string, input: DayImprintInput) {
-  // Warm-up: 10 iterations discarded
-  for (let i = 0; i < 10; i++) buildScene(input)
+  // Warm-up: 50 iterations discarded to settle JIT & thread timing
+  for (let i = 0; i < 50; i++) buildScene(input)
 
   const times: number[] = []
   let scene = buildScene(input) // final scene for shape inspection

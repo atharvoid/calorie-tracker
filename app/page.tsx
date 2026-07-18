@@ -6,20 +6,32 @@ import { PRIMARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
 import { ShieldAlert } from "lucide-react"
 import { HeroDemo } from "@/components/landing/hero-demo"
+import { getActiveExperience } from "@/lib/experience-mode"
 
 async function handleSignIn() {
   "use server"
   await signIn("google", { redirectTo: "/?tab=today" })
 }
 
-export default async function Home() {
+export default async function Home(props: {
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
+}) {
+  const resolvedParams = props.searchParams ? await props.searchParams : undefined
+  const searchUrlParams = new URLSearchParams()
+  if (resolvedParams) {
+    for (const [key, value] of Object.entries(resolvedParams)) {
+      if (typeof value === "string") searchUrlParams.set(key, value)
+    }
+  }
+
   const session = await auth()
   const signedIn = !!session?.user
-  const showImprint = process.env.NEXT_PUBLIC_DAILY_IMPRINT_UI !== "off"
+  const experience = getActiveExperience(searchUrlParams)
+  const isImprint = experience === "imprint"
 
   if (signedIn) {
     return (
-      <main className={cn("app-backdrop", showImprint && "theme-imprint")}>
+      <main className={cn("app-backdrop", isImprint && "theme-imprint")}>
         <div className="mx-auto max-w-5xl px-4 pb-20 pt-6 md:pt-10 sm:px-6 sm:pt-14">
           {/* Top nav bar - hidden on mobile, shown on desktop/tablet */}
           <div className="mb-6 md:mb-10 hidden md:flex items-center justify-between">
@@ -38,7 +50,7 @@ export default async function Home() {
   }
 
   return (
-    <main className={cn("app-backdrop min-h-screen bg-canvas text-primary", showImprint && "theme-imprint")}>
+    <main className={cn("app-backdrop min-h-screen bg-canvas text-primary", isImprint && "theme-imprint")}>
       <div className="mx-auto max-w-5xl px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
         {/* Top nav bar */}
         <div className="mb-16 flex items-center justify-between">
