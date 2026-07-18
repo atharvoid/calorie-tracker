@@ -123,7 +123,7 @@ export function HeroDemo() {
               <span className="inline-block border border-accent/20 bg-accent/10 px-1.5 py-0.5 text-[9px] font-bold text-accent font-mono uppercase rounded-sm mb-2">
                 Draft Imprint forming
               </span>
-              <p className="text-xs text-primary leading-relaxed font-serif italic mb-3">&ldquo;{SAMPLE_LOG}&rdquo;</p>
+              <p className="text-xs text-primary leading-relaxed font-sans font-medium mb-3">&ldquo;{SAMPLE_LOG}&rdquo;</p>
               
               {/* Draft Foods List */}
               <div className="space-y-2 border-t border-subtle/40 pt-2 text-xs">
