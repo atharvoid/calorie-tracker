@@ -9,7 +9,7 @@ export default function PrivacyPage() {
         <div className="mb-12 flex items-center justify-between border-b border-subtle pb-6">
           <Link href="/" className="flex items-center gap-2 focus:outline-none hover:opacity-90">
             <span className="text-lg font-semibold tracking-tight text-primary">
-              Calorie<span className="text-accent">Tracker</span>
+              Calorie <span className="text-accent">Tracker</span>
             </span>
           </Link>
           <span className="text-xs text-muted">Privacy Policy</span>
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-primary font-mono">1. Information We Collect</h2>
             <p>
-              We collect the minimum amount of user information necessary to provide the CalorieTracker service:
+              We collect the minimum amount of user information necessary to provide the Calorie Tracker service:
             </p>
             <ul className="list-disc pl-5 space-y-2">
               <li>
@@ -96,7 +96,7 @@ export default function PrivacyPage() {
           </section>
 
           <footer className="border-t border-subtle pt-6 text-center text-xs text-muted">
-            &copy; {new Date().getFullYear()} CalorieTracker. All rights reserved.
+            &copy; {new Date().getFullYear()} Calorie Tracker. All rights reserved.
           </footer>
         </article>
       </div>

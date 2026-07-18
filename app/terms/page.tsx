@@ -9,7 +9,7 @@ export default function TermsPage() {
         <div className="mb-12 flex items-center justify-between border-b border-subtle pb-6">
           <Link href="/" className="flex items-center gap-2 focus:outline-none hover:opacity-90">
             <span className="text-lg font-semibold tracking-tight text-primary">
-              Calorie<span className="text-accent">Tracker</span>
+              Calorie <span className="text-accent">Tracker</span>
             </span>
           </Link>
           <span className="text-xs text-muted">Terms of Service</span>
@@ -28,14 +28,14 @@ export default function TermsPage() {
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-primary font-mono">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using CalorieTracker (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Service.
+              By accessing or using Calorie Tracker (the "Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use our Service.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-bold text-primary font-mono">2. Description of Service</h2>
             <p>
-              CalorieTracker provides users with tools to log food items, estimate calorie and macronutrient counts using AI models, build visual progress representation (imprints), and sync logs with Google Sheets.
+              Calorie Tracker provides users with tools to log food items, estimate calorie and macronutrient counts using AI models, build visual progress representation (imprints), and sync logs with Google Sheets.
             </p>
           </section>
 
@@ -46,7 +46,7 @@ export default function TermsPage() {
                 <strong className="text-primary">Accuracy of Estimates:</strong> All calorie and macro estimates provided by our AI are for informational purposes only. Portion sizes, preparation styles, and brand variations affect nutritional content. Review all estimates before logging.
               </li>
               <li>
-                <strong className="text-primary">Not Medical Advice:</strong> CalorieTracker does not provide medical, clinical, or formal dietetic advice. Always consult a healthcare professional before starting any weight loss, training, or dietary program.
+                <strong className="text-primary">Not Medical Advice:</strong> Calorie Tracker does not provide medical, clinical, or formal dietetic advice. Always consult a healthcare professional before starting any weight loss, training, or dietary program.
               </li>
             </ul>
           </section>
@@ -81,7 +81,7 @@ export default function TermsPage() {
           </section>
 
           <footer className="border-t border-subtle pt-6 text-center text-xs text-muted">
-            &copy; {new Date().getFullYear()} CalorieTracker. All rights reserved.
+            &copy; {new Date().getFullYear()} Calorie Tracker. All rights reserved.
           </footer>
         </article>
       </div>

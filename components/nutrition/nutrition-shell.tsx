@@ -171,7 +171,7 @@ export function NutritionShell({ userId, user }: Props) {
         <div className="flex items-center gap-1.5">
           <Link href="/?tab=today" className="flex items-center gap-1.5 focus:outline-none hover:opacity-90">
             <span className="text-sm font-semibold tracking-tight text-primary">
-              Calorie<span className="text-accent">Tracker</span>
+              Calorie <span className="text-accent">Tracker</span>
             </span>
             <span className="text-muted-foreground text-xs font-medium px-1.5 py-0.5 rounded bg-elevated">
               {tabTitle}

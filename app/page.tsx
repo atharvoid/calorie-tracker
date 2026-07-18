@@ -38,7 +38,7 @@ export default async function Home(props: {
           <div className="mb-6 md:mb-10 hidden md:flex items-center justify-between">
             <Link href="/?tab=today" className="flex items-center gap-2 focus:outline-none hover:opacity-90">
               <span className="text-lg font-semibold tracking-tight text-primary">
-                Calorie<span className="text-accent">Tracker</span>
+                Calorie <span className="text-accent">Tracker</span>
               </span>
             </Link>
             <div className="flex items-center gap-3">
@@ -60,7 +60,7 @@ export default async function Home(props: {
         <div className="mb-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg font-semibold tracking-tight text-primary">
-              Calorie<span className="text-accent">Tracker</span>
+              Calorie <span className="text-accent">Tracker</span>
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -152,6 +152,30 @@ export default async function Home(props: {
           </div>
         </section>
 
+        {/* Google Sheets Integration & Purpose Disclosure */}
+        <section className="mb-24 rounded-card border border-subtle bg-surface p-8 max-w-2xl mx-auto space-y-4">
+          <h2 className="text-lg font-bold text-primary flex items-center gap-2">
+            <span className="text-accent">●</span> Google Sheets Integration & Purpose
+          </h2>
+          <p className="text-sm text-secondary leading-relaxed">
+            Calorie Tracker is a personal nutrition logging application designed to help you build a clear visual archive of your daily eating patterns. To provide a persistent backup and personal copy of your data, the app offers a Google Sheets synchronization feature.
+          </p>
+          <div className="bg-elevated/40 p-4 rounded-xl space-y-2 border border-subtle/30 text-xs">
+            <p className="font-semibold text-primary">How we use your Google permissions:</p>
+            <ul className="list-disc pl-5 space-y-1 text-secondary">
+              <li>
+                We request the <code className="text-accent">/auth/drive.file</code> scope, which allows the app to create a dedicated spreadsheet named <strong>"Calorie Tracker — Data Assistant"</strong> in your Google Drive.
+              </li>
+              <li>
+                We write and append your daily meal logs, calorie counts, and macronutrient calculations solely to this specific spreadsheet.
+              </li>
+              <li>
+                We do not access, view, or modify any other files or folders in your Google Drive. Your data remains fully under your own control.
+              </li>
+            </ul>
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section className="mb-24 text-center max-w-md mx-auto">
           <h2 className="text-2xl font-semibold mb-2">Simple, transparent pricing</h2>
@@ -212,7 +236,7 @@ export default async function Home(props: {
             </span>
           </div>
           <div>
-            &copy; {new Date().getFullYear()} CalorieTracker. All rights reserved.
+            &copy; {new Date().getFullYear()} Calorie Tracker. All rights reserved.
           </div>
           <div className="flex justify-center gap-4 text-[11px] text-muted">
             <Link href="/privacy" className="hover:text-secondary transition-colors hover:underline">
