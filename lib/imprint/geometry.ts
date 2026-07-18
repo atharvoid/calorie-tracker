@@ -1,5 +1,4 @@
-import { SAFE, LANE_A_Y, LANE_B_Y, FALLBACK_MINUTES, COLLISION_OFFSET_MINUTES } from "./constants"
-import { generateSeededPRNG } from "./seed"
+import { SAFE, FALLBACK_MINUTES, COLLISION_OFFSET_MINUTES } from "./constants"
 
 export interface PrePlacedMeal {
   id: string

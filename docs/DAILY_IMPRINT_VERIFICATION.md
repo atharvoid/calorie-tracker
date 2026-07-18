@@ -56,15 +56,17 @@ TYPECHECK OK   exit=0
 ### Lint
 ```
 $ eslint
-0 errors, 13 existing warnings   exit=0
+0 errors, 5 pre-existing warnings   exit=0
 
-Warnings breakdown (all pre-existing in untouched files):
+Warnings breakdown (all 5 pre-existing in untouched legacy files):
   - app/api/billing/checkout/route.ts (3 unused vars)
-  - app/page.tsx (5 unused vars)
   - components/analytics-report.tsx (1 react-hooks/exhaustive-deps)
   - components/nutrition/meal-composer.tsx (1 unused var)
-  - lib/imprint/geometry.ts (3 unused vars)
-(0 new warnings introduced by this branch)
+
+Note on Baseline comparison:
+  - Baseline master SHA (5741174) had 13 warnings.
+  - This feature branch fixed 8 warnings in modified/new files (app/page.tsx, lib/imprint/geometry.ts).
+  - 0 warnings exist in any file modified or created by this feature branch.
 ```
 
 ### Tests
@@ -117,7 +119,7 @@ exit=0
 
 **Environment**: Windows 11 x64, Node.js v24.13.1, AMD/Intel Multi-core, 1,000 warm iterations per fixture via `tests/__tests__/imprint-perf.test.ts`.
 
-| Fixture | Iterations | Median | p95 | Maximum (Warm) | Max Spike (Cold) | SVG Shapes | Path Count | ~SVG Nodes |
+| Fixture | Iterations | Median | p95 | Current-Run Max | Highest Previously Observed Outlier | Shapes | Paths | Estimated SVG Nodes |
 |---|---|---|---|---|---|---|---|---|
 | `fourBalanced` | 1,000 | 0.47 ms | 0.85 ms | 1.71 ms | 18.41 ms | 4 | 18 | 54 |
 | `manyMeals (10 meals)` | 1,000 | 0.81 ms | 1.21 ms | 3.64 ms | 6.48 ms | 8 | 35 | 87 |
@@ -125,12 +127,12 @@ exit=0
 | `aggregate-only` | 1,000 | 0.17 ms | 0.24 ms | 2.53 ms | 8.35 ms | 1 | 5 | 29 |
 | `empty` | 1,000 | 0.00 ms | 0.00 ms | 0.001 ms | 0.015 ms | 0 | 0 | 20 |
 
-> **Note on Performance Reconciliation**:  
-> In warm execution runs, the maximum scene generation time across all 5,000 total iterations is **3.64 ms** (well below the 50 ms budget). In initial un-cached cold test runs, occasional single-iteration thread-scheduling OS spikes up to **18.41 ms** were observed on `fourBalanced`. Both typical warm execution and worst-case cold spikes satisfy all performance thresholds:
+> **Note on Performance & Node Counts**:  
+> In warm execution runs, the maximum scene generation time across all 5,000 total iterations is **3.64 ms** (well below the 50 ms budget). Across prior runs, the highest single observed outlier was **18.41 ms** on `fourBalanced`. Both current-run max and historical outliers satisfy all performance thresholds:
 > - Median budget: **< 5 ms** (Actual: **0.00 ms - 0.81 ms**)
 > - p95 budget: **< 15 ms** (Actual: **0.00 ms - 1.21 ms**)
 > - Max budget: **< 50 ms** (Actual: **0.001 ms - 18.41 ms**)
-> - Node count budget: **≤ 250** (Actual: **20 - 87 nodes**)
+> - Estimated SVG node count budget: **≤ 250** (Calculated as `shapes × contours + base elements`: **20 - 87 estimated nodes**)
 
 ---
 

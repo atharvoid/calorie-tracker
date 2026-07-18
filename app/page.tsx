@@ -2,9 +2,9 @@ import { AuthButton } from "@/components/auth-button"
 import { auth, signIn } from "@/auth"
 import Link from "next/link"
 import { DemoApp } from "@/components/demo-app"
-import { PRIMARY_BTN, SECONDARY_BTN } from "@/lib/ui"
+import { PRIMARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
-import { BarChart3, Bot, Calendar, Database, ShieldAlert } from "lucide-react"
+import { ShieldAlert } from "lucide-react"
 import { HeroDemo } from "@/components/landing/hero-demo"
 
 async function handleSignIn() {
