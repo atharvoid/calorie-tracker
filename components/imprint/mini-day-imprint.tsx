@@ -13,12 +13,12 @@ interface MiniDayImprintProps {
 }
 
 const MEAL_COLORS: Record<string, string> = {
-  Breakfast: "var(--imprint-moss, #69765B)",
-  Lunch: "var(--imprint-indigo, #555A8C)",
-  Dinner: "var(--imprint-error, #A23E36)",
-  Snack: "var(--imprint-accent, #E5673F)",
-  Other: "var(--imprint-ink-muted, #6E6A61)",
-  Additional: "var(--imprint-ink-muted, #6E6A61)",
+  Breakfast: "var(--action-accent, #10B981)",
+  Lunch: "var(--action-accent, #10B981)",
+  Dinner: "var(--action-accent, #10B981)",
+  Snack: "var(--action-accent, #10B981)",
+  Other: "var(--action-accent, #10B981)",
+  Additional: "var(--action-accent, #10B981)",
 }
 
 export function MiniDayImprint({ summary, mealGroups, width = 60, height = 32 }: MiniDayImprintProps) {
@@ -57,8 +57,8 @@ export function MiniDayImprint({ summary, mealGroups, width = 60, height = 32 }:
       {/* Simplified shapes - outer 2 contours only, no labels, no ticks */}
       {scene.shapes.map((shape, idx) => {
         const color = shape.kind === "meal"
-          ? (MEAL_COLORS[shape.mealType || "Other"] || "var(--imprint-ink-muted)")
-          : "var(--imprint-ink-muted, #6E6A61)"
+          ? (MEAL_COLORS[shape.mealType || "Other"] || "var(--action-accent, #10B981)")
+          : "var(--action-accent, #10B981)"
         const washOpacity = shape.fatShare * 0.12 + 0.04
         const key = shape.kind === "meal" ? shape.id : `aggregate-${idx}`
         // Max 2 contours for mini version to respect node budget
