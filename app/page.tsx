@@ -63,7 +63,10 @@ export default async function Home(props: {
               Calorie<span className="text-accent">Tracker</span>
             </span>
           </div>
-          <AuthButton />
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <AuthButton />
+          </div>
         </div>
 
         {/* Hero Section */}
