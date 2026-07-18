@@ -49,9 +49,13 @@ export function NutritionShell({ userId, user }: Props) {
   const router = useRouter()
 
   const tabParam = searchParams.get("tab") as Tab | null
-  const [activeTab, setActiveTab] = useState<Tab>(
-    TABS.some((t) => t.id === tabParam) ? (tabParam as Tab) : "today"
-  )
+  const activeTab: Tab = TABS.some((t) => t.id === tabParam) ? (tabParam as Tab) : "today"
+
+  const handleTabChange = useCallback((id: Tab) => {
+    const params = new URLSearchParams(searchParams.toString())
+    params.set("tab", id)
+    router.replace(`?${params.toString()}`, { scroll: false })
+  }, [searchParams, router])
 
   const [refreshKey, setRefreshKey] = useState(0)
   const [billing, setBilling] = useState<EntitlementStatus | null>(null)
@@ -92,23 +96,6 @@ export function NutritionShell({ userId, user }: Props) {
       window.removeEventListener("local_nutrition_changed", handler)
     }
   }, [handleNutritionChanged])
-
-  // Sync tab to URL without full navigation
-  useEffect(() => {
-    const current = searchParams.get("tab")
-    if (current !== activeTab) {
-      const params = new URLSearchParams(searchParams.toString())
-      params.set("tab", activeTab)
-      router.replace(`?${params.toString()}`, { scroll: false })
-    }
-  }, [activeTab, router, searchParams])
-
-  // Sync URL search params to tab state (handles logo clicks / back button)
-  useEffect(() => {
-    if (tabParam && TABS.some((t) => t.id === tabParam) && tabParam !== activeTab) {
-      setActiveTab(tabParam)
-    }
-  }, [tabParam, activeTab])
 
   // Close avatar menu when clicking outside
   useEffect(() => {
@@ -233,7 +220,7 @@ export function NutritionShell({ userId, user }: Props) {
                 <strong>Free Trial:</strong> {billing.trialAiLogsUsed} of {billing.trialAiLogLimit} meal logs used.
               </span>
               <button
-                onClick={() => setActiveTab("settings")}
+                onClick={() => handleTabChange("settings")}
                 className="font-semibold text-accent hover:underline focus:outline-none cursor-pointer bg-transparent border-0"
               >
                 Upgrade plan
@@ -246,7 +233,7 @@ export function NutritionShell({ userId, user }: Props) {
                 <strong>Trial Completed:</strong> Your free trial has ended. Upgrade to continue adding meals.
               </span>
               <button
-                onClick={() => setActiveTab("settings")}
+                onClick={() => handleTabChange("settings")}
                 className="font-semibold text-danger hover:underline focus:outline-none cursor-pointer bg-transparent border-0"
               >
                 Upgrade now
@@ -263,7 +250,7 @@ export function NutritionShell({ userId, user }: Props) {
           return (
             <button
               key={id}
-              onClick={() => setActiveTab(id)}
+              onClick={() => handleTabChange(id)}
               className={cn(
                 "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-colors whitespace-nowrap",
                 activeTab === id
@@ -321,7 +308,7 @@ export function NutritionShell({ userId, user }: Props) {
             return (
               <button
                 key={id}
-                onClick={() => setActiveTab(id)}
+                onClick={() => handleTabChange(id)}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 h-full py-1 text-center transition-colors focus:outline-none",
                   active ? "text-accent font-semibold" : "text-muted hover:text-secondary"
