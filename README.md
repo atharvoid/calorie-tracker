@@ -1,145 +1,146 @@
-# Data Assistant — Technical Documentation
+# Calorie Tracker
 
-Data Assistant is a highly interactive, responsive Next.js application that converts unstructured trade inputs (messy text, handwritten/printed bill photos, or inconsistent Excel/CSV spreadsheets) into a clean, editable, and exportable order table with built-in financial analytics and insights.
+Log what you ate in plain language — by web or Telegram — and get calories and
+macros back, tracked against your daily targets.
 
----
+> **Note on history:** this repository previously hosted a different project (an
+> invoice/order extraction tool called "Data Assistant"). Some of that code is
+> still present and is being removed. Anything marked `@deprecated` in
+> `db/schema.ts` or listed under "Legacy surface" below is not part of this
+> product. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
-## 🏗️ Architecture & Component Layout
+## How it works
 
-The application is structured into three layers: **UI Elements**, **Deterministic Code Helpers (Pure Functions)**, and **API Routes (Google Gemini LLM Integration)**.
+1. You describe a meal ("two rotis, dal, half a cup of rice") or send a photo.
+2. Gemini extracts structured items with per-item calories and macros.
+3. You confirm the extraction — nothing is saved until you do.
+4. Confirmed items land in `meal_item` and roll up into daily and weekly views
+   against your targets.
 
-```mermaid
-graph TD
-    %% User Inputs
-    subgraph Input ["Input Modes"]
-        A[Paste Messy Text]
-        B[Upload Photo / Bill]
-        C[Upload Spreadsheet .xlsx/.csv]
-        D[Bulletproof Demo Safety Net]
-    end
+## Access tiers
 
-    %% UI Components
-    subgraph UI ["Core App Shell (DemoApp)"]
-        TP[TransformPanel]
-        ET[EditableTable]
-        AR[AnalyticsReport]
-    end
+There are three ways to use the app. The middle tier is the point: if you bring
+your own AI key, the app is free for you and costs the operator nothing.
 
-    %% Data Helpers
-    subgraph Helpers ["Deterministic Business Logic (lib/)"]
-        NM[normalize.ts]
-        PF[parse-file.ts]
-        EX[export-xlsx.ts]
-        AN[analytics.ts]
-        RP[report-pdf.tsx]
-    end
+| Tier | Cost to you | Cost to operator | Limits |
+| --- | --- | --- | --- |
+| **Free trial** | Free | Operator pays for AI | 7 days, 50 AI logs |
+| **Bring your own key** | Free (you pay Google directly, usually pennies) | Nothing | Unlimited AI logs |
+| **Subscription** | $2.99/month | Operator pays for AI | Fair-use cap of 25 AI logs/day |
 
-    %% LLM APIs
-    subgraph Gemini ["LLM API (api/)"]
-        AE[/api/extract]
-        AEI[/api/extract-image]
-        AI[/api/insights]
-    end
+### Bring your own key (BYOK)
 
-    %% Connectors
-    A --> AE
-    B --> AEI
-    C --> PF
-    D --> TP
-    
-    AE --> NM
-    AEI --> NM
-    PF --> NM
-    
-    NM --> ET
-    ET --> EX
-    
-    ET -- lifted rows state --> AR
-    AR --> AN
-    AN --> AI
-    AR --> RP
-```
+1. Create a free API key at [Google AI Studio](https://aistudio.google.com/apikey).
+2. Paste it into Settings → AI key.
+3. The key is verified against Google immediately, then encrypted with
+   AES-256-GCM before it touches the database.
 
----
+What this means in practice:
 
-## 📁 File Structure & Purpose
+- Your extractions are billed to your own Google account. Google's free tier
+  covers typical personal use, so most people pay nothing.
+- Only the last four characters of your key are ever displayed. The plaintext is
+  never logged, never returned by the API, and only decrypted inside the request
+  that needs it.
+- If Google rejects your key, the app tells you to rotate it. It does **not**
+  silently fall back to the operator's key.
+- Removing your key returns you to whatever tier you were on before.
 
-### 1. `lib/` (Core Logic)
-- **[types.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/types.ts)**: Core TypeScript interfaces representing raw rows, normalized rows, status options (`Paid`, `Pending`, `Partial`), and metadata objects.
-- **[ai.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/ai.ts)**: Model definitions exposing the Google Gemini 3.5 Flash (`gemini-3.5-flash`) models for text, vision, and insights.
-- **[extraction.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/extraction.ts)**: Shared Zod extraction schema and system instructions defining how unstructured data should be interpreted.
-- **[normalize.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/normalize.ts)**: Computes calculated values (e.g., amount = quantity × rate), formats currency (INR), formats dates, and flags rows needing verification.
-- **[parse-file.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/parse-file.ts)**: Client-side CSV/XLSX parser using SheetJS. Implements heuristic column-matching for standard business headers.
-- **[export-xlsx.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/export-xlsx.ts)**: Re-exports rows to a clean `.xlsx` spreadsheet with numeric columns and a summaries footer.
-- **[analytics.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/analytics.ts)**: Computes deterministic KPIs (total sales, collections, outstanding, trends, status distribution) in pure TypeScript.
-- **[image.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/image.ts)**: Client-side canvas utility to downscale large phone photographs to max 1600px JPEGs before uploading.
+Implementation: [`lib/byok.ts`](lib/byok.ts),
+[`app/api/byok/route.ts`](app/api/byok/route.ts), and the `byok_*` columns on
+`product_entitlement`.
 
-### 2. `components/` (Interface Elements)
-- **[demo-app.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/demo-app.tsx)**: Main application context holding global table rows and active tab state. Mounts sub-views with `hidden` to keep analytics and insights cached.
-- **[transform-panel.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/transform-panel.tsx)**: Coordinates input text-areas, dropzones, example selector chips, and triggers transformation pipelines.
-- **[editable-table.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/editable-table.tsx)**: Renders the structured rows, registers inline cell editing, handles status changes, and contains export links.
-- **[editable-cell.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/editable-cell.tsx)**: Click-to-edit input helper supporting text, numeric, and date cell types.
-- **[analytics-report.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/analytics-report.tsx)**: Renders financial KPIs, requests descriptive insights, and lays out Recharts.
-- **[charts.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/charts.tsx)**: Formatted Top Customers BarChart and Sales Trend AreaChart.
-- **[report-pdf.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/report-pdf.tsx)**: Client-side vector PDF generation using `@react-pdf/renderer` displaying KPIs, insights, and customer lists.
+## Stack
 
-### 3. `app/api/` (Next.js Edge/Server Routes)
-- **[api/extract/route.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/app/api/extract/route.ts)**: Accepts text input, calls Gemini, and normalizes structured rows.
-- **[api/extract-image/route.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/app/api/extract-image/route.ts)**: Single-stage endpoint sending base64 images directly to Gemini for visual JSON extraction.
-- **[api/insights/route.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/app/api/insights/route.ts)**: Converts computed business analytics numbers into 4-6 concise bullet points.
+| Layer | Choice |
+| --- | --- |
+| Framework | Next.js (App Router) + React + TypeScript |
+| Styling | Tailwind CSS with semantic design tokens (`lib/ui.ts`) |
+| Database | Postgres via Drizzle ORM |
+| Auth | Auth.js (Google provider) |
+| AI | Google Gemini 2.5 Flash via the Vercel AI SDK |
+| Messaging | Telegram bot (grammY) |
+| Billing | Stripe (Dodo Payments code also present — see plan task D-4) |
+| Tests | Vitest |
 
----
+The model ID lives in one place, [`lib/ai.ts`](lib/ai.ts), alongside its pricing
+constants so cost reporting cannot drift from the model actually in use.
 
-## 🔄 Data Pipeline
+## Getting started
 
-```
-Unstructured Data (Text / Image) 
-  ➔ Google Gemini Extraction 
-  ➔ Deterministic Normalization (lib/normalize.ts) 
-  ➔ Editable State (demo-app.tsx) 
-  ➔ Live Inline Edits (recomputeRow)
-  ➔ Metric Computations (lib/analytics.ts)
-  ➔ Narrative Generation (api/insights) ➔ Recharts / PDF Report
-```
-
-1. **Extraction**: Google Gemini processes text or base64 image data and matches it against `extractionSchema`.
-2. **Deterministic Processing**: The backend applies a standard normalizer `normalizeRows` which:
-   - Sets calculated `amount` if `quantity` and `rate` exist.
-   - Clears flags and verifies row validity dynamically.
-   - Restructures dates to ISO `YYYY-MM-DD`.
-3. **Editing & Live Recalculation**: Clicking any cell in `<EditableTable />` calls `recomputeRow(editedRow)`. The totals and outstanding metrics update instantly.
-4. **Narrative Analysis**: When navigating to the **Analytics** tab, the pre-computed metrics object is posted to `/api/insights`. The LLM translates numbers into plain English/Hindi business points.
-
----
-
-## ⚡ Setup & Local Running
-
-### Prerequisites
-- Node.js 18+
-- pnpm (Recommended)
-
-### 1. Install dependencies
 ```bash
 pnpm install
-```
-
-### 2. Configure Environment Variables
-Create a `.env.local` file in the root directory:
-```bash
-# Get your API key from https://aistudio.google.com/apikey
-GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
-```
-
-### 3. Start Development Server
-```bash
+cp .env.example .env.local   # then fill it in
+pnpm drizzle-kit migrate     # apply schema migrations
 pnpm dev
 ```
-Open [http://localhost:3000](http://localhost:3000) to view the application.
 
----
+`.env.example` documents every variable and marks which are required. The app
+fails fast at boot if `DATABASE_URL` is missing rather than falling back to a
+localhost database.
 
-## 🚀 Deploys
-This project is configured to auto-build on **Vercel**. When importing:
-1. Vercel automatically detects the Next.js setup.
-2. Ensure you add `GOOGLE_GENERATIVE_AI_API_KEY` under the project environment variables before building.
-3. The build config executes `next build` which compiles code into static pages and API serverless functions.
+### Telegram development
+
+The webhook needs a public URL. `pnpm dev:tunnel` starts the dev server behind a
+tunnel; point `setWebhook` at it and pass the same value as
+`TELEGRAM_WEBHOOK_SECRET`.
+
+## Scripts
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Dev server |
+| `pnpm dev:tunnel` | Dev server + public tunnel for Telegram |
+| `pnpm build` / `pnpm start` | Production build / serve |
+| `pnpm typecheck` | `tsc --noEmit` |
+| `pnpm lint` | ESLint |
+| `pnpm format` / `pnpm format:check` | Prettier |
+| `pnpm test` / `pnpm test:run` | Vitest watch / single run |
+
+CI runs typecheck, lint, format check, tests, and build on every pull request.
+
+## Project layout
+
+```
+app/
+  api/
+    auth/        Auth.js handlers
+    byok/        User API key management
+    nutrition/   Meal extraction and commit
+    telegram/    Bot webhook
+    billing/     Checkout and provider webhooks
+    admin/       Operator-only endpoints
+  privacy/  terms/
+components/
+  nutrition/  landing/  ui/  editorial/  imprint/
+db/
+  schema.ts    Drizzle schema (source of truth)
+  index.ts     Client + connection handling
+lib/
+  ai.ts             Model + pricing constants
+  byok.ts           Key encryption and verification
+  entitlements.ts   Access states, quotas, usage accounting
+  nutrition-*.ts    Extraction, queries, calculations, date maths
+  telegram.ts       Bot command handling
+tests/__tests__/    Vitest suites
+docs/               Implementation plan and design notes
+```
+
+## Data and privacy
+
+- Google sign-in requests the `drive.file` scope only, which grants access
+  solely to files this app creates — not your existing Drive contents.
+- Nutrition figures are AI estimates, not medical or dietary advice.
+- Deleting your account cascades to all meal, settings, and entitlement rows.
+
+## Legacy surface
+
+Still present, not part of this product, and scheduled for removal:
+`/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`,
+`/api/sheet`, the `entry` and `sheet_connection` tables, and the spreadsheet-era
+components (`editable-table`, `transform-panel`, `charts`, `report-pdf`, and
+neighbours). Tracked as task group D in the implementation plan.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
