@@ -47,7 +47,7 @@ export function ImprintEmpty({ onLogMeal }: ImprintEmptyProps) {
 								x={x}
 								y={520 - SAFE.bottom + 22}
 								textAnchor="middle"
-								className="fill-current font-mono text-[10px] font-bold"
+								className="fill-current font-mono text-2xs font-bold"
 							>
 								{min === 360 ? "06:00" : min === 720 ? "12:00" : "18:00"}
 							</text>
