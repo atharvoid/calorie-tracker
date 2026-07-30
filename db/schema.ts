@@ -161,9 +161,8 @@ export const mealItems = pgTable(
 		fatG: numeric("fat_g"),
 		notes: text("notes"),
 		source: text("source").$type<LogSource>().notNull().default("telegram"),
-		// References pending_capture.id. Stored as text for historical reasons; the
-		// type migration to uuid + a real FK is task S-1 in the implementation plan.
-		captureId: text("capture_id"),
+		// References pending_capture.id (UUID with set-null on delete)
+		captureId: uuid("capture_id").references(() => pendingCaptures.id, { onDelete: "set null" }),
 		itemIndex: integer("item_index"), // position in capture payload, for idempotency
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
@@ -240,13 +239,7 @@ export const billingCustomers = pgTable("billing_customer", {
 })
 
 export type SubscriptionStatus =
-	| "trialing"
-	| "active"
-	| "past_due"
-	| "canceled"
-	| "unpaid"
-	| "incomplete"
-	| "paused"
+	"trialing" | "active" | "past_due" | "canceled" | "unpaid" | "incomplete" | "paused"
 
 export type PlanKey = "personal_monthly" | "personal_annual"
 

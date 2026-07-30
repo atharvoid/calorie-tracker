@@ -69,13 +69,7 @@ export function TopCustomersChart({ data }: { data: CustomerTotal[] }) {
 		<ResponsiveContainer width="100%" height={220}>
 			<BarChart data={data} margin={CHART_MARGIN}>
 				<CartesianGrid stroke={GRID} vertical={false} />
-				<XAxis
-					dataKey="customer"
-					tick={AXIS_TICK}
-					tickLine={false}
-					axisLine={false}
-					interval={0}
-				/>
+				<XAxis dataKey="customer" tick={AXIS_TICK} tickLine={false} axisLine={false} interval={0} />
 				<YAxis
 					tick={AXIS_TICK}
 					tickLine={false}

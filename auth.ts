@@ -5,7 +5,7 @@ import { db } from "@/db"
 import { accounts, sessions, users, verificationTokens } from "@/db/schema"
 
 if (!process.env.AUTH_URL && !process.env.NEXTAUTH_URL && !process.env.VERCEL_URL) {
-  process.env.AUTH_URL = process.env.NEXT_PUBLIC_APP_URL || "https://logcals.vercel.app"
+	process.env.AUTH_URL = process.env.NEXT_PUBLIC_APP_URL || "https://logcals.vercel.app"
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -33,8 +33,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 				params: {
 					access_type: "offline",
 					prompt: "consent",
-					scope:
-						"openid email profile https://www.googleapis.com/auth/drive.file",
+					scope: "openid email profile https://www.googleapis.com/auth/drive.file",
 				},
 			},
 		}),

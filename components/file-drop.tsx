@@ -29,12 +29,12 @@ export function FileDrop({ file, onFile }: FileDropProps) {
 	if (file) {
 		return (
 			<Panel className="flex min-h-[280px] flex-col items-center justify-center gap-3">
-				<FileSpreadsheet className="h-10 w-10 text-accent" />
-				<span className="text-sm text-primary">{file.name}</span>
+				<FileSpreadsheet className="text-accent h-10 w-10" />
+				<span className="text-primary text-sm">{file.name}</span>
 				<button
 					type="button"
 					onClick={() => onFile(null)}
-					className={cn("inline-flex items-center gap-1 text-xs px-2 py-1 rounded", GHOST_BTN)}
+					className={cn("inline-flex items-center gap-1 rounded px-2 py-1 text-xs", GHOST_BTN)}
 				>
 					<X className="h-3.5 w-3.5" /> Remove
 				</button>
@@ -53,7 +53,7 @@ export function FileDrop({ file, onFile }: FileDropProps) {
 			onDragLeave={() => setDragging(false)}
 			onDrop={onDrop}
 			className={cn(
-				"flex min-h-[280px] w-full flex-col items-center justify-center gap-2 rounded-card border border-dashed text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+				"rounded-card focus-visible:ring-accent flex min-h-[280px] w-full flex-col items-center justify-center gap-2 border border-dashed text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none",
 				dragging
 					? "border-accent bg-elevated text-primary"
 					: "border-subtle text-muted hover:bg-elevated"
@@ -61,7 +61,7 @@ export function FileDrop({ file, onFile }: FileDropProps) {
 		>
 			<FileSpreadsheet className="h-8 w-8" />
 			<span>Drag an Excel/CSV file here, or click to upload</span>
-			<span className="text-xs text-muted">.xlsx, .xls, or .csv</span>
+			<span className="text-muted text-xs">.xlsx, .xls, or .csv</span>
 			<input
 				ref={inputRef}
 				type="file"

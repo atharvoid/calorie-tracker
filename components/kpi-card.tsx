@@ -12,26 +12,16 @@ type KpiCardProps = {
 	accent?: "default" | "pending"
 }
 
-export function KpiCard({
-	label,
-	value,
-	format = "int",
-	accent = "default",
-}: KpiCardProps) {
+export function KpiCard({ label, value, format = "int", accent = "default" }: KpiCardProps) {
 	const display = useCountUp(value)
-	const text =
-		format === "inr"
-			? formatINR(display)
-			: Math.round(display).toLocaleString("en-IN")
+	const text = format === "inr" ? formatINR(display) : Math.round(display).toLocaleString("en-IN")
 
 	return (
 		<Panel>
-			<p className="text-xs font-medium uppercase tracking-wide text-muted font-sans">
-				{label}
-			</p>
+			<p className="text-muted font-sans text-xs font-medium tracking-wide uppercase">{label}</p>
 			<p
 				className={cn(
-					"mt-2 font-mono text-3xl font-semibold tabular",
+					"tabular mt-2 font-mono text-3xl font-semibold",
 					accent === "pending" ? "text-pending" : "text-primary"
 				)}
 			>

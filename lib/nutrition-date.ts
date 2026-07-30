@@ -109,9 +109,7 @@ export function dateRange(start: string, end: string): string[] {
 	let cursor = start
 	while (cursor <= end) {
 		if (results.length >= MAX_DATE_RANGE_DAYS) {
-			throw new Error(
-				`Date range ${start}..${end} exceeds the ${MAX_DATE_RANGE_DAYS}-day maximum.`
-			)
+			throw new Error(`Date range ${start}..${end} exceeds the ${MAX_DATE_RANGE_DAYS}-day maximum.`)
 		}
 		results.push(cursor)
 		cursor = addDays(cursor, 1)

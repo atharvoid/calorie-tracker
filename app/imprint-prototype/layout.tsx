@@ -12,18 +12,13 @@ import { notFound } from "next/navigation"
  *
  * Do NOT expose IMPRINT_PROTOTYPE_PREVIEW via NEXT_PUBLIC_* — this is server-only.
  */
-export default function ImprintPrototypeLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  const allowed =
-    process.env.NODE_ENV !== "production" ||
-    process.env.IMPRINT_PROTOTYPE_PREVIEW === "true"
+export default function ImprintPrototypeLayout({ children }: { children: React.ReactNode }) {
+	const allowed =
+		process.env.NODE_ENV !== "production" || process.env.IMPRINT_PROTOTYPE_PREVIEW === "true"
 
-  if (!allowed) {
-    notFound()
-  }
+	if (!allowed) {
+		notFound()
+	}
 
-  return <>{children}</>
+	return <>{children}</>
 }

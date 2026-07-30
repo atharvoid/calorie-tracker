@@ -26,16 +26,18 @@ async function run() {
 
 	// 2. Start the bot in Long Polling mode
 	console.log("⚡ Starting Telegram bot in Long Polling mode (no tunnel needed!)...")
-	
+
 	// We call bot.start() which runs the polling loop in the background of this process
-	bot.start({
-		allowed_updates: ["message", "callback_query"],
-		onStart: (info) => {
-			console.log(`🤖 Bot @${info.username} is online and polling for messages!`)
-		}
-	}).catch((err) => {
-		console.error("❌ Telegram bot polling error:", err)
-	})
+	bot
+		.start({
+			allowed_updates: ["message", "callback_query"],
+			onStart: (info) => {
+				console.log(`🤖 Bot @${info.username} is online and polling for messages!`)
+			},
+		})
+		.catch((err) => {
+			console.error("❌ Telegram bot polling error:", err)
+		})
 
 	process.on("SIGINT", () => {
 		console.log("\n👋 Stopping development servers...")

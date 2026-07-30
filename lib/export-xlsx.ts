@@ -8,15 +8,7 @@ export function exportToXlsx(
 ): void {
 	const aoa: (string | number | null)[][] = [
 		["Customer", "Quantity", "Unit", "Rate", "Amount", "Date", "Status"],
-		...rows.map((r) => [
-			r.customer,
-			r.quantity,
-			r.unit,
-			r.rate,
-			r.amount,
-			r.date,
-			r.status,
-		]),
+		...rows.map((r) => [r.customer, r.quantity, r.unit, r.rate, r.amount, r.date, r.status]),
 		[],
 		["Total", null, null, null, meta.totalAmount, null, `${meta.pendingCount} pending`],
 	]

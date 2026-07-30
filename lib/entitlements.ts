@@ -214,9 +214,7 @@ function resolveSubscriptionState(
 	}
 }
 
-function hasVerifiedByokKey(
-	ent: typeof productEntitlements.$inferSelect | null
-): boolean {
+function hasVerifiedByokKey(ent: typeof productEntitlements.$inferSelect | null): boolean {
 	if (!ent) return false
 	return Boolean(ent.byokKeyEnvelope && ent.byokVerifiedAt)
 }
@@ -246,11 +244,7 @@ export async function getUserEntitlement(
 	now: Date = new Date()
 ): Promise<UserEntitlement> {
 	const [[ent], [sub], timezone] = await Promise.all([
-		db
-			.select()
-			.from(productEntitlements)
-			.where(eq(productEntitlements.userId, userId))
-			.limit(1),
+		db.select().from(productEntitlements).where(eq(productEntitlements.userId, userId)).limit(1),
 		db
 			.select()
 			.from(subscriptions)
@@ -418,9 +412,7 @@ export async function recordAiUsage(
 	const costMicros =
 		keyOwner === "user"
 			? 0
-			: Math.round(
-					inputTokens * INPUT_TOKEN_MICRO_RATE + outputTokens * OUTPUT_TOKEN_MICRO_RATE
-				)
+			: Math.round(inputTokens * INPUT_TOKEN_MICRO_RATE + outputTokens * OUTPUT_TOKEN_MICRO_RATE)
 
 	await db
 		.insert(usageEvents)

@@ -8,12 +8,7 @@ import { EditableCell } from "./editable-cell"
 import { Button } from "@/components/ui/button"
 import { Panel } from "./ui/panel"
 import { PRIMARY_BTN, SECONDARY_BTN } from "@/lib/ui"
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-} from "@/components/ui/select"
+import { Select, SelectContent, SelectItem, SelectTrigger } from "@/components/ui/select"
 import type { NormalizedRow, ExtractMeta, OrderStatus } from "@/lib/types"
 
 const ROW_INITIAL = { opacity: 0, y: 8 }
@@ -47,30 +42,21 @@ export function EditableTable({
 	return (
 		<div className="space-y-3">
 			<div className="flex flex-wrap items-center justify-between gap-4">
-				<p className="text-sm text-secondary font-mono tabular">
+				<p className="text-secondary tabular font-mono text-sm">
 					{meta.rowCount} orders · {meta.pendingCount} pending · {meta.totalAmountFormatted}
 				</p>
 				<div className="flex flex-wrap items-center gap-2">
 					{onSendToAnalytics && (
-						<Button
-							onClick={onSendToAnalytics}
-							className={SECONDARY_BTN}
-						>
+						<Button onClick={onSendToAnalytics} className={SECONDARY_BTN}>
 							<BarChart3 className="mr-2 h-4 w-4" /> Send to Analytics
 						</Button>
 					)}
 					{onSendToSheet && (
-						<Button
-							onClick={onSendToSheet}
-							className={SECONDARY_BTN}
-						>
+						<Button onClick={onSendToSheet} className={SECONDARY_BTN}>
 							<CloudUpload className="mr-2 h-4 w-4" /> Send to Sheet
 						</Button>
 					)}
-					<Button
-						onClick={onExport}
-						className={PRIMARY_BTN}
-					>
+					<Button onClick={onExport} className={PRIMARY_BTN}>
 						<Download className="mr-2 h-4 w-4" /> Download Excel
 					</Button>
 				</div>
@@ -79,12 +65,12 @@ export function EditableTable({
 			<Panel className="overflow-x-auto p-0">
 				<table className="w-full min-w-[640px] text-sm">
 					<thead>
-						<tr className="border-b border-subtle text-left">
+						<tr className="border-subtle border-b text-left">
 							{HEADERS.map((h, idx) => (
 								<th
 									key={h}
 									className={cn(
-										"px-4 py-3 text-xs font-medium uppercase tracking-wide text-muted",
+										"text-muted px-4 py-3 text-xs font-medium tracking-wide uppercase",
 										idx >= 1 && idx <= 4 && "text-right"
 									)}
 								>
@@ -100,13 +86,13 @@ export function EditableTable({
 								initial={ROW_INITIAL}
 								animate={ROW_ANIMATE}
 								transition={rowTransition(i)}
-								className="border-b border-subtle last:border-0 hover:bg-elevated/20 transition-colors"
+								className="border-subtle hover:bg-elevated/20 border-b transition-colors last:border-0"
 							>
 								<td className="px-2 py-1.5">
 									<div className="flex items-center gap-1">
 										{r.needsReview && (
 											<AlertTriangle
-												className="h-3.5 w-3.5 shrink-0 text-pending animate-pulse"
+												className="text-pending h-3.5 w-3.5 shrink-0 animate-pulse"
 												aria-label="Please verify"
 											/>
 										)}
@@ -142,7 +128,7 @@ export function EditableTable({
 										onCommit={(v) => onEdit(r.id, { rate: toNum(v) })}
 									/>
 								</td>
-								<td className="px-4 py-1.5 text-right font-mono tabular text-secondary">
+								<td className="tabular text-secondary px-4 py-1.5 text-right font-mono">
 									{r.amountFormatted}
 								</td>
 								<td className="px-2 py-1.5">
@@ -159,7 +145,7 @@ export function EditableTable({
 										value={r.status}
 										onValueChange={(v) => onEdit(r.id, { status: v as OrderStatus })}
 									>
-										<SelectTrigger className="h-auto w-auto border-0 bg-transparent p-0 shadow-none focus:ring-0 [&>svg]:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded">
+										<SelectTrigger className="focus-visible:ring-accent h-auto w-auto rounded border-0 bg-transparent p-0 shadow-none focus:ring-0 focus-visible:ring-2 focus-visible:outline-none [&>svg]:hidden">
 											<StatusPill status={r.status} />
 										</SelectTrigger>
 										<SelectContent className="bg-elevated border-subtle">
@@ -175,11 +161,11 @@ export function EditableTable({
 						))}
 					</tbody>
 					<tfoot>
-						<tr className="border-t border-subtle text-sm">
-							<td className="px-4 py-3 text-muted" colSpan={4}>
+						<tr className="border-subtle border-t text-sm">
+							<td className="text-muted px-4 py-3" colSpan={4}>
 								{meta.rowCount} orders · {meta.pendingCount} pending
 							</td>
-							<td className="px-4 py-3 text-right font-mono tabular font-semibold text-primary">
+							<td className="tabular text-primary px-4 py-3 text-right font-mono font-semibold">
 								{meta.totalAmountFormatted}
 							</td>
 							<td colSpan={2} />

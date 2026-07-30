@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
 	try {
 		const update = await req.json()
-		
+
 		// Ensure bot is initialized before manually handling updates
 		if (!bot.isInited()) {
 			await bot.init()
@@ -21,11 +21,12 @@ export async function POST(req: NextRequest) {
 
 		// Await the update processing to ensure it completes before Vercel freezes the execution context
 		await bot.handleUpdate(update)
-		
+
 		// Return 200 OK immediately
 		return NextResponse.json({ ok: true })
 	} catch (err) {
-		console.error("[telegram] failed to parse update:", err)
-		return NextResponse.json({ error: "Invalid payload" }, { status: 400 })
+		console.error("[telegram] failed to process update:", err)
+		// Return 200 OK to Telegram so it does not retry and cause duplicate meal entries
+		return NextResponse.json({ ok: true, handled: false })
 	}
 }

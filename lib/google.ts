@@ -16,10 +16,7 @@ export async function getGoogleAuth(userId: string) {
 		)
 	}
 
-	const oauth2 = new google.auth.OAuth2(
-		process.env.AUTH_GOOGLE_ID,
-		process.env.AUTH_GOOGLE_SECRET
-	)
+	const oauth2 = new google.auth.OAuth2(process.env.AUTH_GOOGLE_ID, process.env.AUTH_GOOGLE_SECRET)
 	oauth2.setCredentials({
 		refresh_token: acct.refresh_token,
 		access_token: acct.access_token ?? undefined,

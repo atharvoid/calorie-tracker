@@ -1,65 +1,93 @@
 import { Bot, InlineKeyboard, type Context } from "grammy"
 import { eq } from "drizzle-orm"
 import { db } from "@/db"
-import {
-	telegramLinks,
-	linkTokens,
-	pendingCaptures,
-} from "@/db/schema"
+import { telegramLinks, linkTokens, pendingCaptures } from "@/db/schema"
 import { extractNutrition, nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { commitNutrition } from "@/lib/commit"
 import { getSettings } from "@/lib/nutrition-queries"
 import { localDate, addDays, parseLocalDate, formatShortDate, isFuture } from "@/lib/nutrition-date"
 
-export function parseTelegramDate(text: string, timezone: string): { date: string; cleanText: string; label: string } | null {
-  const today = localDate(timezone)
-  const textLower = text.toLowerCase().trim()
+export function parseTelegramDate(
+	text: string,
+	timezone: string
+): { date: string; cleanText: string; label: string } | null {
+	const today = localDate(timezone)
+	const textLower = text.toLowerCase().trim()
 
-  // 1. "yesterday"
-  if (/\byesterday\b/.test(textLower)) {
-    const targetDate = addDays(today, -1)
-    const cleanText = text.replace(/\byesterday\b/gi, "").replace(/\s+/g, " ").trim()
-    return { date: targetDate, cleanText, label: "Yesterday" }
-  }
+	// 1. "yesterday"
+	if (/\byesterday\b/.test(textLower)) {
+		const targetDate = addDays(today, -1)
+		const cleanText = text
+			.replace(/\byesterday\b/gi, "")
+			.replace(/\s+/g, " ")
+			.trim()
+		return { date: targetDate, cleanText, label: "Yesterday" }
+	}
 
-  // 2. "on YYYY-MM-DD" or just "YYYY-MM-DD" at the beginning/end
-  const ymdMatch = text.match(/\b(?:on\s+)?(\d{4})-(\d{2})-(\d{2})\b/)
-  if (ymdMatch) {
-    const dateStr = ymdMatch[1] + "-" + ymdMatch[2] + "-" + ymdMatch[3]
-    const cleanText = text.replace(ymdMatch[0], "").replace(/\s+/g, " ").trim()
-    try {
-      parseLocalDate(dateStr)
-      return { date: dateStr, cleanText, label: formatShortDate(dateStr) }
-    } catch {
-      return null
-    }
-  }
+	// 2. "on YYYY-MM-DD" or just "YYYY-MM-DD" at the beginning/end
+	const ymdMatch = text.match(/\b(?:on\s+)?(\d{4})-(\d{2})-(\d{2})\b/)
+	if (ymdMatch) {
+		const dateStr = ymdMatch[1] + "-" + ymdMatch[2] + "-" + ymdMatch[3]
+		const cleanText = text.replace(ymdMatch[0], "").replace(/\s+/g, " ").trim()
+		try {
+			parseLocalDate(dateStr)
+			return { date: dateStr, cleanText, label: formatShortDate(dateStr) }
+		} catch {
+			return null
+		}
+	}
 
-  // 3. "on DD Month" or "on Month DD"
-  const months = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"]
-  const fullMonths = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
-  
-  const dmMatch = text.match(/\b(?:on\s+)?(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]{3,9})\b/i)
-  if (dmMatch) {
-    const day = parseInt(dmMatch[1], 10)
-    const monthStr = dmMatch[2].toLowerCase()
-    let mIdx = months.indexOf(monthStr.substring(0, 3))
-    if (mIdx === -1) mIdx = fullMonths.indexOf(monthStr)
-    
-    if (mIdx !== -1 && day >= 1 && day <= 31) {
-      const currentYear = parseInt(today.split("-")[0], 10)
-      const dateStr = `${currentYear}-${String(mIdx + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-      const cleanText = text.replace(dmMatch[0], "").replace(/\s+/g, " ").trim()
-      try {
-        parseLocalDate(dateStr)
-        return { date: dateStr, cleanText, label: formatShortDate(dateStr) }
-      } catch {
-        return null
-      }
-    }
-  }
+	// 3. "on DD Month" or "on Month DD"
+	const months = [
+		"jan",
+		"feb",
+		"mar",
+		"apr",
+		"may",
+		"jun",
+		"jul",
+		"aug",
+		"sep",
+		"oct",
+		"nov",
+		"dec",
+	]
+	const fullMonths = [
+		"january",
+		"february",
+		"march",
+		"april",
+		"may",
+		"june",
+		"july",
+		"august",
+		"september",
+		"october",
+		"november",
+		"december",
+	]
 
-  return null
+	const dmMatch = text.match(/\b(?:on\s+)?(\d{1,2})(?:st|nd|rd|th)?\s+([a-zA-Z]{3,9})\b/i)
+	if (dmMatch) {
+		const day = parseInt(dmMatch[1], 10)
+		const monthStr = dmMatch[2].toLowerCase()
+		let mIdx = months.indexOf(monthStr.substring(0, 3))
+		if (mIdx === -1) mIdx = fullMonths.indexOf(monthStr)
+
+		if (mIdx !== -1 && day >= 1 && day <= 31) {
+			const currentYear = parseInt(today.split("-")[0], 10)
+			const dateStr = `${currentYear}-${String(mIdx + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+			const cleanText = text.replace(dmMatch[0], "").replace(/\s+/g, " ").trim()
+			try {
+				parseLocalDate(dateStr)
+				return { date: dateStr, cleanText, label: formatShortDate(dateStr) }
+			} catch {
+				return null
+			}
+		}
+	}
+
+	return null
 }
 
 export const bot = new Bot(process.env.TELEGRAM_BOT_TOKEN || "123456:dummy-token")
@@ -70,7 +98,11 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
 		try {
 			return await fn()
 		} catch (err: unknown) {
-			const e = err as { message?: string; code?: string; cause?: { message?: string; code?: string } }
+			const e = err as {
+				message?: string
+				code?: string
+				cause?: { message?: string; code?: string }
+			}
 			const isConnectionError =
 				e.message?.includes("ECONNRESET") ||
 				e.code === "ECONNRESET" ||
@@ -79,7 +111,9 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
 				e.cause?.code === "ECONNRESET" ||
 				e.cause?.message?.includes("terminated")
 			if (isConnectionError && i < retries) {
-				console.warn(`[telegram] DB connection error, retrying in 500ms (attempt ${i + 1}/${retries})...`)
+				console.warn(
+					`[telegram] DB connection error, retrying in 500ms (attempt ${i + 1}/${retries})...`
+				)
 				await new Promise((resolve) => setTimeout(resolve, 500))
 				continue
 			}
@@ -148,7 +182,7 @@ async function presentNutritionConfirm(
 	const kb = new InlineKeyboard()
 		.text("✓ Save", `confirm:${pending.id}`)
 		.text("✏️ Fix", `edit:${pending.id}`)
-	
+
 	const dateLabel = logDate ? `\n\n📅 *Target Date: ${formatShortDate(logDate)}*` : ""
 	await ctx.reply(summarizeMeals(nutrition) + dateLabel, {
 		parse_mode: "Markdown",
@@ -170,11 +204,7 @@ bot.command("start", async (ctx) => {
 		return
 	}
 	const row = await withRetry(async () => {
-		const [res] = await db
-			.select()
-			.from(linkTokens)
-			.where(eq(linkTokens.token, token))
-			.limit(1)
+		const [res] = await db.select().from(linkTokens).where(eq(linkTokens.token, token)).limit(1)
 		return res
 	})
 	if (!row || row.expiresAt < new Date()) {
@@ -206,7 +236,9 @@ bot.on("message:text", async (ctx) => {
 		return
 	}
 	const requestId = `tg-${ctx.update.update_id}`
-	const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://willing-exhibition-inherited-subaru.trycloudflare.com"
+	const appUrl =
+		process.env.NEXT_PUBLIC_APP_URL ||
+		"https://willing-exhibition-inherited-subaru.trycloudflare.com"
 
 	// Pre-extract entitlement check to avoid sending thinking message if already blocked
 	try {
@@ -248,7 +280,8 @@ bot.on("message:text", async (ctx) => {
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		console.error("[telegram] extractNutrition failed:", err)
 
-		const isEntitlementError = err.message?.includes("free trial") || err.message?.includes("limit reached")
+		const isEntitlementError =
+			err.message?.includes("free trial") || err.message?.includes("limit reached")
 		if (isEntitlementError) {
 			const kb = new InlineKeyboard().url("View plans", `${appUrl}/?tab=settings`)
 			await ctx.reply(
@@ -256,7 +289,9 @@ bot.on("message:text", async (ctx) => {
 				{ reply_markup: kb }
 			)
 		} else {
-			await ctx.reply("❌ Couldn't estimate. Try describing your meal again — e.g. '2 eggs with toast, 1 glass milk'")
+			await ctx.reply(
+				"❌ Couldn't estimate. Try describing your meal again — e.g. '2 eggs with toast, 1 glass milk'"
+			)
 		}
 	}
 })
@@ -276,11 +311,7 @@ bot.on("message:document", async (ctx) => {
 bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 	const id = ctx.match[1]
 	const pending = await withRetry(async () => {
-		const [res] = await db
-			.select()
-			.from(pendingCaptures)
-			.where(eq(pendingCaptures.id, id))
-			.limit(1)
+		const [res] = await db.select().from(pendingCaptures).where(eq(pendingCaptures.id, id)).limit(1)
 		return res ?? null
 	})
 	if (!pending) {

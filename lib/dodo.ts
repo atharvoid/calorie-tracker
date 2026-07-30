@@ -3,8 +3,7 @@ import { DodoPayments } from "dodopayments"
 type DodoEnvironment = "test_mode" | "live_mode"
 
 function resolveEnvironment(): DodoEnvironment {
-	const raw =
-		process.env.DODO_ENVIRONMENT || process.env.DODO_PAYMENTS_ENVIRONMENT || "test_mode"
+	const raw = process.env.DODO_ENVIRONMENT || process.env.DODO_PAYMENTS_ENVIRONMENT || "test_mode"
 	return raw === "live" || raw === "live_mode" ? "live_mode" : "test_mode"
 }
 

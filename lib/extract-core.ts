@@ -41,9 +41,7 @@ export async function extractRowsFromAudio(
 	return normalizeRows(object.rows).rows
 }
 
-export async function extractRowsFromImage(
-	image: Uint8Array
-): Promise<NormalizedRow[]> {
+export async function extractRowsFromImage(image: Uint8Array): Promise<NormalizedRow[]> {
 	const { object } = await generateObject({
 		model: TEXT_MODEL,
 		schema: extractionSchema,
@@ -64,4 +62,3 @@ export async function extractRowsFromImage(
 	})
 	return normalizeRows(object.rows).rows
 }
-

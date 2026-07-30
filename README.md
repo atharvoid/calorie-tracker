@@ -22,11 +22,11 @@ macros back, tracked against your daily targets.
 There are three ways to use the app. The middle tier is the point: if you bring
 your own AI key, the app is free for you and costs the operator nothing.
 
-| Tier | Cost to you | Cost to operator | Limits |
-| --- | --- | --- | --- |
-| **Free trial** | Free | Operator pays for AI | 7 days, 50 AI logs |
-| **Bring your own key** | Free (you pay Google directly, usually pennies) | Nothing | Unlimited AI logs |
-| **Subscription** | $2.99/month | Operator pays for AI | Fair-use cap of 25 AI logs/day |
+| Tier                   | Cost to you                                     | Cost to operator     | Limits                         |
+| ---------------------- | ----------------------------------------------- | -------------------- | ------------------------------ |
+| **Free trial**         | Free                                            | Operator pays for AI | 7 days, 50 AI logs             |
+| **Bring your own key** | Free (you pay Google directly, usually pennies) | Nothing              | Unlimited AI logs              |
+| **Subscription**       | $2.99/month                                     | Operator pays for AI | Fair-use cap of 25 AI logs/day |
 
 ### Bring your own key (BYOK)
 
@@ -52,16 +52,16 @@ Implementation: [`lib/byok.ts`](lib/byok.ts),
 
 ## Stack
 
-| Layer | Choice |
-| --- | --- |
-| Framework | Next.js (App Router) + React + TypeScript |
-| Styling | Tailwind CSS with semantic design tokens (`lib/ui.ts`) |
-| Database | Postgres via Drizzle ORM |
-| Auth | Auth.js (Google provider) |
-| AI | Google Gemini 2.5 Flash via the Vercel AI SDK |
-| Messaging | Telegram bot (grammY) |
-| Billing | Stripe (Dodo Payments code also present — see plan task D-4) |
-| Tests | Vitest |
+| Layer     | Choice                                                       |
+| --------- | ------------------------------------------------------------ |
+| Framework | Next.js (App Router) + React + TypeScript                    |
+| Styling   | Tailwind CSS with semantic design tokens (`lib/ui.ts`)       |
+| Database  | Postgres via Drizzle ORM                                     |
+| Auth      | Auth.js (Google provider)                                    |
+| AI        | Google Gemini 2.5 Flash via the Vercel AI SDK                |
+| Messaging | Telegram bot (grammY)                                        |
+| Billing   | Stripe (Dodo Payments code also present — see plan task D-4) |
+| Tests     | Vitest                                                       |
 
 The model ID lives in one place, [`lib/ai.ts`](lib/ai.ts), alongside its pricing
 constants so cost reporting cannot drift from the model actually in use.
@@ -87,15 +87,15 @@ tunnel; point `setWebhook` at it and pass the same value as
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `pnpm dev` | Dev server |
-| `pnpm dev:tunnel` | Dev server + public tunnel for Telegram |
-| `pnpm build` / `pnpm start` | Production build / serve |
-| `pnpm typecheck` | `tsc --noEmit` |
-| `pnpm lint` | ESLint |
-| `pnpm format` / `pnpm format:check` | Prettier |
-| `pnpm test` / `pnpm test:run` | Vitest watch / single run |
+| Command                             | Purpose                                 |
+| ----------------------------------- | --------------------------------------- |
+| `pnpm dev`                          | Dev server                              |
+| `pnpm dev:tunnel`                   | Dev server + public tunnel for Telegram |
+| `pnpm build` / `pnpm start`         | Production build / serve                |
+| `pnpm typecheck`                    | `tsc --noEmit`                          |
+| `pnpm lint`                         | ESLint                                  |
+| `pnpm format` / `pnpm format:check` | Prettier                                |
+| `pnpm test` / `pnpm test:run`       | Vitest watch / single run               |
 
 CI runs typecheck, lint, format check, tests, and build on every pull request.
 

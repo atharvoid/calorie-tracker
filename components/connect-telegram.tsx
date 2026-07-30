@@ -20,11 +20,7 @@ export function ConnectTelegram() {
 		}
 	}
 	return (
-		<Button
-			onClick={connect}
-			disabled={loading}
-			className={SECONDARY_BTN}
-		>
+		<Button onClick={connect} disabled={loading} className={SECONDARY_BTN}>
 			<Send className="mr-2 h-4 w-4" /> Connect Telegram
 		</Button>
 	)

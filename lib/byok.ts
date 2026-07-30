@@ -27,10 +27,7 @@ export class ByokError extends Error {
 }
 
 export type ByokErrorCode =
-	| "byok_disabled"
-	| "invalid_key_format"
-	| "key_verification_failed"
-	| "decryption_failed"
+	"byok_disabled" | "invalid_key_format" | "key_verification_failed" | "decryption_failed"
 
 /** True when the deployment is configured to accept user API keys. */
 export function isByokEnabled(): boolean {
@@ -94,11 +91,7 @@ export function decryptApiKey(envelope: string): string {
 	}
 	const [, ivPart, tagPart, dataPart] = parts
 	try {
-		const decipher = createDecipheriv(
-			ALGORITHM,
-			encryptionKey(),
-			Buffer.from(ivPart, "base64url")
-		)
+		const decipher = createDecipheriv(ALGORITHM, encryptionKey(), Buffer.from(ivPart, "base64url"))
 		decipher.setAuthTag(Buffer.from(tagPart, "base64url"))
 		return Buffer.concat([
 			decipher.update(Buffer.from(dataPart, "base64url")),

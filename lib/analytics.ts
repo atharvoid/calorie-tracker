@@ -18,9 +18,7 @@ export type AnalyticsData = {
 
 export function computeAnalytics(rows: NormalizedRow[]): AnalyticsData {
 	const totalSales = sum(rows.map((r) => r.amount ?? 0))
-	const collected = sum(
-		rows.filter((r) => r.status === "Paid").map((r) => r.amount ?? 0)
-	)
+	const collected = sum(rows.filter((r) => r.status === "Paid").map((r) => r.amount ?? 0))
 	const outstanding = Math.max(0, totalSales - collected)
 	const orderCount = rows.length
 	const customerCount = new Set(rows.map((r) => r.customer)).size
@@ -60,8 +58,7 @@ export function computeAnalytics(rows: NormalizedRow[]): AnalyticsData {
 		if (!r.unit) continue
 		byUnit.set(r.unit, (byUnit.get(r.unit) ?? 0) + (r.quantity ?? 0))
 	}
-	const topUnit =
-		[...byUnit.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null
+	const topUnit = [...byUnit.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? null
 
 	return {
 		totalSales,

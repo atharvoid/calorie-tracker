@@ -3,11 +3,15 @@ import { spawn } from "child_process"
 const lt = spawn(
 	"ssh",
 	[
-		"-o", "StrictHostKeyChecking=no",
-		"-o", "ServerAliveInterval=30",
-		"-p", "443",
-		"-R", "80:localhost:3000",
-		"serveo.net"
+		"-o",
+		"StrictHostKeyChecking=no",
+		"-o",
+		"ServerAliveInterval=30",
+		"-p",
+		"443",
+		"-R",
+		"80:localhost:3000",
+		"serveo.net",
 	],
 	{ shell: true }
 )

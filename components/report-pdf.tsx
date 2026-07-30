@@ -1,13 +1,6 @@
 "use client"
 
-import {
-	Document,
-	Page,
-	View,
-	Text,
-	StyleSheet,
-	pdf,
-} from "@react-pdf/renderer"
+import { Document, Page, View, Text, StyleSheet, pdf } from "@react-pdf/renderer"
 import type { AnalyticsData } from "@/lib/analytics"
 
 const styles = StyleSheet.create({
@@ -56,17 +49,8 @@ function Kpi({ label, value }: { label: string; value: string }) {
 	)
 }
 
-function ReportDocument({
-	analytics,
-	insights,
-}: {
-	analytics: AnalyticsData
-	insights: string[]
-}) {
-	const maxCust = Math.max(
-		1,
-		...analytics.topCustomers.map((c) => c.amount)
-	)
+function ReportDocument({ analytics, insights }: { analytics: AnalyticsData; insights: string[] }) {
+	const maxCust = Math.max(1, ...analytics.topCustomers.map((c) => c.amount))
 	return (
 		<Document>
 			<Page size="A4" style={styles.page}>
@@ -114,13 +98,8 @@ function ReportDocument({
 	)
 }
 
-export async function downloadReport(
-	analytics: AnalyticsData,
-	insights: string[]
-): Promise<void> {
-	const blob = await pdf(
-		<ReportDocument analytics={analytics} insights={insights} />
-	).toBlob()
+export async function downloadReport(analytics: AnalyticsData, insights: string[]): Promise<void> {
+	const blob = await pdf(<ReportDocument analytics={analytics} insights={insights} />).toBlob()
 	const url = URL.createObjectURL(blob)
 	const a = document.createElement("a")
 	a.href = url

@@ -18,17 +18,15 @@ type InputToggleProps = {
 
 export function InputToggle({ mode, onChange }: InputToggleProps) {
 	return (
-		<div className="inline-flex flex-wrap rounded-btn border border-subtle bg-surface p-0.5">
+		<div className="rounded-btn border-subtle bg-surface inline-flex flex-wrap border p-0.5">
 			{TABS.map((t) => (
 				<button
 					key={t.id}
 					type="button"
 					onClick={() => onChange(t.id)}
 					className={cn(
-						"inline-flex items-center gap-1.5 rounded-btn px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
-						mode === t.id
-							? "bg-elevated text-primary"
-							: "text-muted hover:text-primary"
+						"rounded-btn focus-visible:ring-accent inline-flex items-center gap-1.5 px-3 py-1.5 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none",
+						mode === t.id ? "bg-elevated text-primary" : "text-muted hover:text-primary"
 					)}
 				>
 					<t.Icon className="h-4 w-4" />

@@ -34,6 +34,8 @@ jobs:
 
       - run: pnpm test:run
 
+      - run: pnpm format:check
+
       # The build imports every route module to collect page data. Client
       # construction is lazy now, so these placeholders are only needed for the
       # variables read at module scope.
@@ -42,9 +44,3 @@ jobs:
           DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
           AUTH_SECRET: ci-placeholder-value-never-used-at-runtime
           NEXT_PUBLIC_APP_URL: http://localhost:3000
-
-# A format:check step belongs here, but prettier is not yet in devDependencies
-# and adding it from a tool that cannot regenerate pnpm-lock.yaml would break
-# --frozen-lockfile. Tracked in issue #10: run `pnpm add -D prettier
-# prettier-plugin-tailwindcss`, add the scripts, commit the lockfile, then add
-# the step back here.

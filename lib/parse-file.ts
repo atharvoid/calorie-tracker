@@ -2,9 +2,7 @@ import * as XLSX from "xlsx"
 import { normalizeRows } from "./normalize"
 import type { RawOrderRow, ExtractResponse, OrderStatus } from "./types"
 
-export async function parseArrayBufferToExtract(
-	buf: ArrayBuffer
-): Promise<ExtractResponse> {
+export async function parseArrayBufferToExtract(buf: ArrayBuffer): Promise<ExtractResponse> {
 	const wb = XLSX.read(buf, { type: "array", cellDates: true })
 	const firstSheetName = wb.SheetNames[0]
 	if (!firstSheetName) return normalizeRows([])
@@ -14,9 +12,7 @@ export async function parseArrayBufferToExtract(
 	})
 	const raw = records
 		.map(recordToRaw)
-		.filter(
-			(r) => r.customer.trim() !== "" || r.amount != null || r.quantity != null
-		)
+		.filter((r) => r.customer.trim() !== "" || r.amount != null || r.quantity != null)
 	return normalizeRows(raw)
 }
 
@@ -24,7 +20,6 @@ export async function parseArrayBufferToExtract(
 export async function parseFileToExtract(file: File): Promise<ExtractResponse> {
 	return parseArrayBufferToExtract(await file.arrayBuffer())
 }
-
 
 function recordToRaw(rec: Record<string, unknown>): RawOrderRow {
 	const pick = (re: RegExp): unknown => {
@@ -75,6 +70,7 @@ function toStatus(v: unknown): OrderStatus | null {
 	const s = v.toLowerCase()
 	if (s.includes("paid") || s.includes("done") || s.includes("cleared")) return "Paid"
 	if (s.includes("partial") || s.includes("half") || s.includes("part")) return "Partial"
-	if (s.includes("pending") || s.includes("due") || s.includes("baaki") || s.includes("udhaar")) return "Pending"
+	if (s.includes("pending") || s.includes("due") || s.includes("baaki") || s.includes("udhaar"))
+		return "Pending"
 	return null
 }

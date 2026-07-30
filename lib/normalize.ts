@@ -1,10 +1,4 @@
-import type {
-	RawOrderRow,
-	NormalizedRow,
-	ExtractResponse,
-	ExtractMeta,
-	OrderStatus,
-} from "./types"
+import type { RawOrderRow, NormalizedRow, ExtractResponse, ExtractMeta, OrderStatus } from "./types"
 
 const CONFIDENCE_THRESHOLD = 0.85
 
@@ -30,10 +24,7 @@ export function toTitleCase(s: string): string {
 
 // Recompute derived fields for ONE row after an inline edit.
 export function recomputeRow(row: NormalizedRow): NormalizedRow {
-	const amount =
-		row.quantity != null && row.rate != null
-			? row.quantity * row.rate
-			: row.amount
+	const amount = row.quantity != null && row.rate != null ? row.quantity * row.rate : row.amount
 	return {
 		...row,
 		amount,

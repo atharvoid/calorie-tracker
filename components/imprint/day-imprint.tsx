@@ -10,53 +10,53 @@ import { ImprintEmpty } from "./imprint-empty"
 import { ImprintErrorBoundary } from "./imprint-error-boundary"
 
 interface DayImprintProps {
-  summary: DailyNutritionSummary
-  mealGroups: MealGroupDTO[]
-  highlightedMealId?: string | null
-  onMealClick?: (mealId: string) => void
-  onLogMeal?: () => void
+	summary: DailyNutritionSummary
+	mealGroups: MealGroupDTO[]
+	highlightedMealId?: string | null
+	onMealClick?: (mealId: string) => void
+	onLogMeal?: () => void
 }
 
 export function DayImprint({
-  summary,
-  mealGroups,
-  highlightedMealId,
-  onMealClick,
-  onLogMeal,
+	summary,
+	mealGroups,
+	highlightedMealId,
+	onMealClick,
+	onLogMeal,
 }: DayImprintProps) {
-  const [reducedMotion, setReducedMotion] = useState(false)
+	const [reducedMotion, setReducedMotion] = useState(false)
 
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
-    setReducedMotion(mediaQuery.matches)
+	useEffect(() => {
+		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+		setReducedMotion(mediaQuery.matches)
 
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
-    mediaQuery.addEventListener("change", handler)
-    return () => mediaQuery.removeEventListener("change", handler)
-  }, [])
+		const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
+		mediaQuery.addEventListener("change", handler)
+		return () => mediaQuery.removeEventListener("change", handler)
+	}, [])
 
-  const input = normalizeInput(summary, mealGroups)
-  const scene = buildScene(input)
+	const input = normalizeInput(summary, mealGroups)
+	const scene = buildScene(input)
 
-  if (scene.state === "empty") {
-    return <ImprintEmpty onLogMeal={onLogMeal} />
-  }
+	if (scene.state === "empty") {
+		return <ImprintEmpty onLogMeal={onLogMeal} />
+	}
 
-  return (
-    <ImprintErrorBoundary fallbackText={scene.accessibleSummary}>
-      {reducedMotion ? (
-        <DayImprintStatic
-          scene={scene}
-          highlightedMealId={highlightedMealId}
-          onMealClick={onMealClick}
-        />
-      ) : (
-        <DayImprintAnimated
-          scene={scene}
-          highlightedMealId={highlightedMealId}
-          onMealClick={onMealClick}
-        />
-      )}
-    </ImprintErrorBoundary>
-  )
+	return (
+		<ImprintErrorBoundary fallbackText={scene.accessibleSummary}>
+			{reducedMotion ? (
+				<DayImprintStatic
+					scene={scene}
+					highlightedMealId={highlightedMealId}
+					onMealClick={onMealClick}
+				/>
+			) : (
+				<DayImprintAnimated
+					scene={scene}
+					highlightedMealId={highlightedMealId}
+					onMealClick={onMealClick}
+				/>
+			)}
+		</ImprintErrorBoundary>
+	)
 }

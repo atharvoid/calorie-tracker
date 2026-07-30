@@ -52,14 +52,12 @@ export async function ensureMealSheet(userId: string): Promise<string> {
 		requestBody: { values: [MEALS_HEADER] },
 	})
 
-	await db
-		.insert(sheetConnections)
-		.values({ userId, spreadsheetId, sheetTitle: "Meals" })
+	await db.insert(sheetConnections).values({ userId, spreadsheetId, sheetTitle: "Meals" })
 	return spreadsheetId
 }
 
 export type MealRow = {
-	id?: string			// meal_item.id — included for new rows; absent for legacy rows
+	id?: string // meal_item.id — included for new rows; absent for legacy rows
 	date: string
 	mealType: string | null
 	timeHint: string | null
@@ -73,14 +71,11 @@ export type MealRow = {
 	source: string
 }
 
-export async function appendMealRows(
-	userId: string,
-	rows: MealRow[]
-): Promise<string> {
+export async function appendMealRows(userId: string, rows: MealRow[]): Promise<string> {
 	const spreadsheetId = await ensureMealSheet(userId)
 	const sheets = sheetsClient(await getGoogleAuth(userId))
 	const values = rows.map((r) => [
-		r.id ?? "",		// Item ID — empty for rows committed before this migration
+		r.id ?? "", // Item ID — empty for rows committed before this migration
 		r.date,
 		r.mealType ?? "",
 		r.timeHint ?? "",

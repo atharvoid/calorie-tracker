@@ -25,7 +25,9 @@ async function main() {
 				console.log(body)
 				return
 			} else {
-				console.warn(`[telegram-webhook] Attempt ${i} failed: ${body.description}. Retrying in 5s...`)
+				console.warn(
+					`[telegram-webhook] Attempt ${i} failed: ${body.description}. Retrying in 5s...`
+				)
 			}
 		} catch (err) {
 			console.error(`[telegram-webhook] Error on attempt ${i}:`, err)

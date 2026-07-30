@@ -3,7 +3,7 @@ import type { OrderStatus } from "@/lib/types"
 
 // Status backgrounds use Tailwind opacity modifiers so no raw rgba is needed
 const STYLES: Record<OrderStatus, string> = {
-	Paid:    "text-paid    bg-paid/10",
+	Paid: "text-paid    bg-paid/10",
 	Pending: "text-pending  bg-pending/10",
 	Partial: "text-partial  bg-partial/10",
 }

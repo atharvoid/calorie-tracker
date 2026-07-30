@@ -4,41 +4,51 @@ import { TEXT_MODEL } from "@/lib/ai"
 
 const foodItemSchema = z.preprocess(
 	(val: any) => {
-		if (!val || typeof val !== "object") return val;
-		const copy = { ...val };
+		if (!val || typeof val !== "object") return val
+		const copy = { ...val }
 		if ("weight" in copy && copy.grams === undefined) {
-			copy.grams = copy.weight;
+			copy.grams = copy.weight
 		}
 		if ("protein" in copy && copy.protein_g === undefined) {
-			copy.protein_g = copy.protein;
+			copy.protein_g = copy.protein
 		}
 		if ("carbs" in copy && copy.carbs_g === undefined) {
-			copy.carbs_g = copy.carbs;
+			copy.carbs_g = copy.carbs
 		}
 		if ("fat" in copy && copy.fat_g === undefined) {
-			copy.fat_g = copy.fat;
+			copy.fat_g = copy.fat
 		}
-		return copy;
+		return copy
 	},
 	z.object({
 		name: z.string().catch("Unknown item").describe("Cleaned item name, Title Case"),
-		grams: z.number().nullable().default(null).catch(null).describe("Weight in grams, approximated if not stated"),
+		grams: z
+			.number()
+			.nullable()
+			.default(null)
+			.catch(null)
+			.describe("Weight in grams, approximated if not stated"),
 		kcal: z.number().default(0).catch(0).describe("Estimated kilocalories"),
 		protein_g: z.number().default(0).catch(0).describe("Protein in grams"),
 		carbs_g: z.number().default(0).catch(0).describe("Carbohydrates in grams"),
 		fat_g: z.number().default(0).catch(0).describe("Fat in grams"),
-		notes: z.string().nullable().default(null).catch(null).describe("Short note on assumptions, e.g. assumed raw, portion approx"),
+		notes: z
+			.string()
+			.nullable()
+			.default(null)
+			.catch(null)
+			.describe("Short note on assumptions, e.g. assumed raw, portion approx"),
 	})
 )
 
 const mealSchema = z.preprocess(
 	(val: any) => {
-		if (!val || typeof val !== "object") return val;
-		const copy = { ...val };
+		if (!val || typeof val !== "object") return val
+		const copy = { ...val }
 		if (!("meal_type" in copy) || copy.meal_type === undefined) {
-			copy.meal_type = null;
+			copy.meal_type = null
 		}
-		return copy;
+		return copy
 	},
 	z.object({
 		meal_type: z
@@ -136,7 +146,8 @@ export async function extractNutrition(
 
 		return object
 	} catch (err: any) {
-		const isEntitlementError = err.message?.includes("free trial") || err.message?.includes("limit reached")
+		const isEntitlementError =
+			err.message?.includes("free trial") || err.message?.includes("limit reached")
 		if (!isEntitlementError) {
 			await recordAiUsage(userId, {
 				requestId,

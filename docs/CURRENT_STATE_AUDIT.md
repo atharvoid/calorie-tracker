@@ -20,6 +20,7 @@ This document details the verified repository state of the **Calorie Tracker** a
 ## 2. Objective Status: What is Implemented, Broken, or Missing
 
 ### A. What is Fully Implemented & Working
+
 1. **Telegram Long-Polling Bot**: Located in [scripts/start-dev.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/scripts/start-dev.ts) and [lib/telegram.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/telegram.ts). Bypasses local network port 22 firewall blocking and runs stably without any web tunnels (e.g. ngrok/localtunnel).
 2. **Gemini 2.5 Flash Nutrition Extraction**: Located in [lib/nutrition.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/nutrition.ts). Resolves free-form food descriptions to structured JSON containing calorie, protein, carbohydrate, and fat estimates in under 1.5 seconds.
 3. **Database Schema & ORM**: Using Drizzle ORM configured in [drizzle.config.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/drizzle.config.ts) and defined in [db/schema.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/db/schema.ts).
@@ -27,11 +28,13 @@ This document details the verified repository state of the **Calorie Tracker** a
 5. **Account Linking**: Command `/start <token>` in [lib/telegram.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/telegram.ts#L103-L141) successfully links a Telegram user ID to a Supabase application user ID.
 
 ### B. What is Partially Implemented or Broken
+
 1. **Realtime Broadcast Listener**: [components/realtime-listener.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/realtime-listener.tsx) only handles the legacy `"entries"` event (for order tracking) and does not update when a new meal is logged.
 2. **Database Connection Resets**: Drizzle Query errors wrap connection failures (`ECONNRESET`) in a custom exception. While a `withRetry` helper was added, the outer error wrapper was bypassing it. (We updated the wrapper to check `err.cause` properties, making it resilient).
 3. **Legacy UI Charts**: The charts in [components/charts.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/charts.tsx) and [components/analytics-report.tsx](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/components/analytics-report.tsx) are fully hardcoded for order totals (INR currency symbols `₹`, customers, orders count) and do not read `meal_item` records.
 
 ### C. What is Absent (Requires Implementation)
+
 1. **Daily & Weekly Calorie History**: The database query layer and front-end interface to browse meals by day and sort them by Monday–Sunday weeks.
 2. **Maintenance & Target Calories Settings**: No DB tables or settings panel exist to store user default maintenance calories or daily target guidelines.
 3. **Day-Specific Target Overrides**: Ability to set a custom target for a specific date (e.g. higher calories on workout days).

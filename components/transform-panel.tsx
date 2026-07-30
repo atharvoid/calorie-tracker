@@ -45,11 +45,7 @@ export function TransformPanel({
 	const meta = useMemo(() => (rows.length ? computeMeta(rows) : null), [rows])
 
 	const canTransform =
-		mode === "text"
-			? text.trim().length > 0
-			: mode === "photo"
-				? image != null
-				: file != null
+		mode === "text" ? text.trim().length > 0 : mode === "photo" ? image != null : file != null
 
 	async function handleTransform() {
 		if (!canTransform) return
@@ -60,8 +56,7 @@ export function TransformPanel({
 			if (mode === "file" && file) {
 				data = await parseFileToExtract(file)
 			} else {
-				const endpoint =
-					mode === "text" ? "/api/extract" : "/api/extract-image"
+				const endpoint = mode === "text" ? "/api/extract" : "/api/extract-image"
 				const payload = mode === "text" ? { text } : { image }
 				const res = await fetch(endpoint, {
 					method: "POST",
@@ -83,9 +78,7 @@ export function TransformPanel({
 	}
 
 	function handleEdit(id: string, patch: Partial<NormalizedRow>) {
-		onRows(
-			rows.map((r) => (r.id === id ? recomputeRow({ ...r, ...patch }) : r))
-		)
+		onRows(rows.map((r) => (r.id === id ? recomputeRow({ ...r, ...patch }) : r)))
 	}
 
 	function handleExport() {
@@ -124,7 +117,7 @@ export function TransformPanel({
 						value={text}
 						onChange={(e) => setText(e.target.value)}
 						placeholder="Paste your WhatsApp orders / notes here..."
-						className="min-h-[280px] resize-none border bg-surface text-foreground focus-visible:ring-2 focus-visible:ring-accent"
+						className="bg-surface text-foreground focus-visible:ring-accent min-h-[280px] resize-none border focus-visible:ring-2"
 					/>
 				)}
 				{mode === "photo" && <Dropzone imageUrl={image} onImage={setImage} />}
@@ -138,7 +131,8 @@ export function TransformPanel({
 					>
 						{status === "loading" ? (
 							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin text-accent-contrast" /> Transforming...
+								<Loader2 className="text-accent-contrast mr-2 h-4 w-4 animate-spin" />{" "}
+								Transforming...
 							</>
 						) : (
 							<>
@@ -147,31 +141,28 @@ export function TransformPanel({
 						)}
 					</Button>
 
-					<Button
-						onClick={loadDemo}
-						className={SECONDARY_BTN}
-					>
+					<Button onClick={loadDemo} className={SECONDARY_BTN}>
 						Load demo data
 					</Button>
 
-						{mode === "text" && (
-						<div className="flex flex-wrap items-center gap-2 text-xs text-muted">
+					{mode === "text" && (
+						<div className="text-muted flex flex-wrap items-center gap-2 text-xs">
 							<span className="text-muted">Try sample:</span>
 							<button
 								onClick={() => setText(SAMPLE_TIDY)}
-								className={cn("px-1.5 py-0.5 rounded", GHOST_BTN)}
+								className={cn("rounded px-1.5 py-0.5", GHOST_BTN)}
 							>
 								Tidy
 							</button>
 							<button
 								onClick={() => setText(SAMPLE_MESSY)}
-								className={cn("px-1.5 py-0.5 rounded", GHOST_BTN)}
+								className={cn("rounded px-1.5 py-0.5", GHOST_BTN)}
 							>
 								Messy
 							</button>
 							<button
 								onClick={() => setText(SAMPLE_UGLY)}
-								className={cn("px-1.5 py-0.5 rounded", GHOST_BTN)}
+								className={cn("rounded px-1.5 py-0.5", GHOST_BTN)}
 							>
 								Handwritten
 							</button>
@@ -183,7 +174,7 @@ export function TransformPanel({
 			<div>
 				{status === "loading" && <TableSkeleton />}
 				{status === "error" && (
-					<Panel className="border-danger/20 bg-danger/5 p-6 text-sm text-danger font-medium">
+					<Panel className="border-danger/20 bg-danger/5 text-danger p-6 text-sm font-medium">
 						{error}
 					</Panel>
 				)}
@@ -199,7 +190,7 @@ export function TransformPanel({
 				)}
 				{status === "idle" && rows.length === 0 && (
 					<EmptyState
-						icon={<FileText className="h-8 w-8 text-muted" />}
+						icon={<FileText className="text-muted h-8 w-8" />}
 						title="Your clean table will appear here."
 						hint="Paste text, upload a photo of a register, or drop an Excel/CSV file to transform data."
 					/>
@@ -213,7 +204,7 @@ function TableSkeleton() {
 	return (
 		<Panel className="space-y-2 p-4">
 			{Array.from({ length: 5 }).map((_, i) => (
-				<div key={i} className="h-8 animate-pulse rounded bg-elevated" />
+				<div key={i} className="bg-elevated h-8 animate-pulse rounded" />
 			))}
 		</Panel>
 	)

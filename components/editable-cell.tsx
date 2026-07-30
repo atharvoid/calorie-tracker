@@ -53,16 +53,15 @@ export function EditableCell({
 					if (e.key === "Escape") setEditing(false)
 				}}
 				className={cn(
-					"w-full rounded-md bg-elevated px-2 py-1 text-sm outline-none ring-2 ring-accent",
-					mono && "font-mono tabular",
+					"bg-elevated ring-accent w-full rounded-md px-2 py-1 text-sm ring-2 outline-none",
+					mono && "tabular font-mono",
 					align === "right" && "text-right"
 				)}
 			/>
 		)
 	}
 
-	const shown =
-		display ?? (value == null || value === "" ? placeholder : String(value))
+	const shown = display ?? (value == null || value === "" ? placeholder : String(value))
 	const isEmpty = value == null || value === ""
 
 	return (
@@ -70,9 +69,9 @@ export function EditableCell({
 			type="button"
 			onClick={start}
 			className={cn(
-				"w-full rounded-md px-2 py-1 text-sm transition-colors hover:bg-elevated focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent",
+				"hover:bg-elevated focus-visible:ring-accent w-full rounded-md px-2 py-1 text-sm transition-colors focus-visible:ring-2 focus-visible:outline-none",
 				align === "right" ? "text-right" : "text-left",
-				mono && "font-mono tabular",
+				mono && "tabular font-mono",
 				isEmpty && "text-muted"
 			)}
 		>

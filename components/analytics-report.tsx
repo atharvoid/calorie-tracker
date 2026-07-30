@@ -47,7 +47,7 @@ export function AnalyticsReport({
 		}
 	}, [scope, allRows])
 
-	const sourceRows = scope === "all" ? allRows ?? [] : rows
+	const sourceRows = scope === "all" ? (allRows ?? []) : rows
 	const analytics = useMemo(() => computeAnalytics(sourceRows), [sourceRows])
 
 	useEffect(() => {
@@ -65,7 +65,7 @@ export function AnalyticsReport({
 		})
 			.then(async (res) => {
 				if (!res.ok) throw new Error("failed")
-				const data = await res.json() as { insights?: string[] }
+				const data = (await res.json()) as { insights?: string[] }
 				if (!cancelled) {
 					setInsights(Array.isArray(data.insights) ? data.insights : [])
 					setStatus("idle")
@@ -97,34 +97,38 @@ export function AnalyticsReport({
 		<div className="space-y-6">
 			<div className="flex flex-wrap items-center justify-between gap-4">
 				<div>
-					<h2 className="text-lg font-semibold text-primary">Business Report</h2>
-					<p className="text-sm text-muted">A quick read on your sales</p>
+					<h2 className="text-primary text-lg font-semibold">Business Report</h2>
+					<p className="text-muted text-sm">A quick read on your sales</p>
 				</div>
 				<div className="flex flex-wrap items-center gap-3">
 					{signedIn ? (
-						<div className="inline-flex rounded-btn border border-subtle bg-surface p-0.5 text-sm">
+						<div className="rounded-btn border-subtle bg-surface inline-flex border p-0.5 text-sm">
 							<button
 								onClick={() => setScope("session")}
-								className={scope === "session" ? "rounded-[8px] bg-elevated px-3 py-1 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" : "px-3 py-1 text-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-[8px]"}
+								className={
+									scope === "session"
+										? "bg-elevated text-primary focus-visible:ring-accent rounded-[8px] px-3 py-1 focus-visible:ring-2 focus-visible:outline-none"
+										: "text-muted hover:text-primary focus-visible:ring-accent rounded-[8px] px-3 py-1 focus-visible:ring-2 focus-visible:outline-none"
+								}
 							>
 								This session
 							</button>
 							<button
 								onClick={() => setScope("all")}
-								className={scope === "all" ? "rounded-[8px] bg-elevated px-3 py-1 text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent" : "px-3 py-1 text-muted hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded-[8px]"}
+								className={
+									scope === "all"
+										? "bg-elevated text-primary focus-visible:ring-accent rounded-[8px] px-3 py-1 focus-visible:ring-2 focus-visible:outline-none"
+										: "text-muted hover:text-primary focus-visible:ring-accent rounded-[8px] px-3 py-1 focus-visible:ring-2 focus-visible:outline-none"
+								}
 							>
 								All data
 							</button>
 						</div>
 					) : null}
-					<Button
-						onClick={handleDownloadPdf}
-						disabled={pdfBusy}
-						className={PRIMARY_BTN}
-					>
+					<Button onClick={handleDownloadPdf} disabled={pdfBusy} className={PRIMARY_BTN}>
 						{pdfBusy ? (
 							<>
-								<Loader2 className="mr-2 h-4 w-4 animate-spin text-accent-contrast" /> Preparing...
+								<Loader2 className="text-accent-contrast mr-2 h-4 w-4 animate-spin" /> Preparing...
 							</>
 						) : (
 							<>
@@ -135,38 +139,31 @@ export function AnalyticsReport({
 				</div>
 			</div>
 
-
 			<div className="grid grid-cols-2 gap-4 md:grid-cols-4">
 				<KpiCard label="Total Sales" value={analytics.totalSales} format="inr" />
 				<KpiCard label="Collected" value={analytics.collected} format="inr" />
-				<KpiCard
-					label="Outstanding"
-					value={analytics.outstanding}
-					format="inr"
-					accent="pending"
-				/>
+				<KpiCard label="Outstanding" value={analytics.outstanding} format="inr" accent="pending" />
 				<KpiCard label="Orders" value={analytics.orderCount} format="int" />
 			</div>
 
 			<Panel>
-				<div className="mb-3 flex items-center gap-2 text-sm font-medium text-primary">
-					<Sparkles className="h-4 w-4 text-accent" /> Key Points
+				<div className="text-primary mb-3 flex items-center gap-2 text-sm font-medium">
+					<Sparkles className="text-accent h-4 w-4" /> Key Points
 				</div>
 				{status === "loading" && (
-					<div className="flex items-center gap-2 text-sm text-muted">
-						<Loader2 className="h-4 w-4 animate-spin text-accent" /> Analyzing...
+					<div className="text-muted flex items-center gap-2 text-sm">
+						<Loader2 className="text-accent h-4 w-4 animate-spin" /> Analyzing...
 					</div>
 				)}
 				{status === "error" && (
-					<p className="text-sm text-muted">
-						Couldn&apos;t generate insights right now — the numbers above are still
-						accurate.
+					<p className="text-muted text-sm">
+						Couldn&apos;t generate insights right now — the numbers above are still accurate.
 					</p>
 				)}
 				{status === "idle" && insights && (
 					<ul className="space-y-2">
 						{insights.map((line, i) => (
-							<li key={i} className="flex gap-2 text-sm text-secondary">
+							<li key={i} className="text-secondary flex gap-2 text-sm">
 								<span className="text-accent">•</span>
 								<span>{line}</span>
 							</li>
@@ -187,16 +184,10 @@ export function AnalyticsReport({
 	)
 }
 
-function ChartCard({
-	title,
-	children,
-}: {
-	title: string
-	children: React.ReactNode
-}) {
+function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
 	return (
 		<Panel>
-			<h3 className="mb-4 text-sm font-medium text-primary">{title}</h3>
+			<h3 className="text-primary mb-4 text-sm font-medium">{title}</h3>
 			{children}
 		</Panel>
 	)
