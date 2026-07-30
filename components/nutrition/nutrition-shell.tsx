@@ -10,6 +10,7 @@ import { HistoryView } from "./history-view"
 import { AnalyticsView } from "./analytics-view"
 import { SettingsView } from "./settings-view"
 import { PaywallAlert } from "./paywall-alert"
+import { OnboardingTour } from "@/components/onboarding-tour"
 import Link from "next/link"
 import { signOutAction } from "@/components/auth-actions"
 import { getActiveExperience } from "@/lib/experience-mode"
@@ -25,7 +26,15 @@ const TABS: { id: Tab; label: string; Icon: React.FC<{ className?: string }> }[]
 ]
 
 type EntitlementStatus = {
-	accessState: "pre_trial" | "trial" | "active" | "grace" | "expired" | "blocked"
+	accessState:
+		| "pre_trial"
+		| "trial"
+		| "byok"
+		| "active"
+		| "grace"
+		| "trial_ended"
+		| "quota_exhausted"
+		| "blocked"
 	trialStartedAt: string | null
 	trialEndsAt: string | null
 	trialAiLogsUsed: number
@@ -161,9 +170,12 @@ export function NutritionShell({ userId, user }: Props) {
 	const rawTabTitle = TABS.find((t) => t.id === activeTab)?.label ?? "Calorie Tracker"
 	const tabTitle = isImprint && activeTab === "analytics" ? "Patterns" : rawTabTitle
 
+	const isPaywalled = billing?.accessState === "trial_ended" || billing?.accessState === "quota_exhausted" || billing?.accessState === "blocked"
+
 	return (
 		<div className={cn("pb-mobile-nav w-full md:pb-0", isImprint && "theme-imprint")}>
 			<RealtimeListener userId={userId} onNutritionChanged={handleNutritionChanged} />
+			<OnboardingTour />
 
 			{/* Mobile-only Header */}
 			<header className="border-subtle bg-surface/90 sticky top-0 z-30 flex items-center justify-between border-b px-4 py-2.5 backdrop-blur-md md:hidden">
@@ -251,22 +263,29 @@ export function NutritionShell({ userId, user }: Props) {
 								onClick={() => handleTabChange("settings")}
 								className="text-accent cursor-pointer border-0 bg-transparent font-semibold hover:underline focus:outline-none"
 							>
-								Upgrade plan
+								Add your own key or upgrade
 							</button>
 						</div>
 					)}
-					{billing.accessState === "expired" && (
+					{(billing.accessState === "trial_ended" || billing.accessState === "quota_exhausted") && (
 						<div className="border-danger/25 bg-danger/5 text-secondary mb-4 flex items-center justify-between rounded-lg border px-4 py-2 text-xs">
 							<span>
-								<strong>Trial Completed:</strong> Your free trial has ended. Upgrade to continue
+								<strong>Trial Completed:</strong> Add your own free API key or upgrade to continue
 								adding meals.
 							</span>
 							<button
 								onClick={() => handleTabChange("settings")}
 								className="text-danger cursor-pointer border-0 bg-transparent font-semibold hover:underline focus:outline-none"
 							>
-								Upgrade now
+								Fix this now
 							</button>
+						</div>
+					)}
+					{billing.accessState === "byok" && (
+						<div className="border-accent/25 bg-accent/5 text-secondary mb-4 flex items-center justify-between rounded-lg border px-4 py-2 text-xs">
+							<span>
+								<strong>Bring Your Own Key:</strong> Unlimited free logging with your own API key.
+							</span>
 						</div>
 					)}
 				</div>
@@ -300,11 +319,12 @@ export function NutritionShell({ userId, user }: Props) {
 			{/* Tab content */}
 			<div role="tabpanel" className="mt-4 px-2 md:mt-0 md:px-0">
 				<div className={cn(activeTab === "today" ? "animate-tab-enter space-y-4" : "hidden")}>
-					{billing && (billing.accessState === "expired" || billing.accessState === "blocked") && (
+					{billing && isPaywalled && (
 						<PaywallAlert
 							trialUsed={billing.trialAiLogsUsed}
 							trialLimit={billing.trialAiLogLimit}
 							isLimitReached={billing.trialAiLogsUsed >= billing.trialAiLogLimit}
+							onAddKey={() => handleTabChange("settings")}
 						/>
 					)}
 					<TodayView refreshKey={refreshKey} />

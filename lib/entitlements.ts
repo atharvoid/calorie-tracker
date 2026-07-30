@@ -11,7 +11,7 @@ import {
 import { eq, desc, sql } from "drizzle-orm"
 import { localDate } from "./nutrition-date"
 import { MODEL_PRICING_USD_PER_MTOK } from "./ai"
-import { decryptApiKey, isByokEnabled } from "./byok"
+import { decryptApiKey, encryptApiKey, isByokEnabled, keyFingerprint, verifyGoogleApiKey } from "./byok"
 
 export type { AccessState }
 
@@ -324,6 +324,51 @@ export async function startTrialOnFirstMeal(
 		.onConflictDoNothing({ target: productEntitlements.userId })
 
 	return getUserEntitlement(userId, now)
+}
+
+/**
+ * Verifies a user-supplied API key against the provider, then stores it
+ * encrypted. Shared by the web settings endpoint (app/api/byok/route.ts) and
+ * the Telegram /setkey command so the two paths cannot drift apart.
+ *
+ * Throws ByokError (from lib/byok.ts) and never partially stores an
+ * unverified key — the insert/update only runs after verification succeeds.
+ */
+export async function setByokKey(userId: string, apiKey: string): Promise<UserEntitlement> {
+	await verifyGoogleApiKey(apiKey)
+
+	const now = new Date()
+	const values = {
+		byokProvider: "google" as const,
+		byokKeyEnvelope: encryptApiKey(apiKey),
+		byokKeyLast4: keyFingerprint(apiKey),
+		byokVerifiedAt: now,
+		byokFailureCount: 0,
+		byokLastFailureAt: null,
+	}
+	await db
+		.insert(productEntitlements)
+		.values({ userId, ...values })
+		.onConflictDoUpdate({ target: productEntitlements.userId, set: values })
+
+	return getUserEntitlement(userId, now)
+}
+
+/** Removes a stored BYOK key. The user reverts to their trial or paid state. */
+export async function clearByokKey(userId: string): Promise<UserEntitlement> {
+	await db
+		.update(productEntitlements)
+		.set({
+			byokProvider: null,
+			byokKeyEnvelope: null,
+			byokKeyLast4: null,
+			byokVerifiedAt: null,
+			byokFailureCount: 0,
+			byokLastFailureAt: null,
+		})
+		.where(eq(productEntitlements.userId, userId))
+
+	return getUserEntitlement(userId)
 }
 
 /**

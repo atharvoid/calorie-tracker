@@ -17,9 +17,18 @@ import { Panel } from "@/components/ui/panel"
 import { Button } from "@/components/ui/button"
 import { ConnectTelegram } from "../connect-telegram"
 import { signOutAction } from "../auth-actions"
+import { ByokPanel } from "./byok-panel"
 
 type EntitlementStatus = {
-	accessState: "pre_trial" | "trial" | "active" | "grace" | "expired" | "blocked"
+	accessState:
+		| "pre_trial"
+		| "trial"
+		| "byok"
+		| "active"
+		| "grace"
+		| "trial_ended"
+		| "quota_exhausted"
+		| "blocked"
 	trialStartedAt: string | null
 	trialEndsAt: string | null
 	trialAiLogsUsed: number
@@ -447,6 +456,9 @@ export function SettingsView({ refreshKey }: Props) {
 				</div>
 			</Panel>
 
+			{/* Bring Your Own Key Section */}
+			<ByokPanel onChanged={loadBilling} />
+
 			{/* Telegram Connection Section */}
 			<Panel>
 				<h2 className="text-primary mb-1 flex items-center gap-2 text-base font-bold">
@@ -454,7 +466,9 @@ export function SettingsView({ refreshKey }: Props) {
 					Telegram Bot Log
 				</h2>
 				<p className="text-muted mb-3 text-xs leading-relaxed">
-					Connect your Telegram account to log meals by sending a message to the bot.
+					Connect your Telegram account to log meals by sending a message to the bot. Once
+					connected, use <code className="text-accent">/setkey</code> in the chat to add your own API
+					key there too.
 				</p>
 				<ConnectTelegram />
 			</Panel>
@@ -485,7 +499,7 @@ export function SettingsView({ refreshKey }: Props) {
 							<RefreshCw className="h-3.5 w-3.5" /> Refresh
 						</button>
 						<a
-							href={`https://docs.google.com/spreadsheets/d/${sheetId}`}
+							href={`{{https://docs.google.com/spreadsheets/d/${sheetId}}}`}
 							target="_blank"
 							rel="noreferrer"
 							className="border-subtle bg-elevated text-accent hover:bg-surface inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
@@ -530,7 +544,7 @@ export function SettingsView({ refreshKey }: Props) {
 						<div className="border-subtle flex items-center justify-between border-b pb-3">
 							<span>Status</span>
 							<span className="text-primary font-bold capitalize">
-								{billing.accessState.replace("_", " ")}
+								{billing.accessState.replace(/_/g, " ")}
 							</span>
 						</div>
 
@@ -538,6 +552,13 @@ export function SettingsView({ refreshKey }: Props) {
 							<p className="text-muted text-xs leading-relaxed">
 								Your 7-day free trial has not started yet. It begins automatically when you log your
 								first meal.
+							</p>
+						)}
+
+						{billing.accessState === "byok" && (
+							<p className="text-accent text-xs leading-relaxed font-semibold">
+								You're logging with your own API key — unlimited and free, forever. No subscription
+								needed.
 							</p>
 						)}
 
@@ -557,14 +578,15 @@ export function SettingsView({ refreshKey }: Props) {
 							</div>
 						)}
 
-						{billing.accessState === "expired" && (
+						{(billing.accessState === "trial_ended" || billing.accessState === "quota_exhausted") && (
 							<p className="text-danger text-xs leading-relaxed font-semibold">
-								Your trial is complete. Your meal history is still available. Upgrade to keep adding
-								meals from the web or Telegram.
+								Your trial is complete. Your meal history is still available. Add your own API key
+								above for free unlimited logging, or upgrade to keep using ours.
 							</p>
 						)}
 
-						{(billing.accessState === "expired" ||
+						{(billing.accessState === "trial_ended" ||
+							billing.accessState === "quota_exhausted" ||
 							billing.accessState === "pre_trial" ||
 							billing.accessState === "trial") && (
 							<div className="space-y-3 pt-2">
@@ -586,7 +608,8 @@ export function SettingsView({ refreshKey }: Props) {
 								</div>
 								<p className="text-muted text-center text-[10px] leading-relaxed">
 									Both plans include unlimited meals on the web, 25 daily AI Telegram logs, custom
-									targets, Google Sheets sync, and full data export.
+									targets, Google Sheets sync, and full data export. Or add your own API key above to
+									skip payment entirely.
 								</p>
 							</div>
 						)}

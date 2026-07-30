@@ -1,6 +1,6 @@
 import { z } from "zod"
 import { generateObject } from "ai"
-import { TEXT_MODEL } from "@/lib/ai"
+import { getModel, MODEL_ID } from "@/lib/ai"
 
 const foodItemSchema = z.preprocess(
 	(val: any) => {
@@ -112,6 +112,12 @@ Meal Classification Rules:
 
 Return ONE JSON object matching the given schema. No commentary outside the JSON.`
 
+/** True for provider errors that mean "this specific key is bad", not "the service is down". */
+function isAuthLikeProviderError(err: any): boolean {
+	const status = err?.statusCode ?? err?.status ?? err?.response?.status
+	return status === 400 || status === 401 || status === 403
+}
+
 export async function extractNutrition(
 	text: string,
 	userId: string,
@@ -119,13 +125,31 @@ export async function extractNutrition(
 	source: "web" | "telegram" = "telegram"
 ): Promise<NutritionResult> {
 	// 1. Assert entitlement first before calling Gemini API
-	const { assertCanUseAiLog, recordAiUsage } = await import("@/lib/entitlements")
+	const { assertCanUseAiLog, recordAiUsage, resolveApiKeyForUser, recordByokSuccess, recordByokFailure } =
+		await import("@/lib/entitlements")
 	await assertCanUseAiLog(userId)
 
-	const modelName = "gemini-2.5-flash"
+	// 2. Resolve which API key pays for this call. A rotated BYOK_ENCRYPTION_KEY
+	// would make decryption throw; treat that the same as an invalid key rather
+	// than crashing the request.
+	let apiKey: string | null = null
+	let keyOwner: "platform" | "user" = "platform"
+	try {
+		const resolved = await resolveApiKeyForUser(userId)
+		apiKey = resolved.apiKey
+		keyOwner = resolved.keyOwner
+	} catch (err) {
+		console.error("[nutrition] failed to resolve BYOK key, falling back to invalid-key error:", err)
+		const { EntitlementError } = await import("@/lib/entitlements")
+		throw new EntitlementError(
+			"byok_key_invalid",
+			"Your saved API key could not be read. Please re-enter it in Settings."
+		)
+	}
+
 	try {
 		const { object, usage } = await generateObject({
-			model: TEXT_MODEL,
+			model: getModel(apiKey),
 			schema: nutritionSchema,
 			system: NUTRITION_SYSTEM,
 			prompt: text,
@@ -134,27 +158,42 @@ export async function extractNutrition(
 		})
 		console.log("Raw Gemini response:", JSON.stringify(object, null, 2))
 
-		// 2. Record success usage event
+		// 3. Record success usage event, attributing cost to whoever owns the key.
 		await recordAiUsage(userId, {
 			requestId,
 			source,
-			model: modelName,
+			model: MODEL_ID,
 			inputTokens: usage?.inputTokens || 0,
 			outputTokens: usage?.outputTokens || 0,
 			success: true,
+			keyOwner,
 		})
+		if (keyOwner === "user") await recordByokSuccess(userId)
 
 		return object
 	} catch (err: any) {
-		const isEntitlementError =
-			err.message?.includes("free trial") || err.message?.includes("limit reached")
+		const isEntitlementError = err?.name === "EntitlementError"
+
+		// A BYOK key that the provider rejects (revoked, wrong project, no quota)
+		// must never fall back to the platform key — that would quietly move the
+		// user's bill onto us. Tell them to rotate it instead.
+		if (keyOwner === "user" && isAuthLikeProviderError(err)) {
+			await recordByokFailure(userId)
+			const { EntitlementError } = await import("@/lib/entitlements")
+			throw new EntitlementError(
+				"byok_key_invalid",
+				"Your saved API key was rejected by Google. Please check it in Settings and re-enter it."
+			)
+		}
+
 		if (!isEntitlementError) {
 			await recordAiUsage(userId, {
 				requestId,
 				source,
-				model: modelName,
+				model: MODEL_ID,
 				success: false,
 				failureCategory: err.message || String(err),
+				keyOwner,
 			})
 		}
 		throw err
