@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next"
 import { Geist, Geist_Mono, Fraunces } from "next/font/google"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -52,19 +53,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			</head>
 			<body className="font-sans antialiased">
 				<ThemeProvider>
-					{children}
-					<Toaster
-						theme="dark"
-						position="bottom-right"
-						richColors
-						toastOptions={{
-							style: {
-								background: "var(--bg-elevated)",
-								border: "1px solid var(--border-default)",
-								color: "var(--text-primary)",
-							},
-						}}
-					/>
+					<TooltipProvider>
+						{children}
+						<Toaster
+							theme="dark"
+							position="bottom-right"
+							richColors
+							toastOptions={{
+								style: {
+									background: "var(--bg-elevated)",
+									border: "1px solid var(--border-default)",
+									color: "var(--text-primary)",
+								},
+							}}
+						/>
+					</TooltipProvider>
 				</ThemeProvider>
 			</body>
 		</html>
