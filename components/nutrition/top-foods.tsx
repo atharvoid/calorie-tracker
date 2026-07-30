@@ -1,6 +1,7 @@
 "use client"
 
 import { Mascot } from "@/components/mascot"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type TopFood = {
 	name: string
@@ -84,9 +85,9 @@ function FoodTable({
 export function TopFoods({ byKcal, byProtein, loading = false }: Props) {
 	if (loading) {
 		return (
-			<div className="grid animate-pulse gap-6 md:grid-cols-2">
-				<div className="bg-elevated h-40 rounded-xl" />
-				<div className="bg-elevated h-40 rounded-xl" />
+			<div className="grid gap-6 md:grid-cols-2">
+				<Skeleton className="h-40 rounded-xl" />
+				<Skeleton className="h-40 rounded-xl" />
 			</div>
 		)
 	}
