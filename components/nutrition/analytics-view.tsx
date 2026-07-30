@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import { Panel } from "@/components/ui/panel"
+import { Skeleton } from "@/components/ui/skeleton"
 import { AnalyticsKpis } from "./analytics-kpis"
 import { CalorieTrendChart } from "./calorie-trend-chart"
 import { TopFoods } from "./top-foods"
@@ -146,7 +147,7 @@ export function AnalyticsView({ refreshKey }: Props) {
 				<Panel>
 					<h3 className="text-primary mb-2 font-mono text-sm font-bold">Daily Rhythm</h3>
 					{loading ? (
-						<div className="bg-elevated/40 h-[48px] animate-pulse rounded-xl" />
+						<Skeleton className="h-[48px] rounded-xl" />
 					) : (
 						<div className="space-y-4">
 							<p className="text-secondary text-xs leading-relaxed">
@@ -204,7 +205,7 @@ export function AnalyticsView({ refreshKey }: Props) {
 			<Panel>
 				<h3 className="text-primary mb-3 font-mono text-sm font-bold">Calorie Trend</h3>
 				{loading ? (
-					<div className="bg-elevated h-[220px] animate-pulse rounded-xl" />
+					<Skeleton className="h-[220px] rounded-xl" />
 				) : (
 					<CalorieTrendChart data={data?.trendPoints ?? []} />
 				)}
@@ -224,7 +225,7 @@ export function AnalyticsView({ refreshKey }: Props) {
 			<Panel>
 				<h3 className="text-primary mb-3 font-mono text-sm font-bold">Meal Breakdown</h3>
 				{loading ? (
-					<div className="bg-elevated h-[180px] animate-pulse rounded-xl" />
+					<Skeleton className="h-[180px] rounded-xl" />
 				) : (
 					<MealContribution data={data?.mealContribution ?? []} />
 				)}

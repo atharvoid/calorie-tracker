@@ -12,6 +12,7 @@ import {
 	Cell,
 } from "recharts"
 import { Mascot } from "@/components/mascot"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type MealContrib = {
 	mealType: string
@@ -68,7 +69,7 @@ const TooltipContent = MealTooltip as React.FC
 
 export function MealContribution({ data, loading = false }: Props) {
 	if (loading) {
-		return <div className="bg-elevated h-[180px] animate-pulse rounded-xl" />
+		return <Skeleton className="h-[180px] rounded-xl" />
 	}
 	if (data.length === 0) {
 		return (

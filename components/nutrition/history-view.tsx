@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { Loader2 } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
+import { Skeleton } from "@/components/ui/skeleton"
 import { WeekNavigator } from "./week-navigator"
 import { TodayView } from "./today-view"
 import { HistoryTable } from "./history-table"
@@ -102,12 +103,12 @@ export function HistoryView({ refreshKey }: Props) {
 			{/* Week navigator */}
 			<Panel>
 				{weekLoading && weekSummaries.length === 0 ? (
-					<div className="flex h-24 animate-pulse items-center justify-around">
+					<div className="flex h-24 items-center justify-around">
 						{[...Array(7)].map((_, i) => (
 							<div key={i} className="flex flex-col items-center gap-1.5">
-								<div className="bg-elevated/40 h-2 w-4 rounded" />
-								<div className="bg-elevated/40 h-10 w-12 rounded-lg" />
-								<div className="bg-elevated/40 h-2 w-3 rounded" />
+								<Skeleton className="h-2 w-4 rounded" />
+								<Skeleton className="h-10 w-12 rounded-lg" />
+								<Skeleton className="h-2 w-3 rounded" />
 							</div>
 						))}
 					</div>
@@ -133,12 +134,12 @@ export function HistoryView({ refreshKey }: Props) {
 			<div>
 				<p className="text-primary mb-3 text-sm font-medium">Last 28 days</p>
 				{historyLoading && historyData.length === 0 ? (
-					<div className="animate-pulse space-y-2.5">
-						<div className="bg-elevated/40 h-10 rounded-lg" />
-						<div className="bg-elevated/40 h-12 rounded-lg" />
-						<div className="bg-elevated/40 h-12 rounded-lg" />
-						<div className="bg-elevated/40 h-12 rounded-lg" />
-						<div className="bg-elevated/40 h-12 rounded-lg" />
+					<div className="space-y-2.5">
+						<Skeleton className="h-10 rounded-lg" />
+						<Skeleton className="h-12 rounded-lg" />
+						<Skeleton className="h-12 rounded-lg" />
+						<Skeleton className="h-12 rounded-lg" />
+						<Skeleton className="h-12 rounded-lg" />
 					</div>
 				) : (
 					<HistoryTable

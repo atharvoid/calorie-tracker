@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
+import { Skeleton } from "@/components/ui/skeleton"
 import { CalorieProgress } from "./calorie-progress"
 import { MacroSummary } from "./macro-summary"
 import { MealGroup } from "./meal-group"
@@ -229,14 +230,14 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 
 			{/* Loading state */}
 			{loading && !data && (
-				<div className="animate-pulse space-y-4">
-					{isImprint && <div className="bg-elevated/40 h-[220px] rounded-xl" />}
-					<div className="bg-elevated/40 h-[76px] rounded-xl" />
-					<div className="bg-elevated/40 h-[96px] rounded-xl" />
+				<div className="space-y-4">
+					{isImprint && <Skeleton className="h-[220px] rounded-xl" />}
+					<Skeleton className="h-[76px] rounded-xl" />
+					<Skeleton className="h-[96px] rounded-xl" />
 					<div className="space-y-2">
-						<div className="bg-elevated/40 h-3 w-16 rounded" />
-						<div className="bg-elevated/40 h-[56px] rounded-xl" />
-						<div className="bg-elevated/40 h-[56px] rounded-xl" />
+						<Skeleton className="h-3 w-16 rounded" />
+						<Skeleton className="h-[56px] rounded-xl" />
+						<Skeleton className="h-[56px] rounded-xl" />
 					</div>
 				</div>
 			)}
