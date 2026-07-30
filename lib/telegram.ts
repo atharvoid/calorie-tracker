@@ -6,6 +6,8 @@ import { extractNutrition, nutritionSchema, type NutritionResult } from "@/lib/n
 import { commitNutrition } from "@/lib/commit"
 import { getSettings } from "@/lib/nutrition-queries"
 import { localDate, addDays, parseLocalDate, formatShortDate, isFuture } from "@/lib/nutrition-date"
+import { setByokKey, clearByokKey } from "@/lib/entitlements"
+import { ByokError } from "@/lib/byok"
 
 export function parseTelegramDate(
 	text: string,
@@ -227,6 +229,42 @@ bot.command("start", async (ctx) => {
 	)
 })
 
+// /setkey <apiKey> — verifies and stores a BYOK key, then deletes the message
+// immediately so the raw key does not linger in Telegram chat history.
+bot.command("setkey", async (ctx) => {
+	const userId = await userIdForTelegram(String(ctx.from?.id))
+	await ctx.deleteMessage().catch(() => null)
+	if (!userId) {
+		await ctx.reply("Please connect your account first — open the app and click Connect Telegram.")
+		return
+	}
+	const apiKey = ctx.match?.trim()
+	if (!apiKey) {
+		await ctx.reply("Usage: /setkey YOUR_GOOGLE_AI_STUDIO_KEY\n\nGet a free key at https://aistudio.google.com/apikey")
+		return
+	}
+	try {
+		await setByokKey(userId, apiKey)
+		await ctx.reply(
+			"✅ Your API key is saved and verified. Your meal logs are now unlimited and free — billed to your own Google account. I've deleted your message so the key doesn't stay in this chat."
+		)
+	} catch (err) {
+		const message = err instanceof ByokError ? err.message : "Could not save that API key."
+		await ctx.reply(`❌ ${message}`)
+	}
+})
+
+// /removekey — clears a stored BYOK key
+bot.command("removekey", async (ctx) => {
+	const userId = await userIdForTelegram(String(ctx.from?.id))
+	if (!userId) {
+		await ctx.reply("Please connect your account first — open the app and click Connect Telegram.")
+		return
+	}
+	await clearByokKey(userId)
+	await ctx.reply("🗑️ Your API key has been removed. You're back on your trial or subscription plan.")
+})
+
 // Text message → extract nutrition → confirm
 bot.on("message:text", async (ctx) => {
 	if (ctx.message.text.startsWith("/")) return
@@ -247,7 +285,7 @@ bot.on("message:text", async (ctx) => {
 	} catch {
 		const kb = new InlineKeyboard().url("View plans", `${appUrl}/?tab=settings`)
 		await ctx.reply(
-			"Your free trial has ended. Your meal history is still available. Upgrade to continue logging new meals.",
+			"Your free trial has ended. Your meal history is still available. Add your own API key with /setkey, or upgrade to continue logging new meals.",
 			{ reply_markup: kb }
 		)
 		return
@@ -280,12 +318,19 @@ bot.on("message:text", async (ctx) => {
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		console.error("[telegram] extractNutrition failed:", err)
 
+		if (err.code === "byok_key_invalid") {
+			await ctx.reply(
+				`⚠️ ${err.userMessage || "Your saved API key was rejected."} Use /setkey to re-enter it, or /removekey to go back to the platform plan.`
+			)
+			return
+		}
+
 		const isEntitlementError =
 			err.message?.includes("free trial") || err.message?.includes("limit reached")
 		if (isEntitlementError) {
 			const kb = new InlineKeyboard().url("View plans", `${appUrl}/?tab=settings`)
 			await ctx.reply(
-				"Your free trial has ended. Your meal history is still available. Upgrade to continue logging new meals.",
+				"Your free trial has ended. Your meal history is still available. Add your own API key with /setkey, or upgrade to continue logging new meals.",
 				{ reply_markup: kb }
 			)
 		} else {
