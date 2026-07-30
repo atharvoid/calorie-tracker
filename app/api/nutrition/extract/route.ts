@@ -61,9 +61,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const msg = err.message || String(err)
 		console.error("[extract] failed:", err)
 
-		const isEntitlementError = msg.includes("free trial") || msg.includes("limit reached")
+		if (err.code === "byok_key_invalid") {
+			return errResponse("BYOK_KEY_INVALID", err.userMessage || msg, 400)
+		}
+
+		const isEntitlementError =
+			err.code === "trial_ended" ||
+			err.code === "trial_quota_exhausted" ||
+			err.code === "daily_limit_reached" ||
+			err.code === "account_blocked" ||
+			msg.includes("free trial") ||
+			msg.includes("limit reached")
 		if (isEntitlementError) {
-			return errResponse("TRIAL_EXPIRED", msg, 403)
+			return errResponse("TRIAL_EXPIRED", err.userMessage || msg, 403)
 		}
 		return errResponse("EXTRACTION_FAILED", msg, 500)
 	}
