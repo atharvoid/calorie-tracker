@@ -36,7 +36,7 @@ export function BentoGridItem({ index, title, description, className }: BentoGri
 				className
 			)}
 		>
-			<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
+			<span className="text-accent font-mono text-2xs font-bold tracking-wider uppercase">
 				{index}
 			</span>
 			<div className="space-y-2">
