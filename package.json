@@ -46,6 +46,7 @@
 		"zod": "^4.4.3"
 	},
 	"devDependencies": {
+		"@eslint/eslintrc": "^2.1.4",
 		"@tailwindcss/postcss": "^4",
 		"@types/localtunnel": "^2.0.4",
 		"@types/node": "^20",

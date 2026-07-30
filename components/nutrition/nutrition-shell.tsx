@@ -170,7 +170,10 @@ export function NutritionShell({ userId, user }: Props) {
 	const rawTabTitle = TABS.find((t) => t.id === activeTab)?.label ?? "Calorie Tracker"
 	const tabTitle = isImprint && activeTab === "analytics" ? "Patterns" : rawTabTitle
 
-	const isPaywalled = billing?.accessState === "trial_ended" || billing?.accessState === "quota_exhausted" || billing?.accessState === "blocked"
+	const isPaywalled =
+		billing?.accessState === "trial_ended" ||
+		billing?.accessState === "quota_exhausted" ||
+		billing?.accessState === "blocked"
 
 	return (
 		<div className={cn("pb-mobile-nav w-full md:pb-0", isImprint && "theme-imprint")}>

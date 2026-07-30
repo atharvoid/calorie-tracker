@@ -125,8 +125,13 @@ export async function extractNutrition(
 	source: "web" | "telegram" = "telegram"
 ): Promise<NutritionResult> {
 	// 1. Assert entitlement first before calling Gemini API
-	const { assertCanUseAiLog, recordAiUsage, resolveApiKeyForUser, recordByokSuccess, recordByokFailure } =
-		await import("@/lib/entitlements")
+	const {
+		assertCanUseAiLog,
+		recordAiUsage,
+		resolveApiKeyForUser,
+		recordByokSuccess,
+		recordByokFailure,
+	} = await import("@/lib/entitlements")
 	await assertCanUseAiLog(userId)
 
 	// 2. Resolve which API key pays for this call. A rotated BYOK_ENCRYPTION_KEY

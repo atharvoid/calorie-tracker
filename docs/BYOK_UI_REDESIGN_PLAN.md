@@ -17,15 +17,15 @@ no UI is invisible, which is exactly what was reported.
 
 ## Phase 1 — BYOK completion (this PR)
 
-| Task | What changed |
-| --- | --- |
-| Wire extraction | `lib/nutrition.ts` now resolves the user's key and passes it to `getModel()`. Previously the key was stored but never read back. |
-| No silent fallback | A rejected BYOK key throws a distinct `byok_key_invalid` error rather than silently billing the platform key — this is the one invariant that makes the tier trustworthy, so it is enforced in one place (`extractNutrition`) rather than at each call site. |
-| Settings UI | `components/nutrition/byok-panel.tsx` — paste field, live verification against Google before saving, masked `•••• last4`, remove button, link to Google AI Studio. |
-| Pricing | `app/page.tsx` pricing section is now three tiers instead of one, with BYOK positioned as "free forever." |
-| Telegram | `/setkey <key>` and `/removekey`. The message containing the key is deleted immediately after processing per the original task spec (B-13) — it must not sit in a chat history in plaintext. |
-| Stale state bug | The frontend still matched on `accessState === "expired"`, a value that stopped existing when trial-ended and quota-exhausted were split apart. This meant the trial banner and paywall screen have not rendered since that change shipped. Fixed in `settings-view.tsx` and `nutrition-shell.tsx`. |
-| OAuth copy | Removed the old "Calorie Tracker — Data Assistant" product name from the Google Drive scope justification on the landing page (previously flagged as high-risk for OAuth verification review; this was a one-line, low-risk fix picked up opportunistically). |
+| Task               | What changed                                                                                                                                                                                                                                                                                        |
+| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Wire extraction    | `lib/nutrition.ts` now resolves the user's key and passes it to `getModel()`. Previously the key was stored but never read back.                                                                                                                                                                    |
+| No silent fallback | A rejected BYOK key throws a distinct `byok_key_invalid` error rather than silently billing the platform key — this is the one invariant that makes the tier trustworthy, so it is enforced in one place (`extractNutrition`) rather than at each call site.                                        |
+| Settings UI        | `components/nutrition/byok-panel.tsx` — paste field, live verification against Google before saving, masked `•••• last4`, remove button, link to Google AI Studio.                                                                                                                                  |
+| Pricing            | `app/page.tsx` pricing section is now three tiers instead of one, with BYOK positioned as "free forever."                                                                                                                                                                                           |
+| Telegram           | `/setkey <key>` and `/removekey`. The message containing the key is deleted immediately after processing per the original task spec (B-13) — it must not sit in a chat history in plaintext.                                                                                                        |
+| Stale state bug    | The frontend still matched on `accessState === "expired"`, a value that stopped existing when trial-ended and quota-exhausted were split apart. This meant the trial banner and paywall screen have not rendered since that change shipped. Fixed in `settings-view.tsx` and `nutrition-shell.tsx`. |
+| OAuth copy         | Removed the old "Calorie Tracker — Data Assistant" product name from the Google Drive scope justification on the landing page (previously flagged as high-risk for OAuth verification review; this was a one-line, low-risk fix picked up opportunistically).                                       |
 
 ### Still blocking, cannot be done from here
 

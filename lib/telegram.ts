@@ -240,7 +240,9 @@ bot.command("setkey", async (ctx) => {
 	}
 	const apiKey = ctx.match?.trim()
 	if (!apiKey) {
-		await ctx.reply("Usage: /setkey YOUR_GOOGLE_AI_STUDIO_KEY\n\nGet a free key at https://aistudio.google.com/apikey")
+		await ctx.reply(
+			"Usage: /setkey YOUR_GOOGLE_AI_STUDIO_KEY\n\nGet a free key at https://aistudio.google.com/apikey"
+		)
 		return
 	}
 	try {
@@ -262,7 +264,9 @@ bot.command("removekey", async (ctx) => {
 		return
 	}
 	await clearByokKey(userId)
-	await ctx.reply("🗑️ Your API key has been removed. You're back on your trial or subscription plan.")
+	await ctx.reply(
+		"🗑️ Your API key has been removed. You're back on your trial or subscription plan."
+	)
 })
 
 // Text message → extract nutrition → confirm
