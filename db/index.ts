@@ -44,30 +44,6 @@ function resolveConnectionString(): string {
 	)
 }
 
-function parseConnectionOptions(connectionString: string) {
-	try {
-		const parsed = new URL(connectionString)
-		return {
-			host: parsed.hostname || "127.0.0.1",
-			port: parsed.port ? parseInt(parsed.port, 10) : 5432,
-			database: parsed.pathname ? parsed.pathname.replace(/^\//, "") : "postgres",
-			username: decodeURIComponent(parsed.username || "postgres"),
-			password: decodeURIComponent(parsed.password || "postgres"),
-			ssl: connectionString.includes("sslmode=require") || connectionString.includes("supabase.com") ? ("require" as const) : false,
-			prepare: false,
-		}
-	} catch {
-		return {
-			host: "127.0.0.1",
-			port: 5432,
-			database: "postgres",
-			username: "postgres",
-			password: "postgres",
-			prepare: false,
-		}
-	}
-}
-
 /**
  * Serverless functions get a single connection because each invocation is its
  * own isolate; a pool would leak connections. Local dev uses the driver default
@@ -75,11 +51,29 @@ function parseConnectionOptions(connectionString: string) {
  */
 const MAX_CONNECTIONS_SERVERLESS = 1
 
+/**
+ * The connection string is handed to postgres.js as-is rather than being taken
+ * apart into { host, port, username, password, ssl } first.
+ *
+ * Decomposing it looks harmless and is not:
+ *
+ *   - Query parameters are lost. `sslmode`, `pgbouncer=true`, `connect_timeout`
+ *     and `options=--search_path=...` all live after the `?`, and Supabase's
+ *     pooler string carries some of them.
+ *   - SSL ends up being inferred from the hostname. Matching on "supabase.com"
+ *     silently downgrades every other managed Postgres, and every Supabase
+ *     custom domain, to an unencrypted connection.
+ *   - Any catch-and-default around the parse converts a malformed URL into a
+ *     connection to some other database instead of an error, which is the
+ *     failure mode this file exists to avoid.
+ *
+ * postgres.js already handles percent-decoded credentials, multi-host strings
+ * and sslmode. If a connection problem appears, fix the URL rather than the
+ * parser.
+ */
 function createClient() {
-	const connStr = resolveConnectionString()
-	const options = parseConnectionOptions(connStr)
-	return postgres({
-		...options,
+	return postgres(resolveConnectionString(), {
+		prepare: false,
 		max: process.env.NODE_ENV === "production" ? MAX_CONNECTIONS_SERVERLESS : undefined,
 	})
 }
