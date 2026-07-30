@@ -5,7 +5,7 @@ import Link from "next/link"
 import { DemoApp } from "@/components/demo-app"
 import { PRIMARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
-import { ShieldAlert } from "lucide-react"
+import { ShieldAlert, KeyRound } from "lucide-react"
 import { HeroDemo } from "@/components/landing/hero-demo"
 import { getActiveExperience } from "@/lib/experience-mode"
 
@@ -104,6 +104,9 @@ export default async function Home(props: {
 								</button>
 							</form>
 						</div>
+						<p className="text-muted text-xs">
+							Or bring your own free API key later — no card required, ever.
+						</p>
 					</div>
 
 					<div className="w-full max-w-md flex-1">
@@ -182,6 +185,17 @@ export default async function Home(props: {
 								on the run, and watch it sync to your dashboard instantly.
 							</p>
 						</div>
+
+						<div className="space-y-3">
+							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
+								07 · Bring Your Own Key
+							</span>
+							<h2 className="text-primary text-xl font-bold">Or don't pay us at all.</h2>
+							<p className="text-secondary text-sm leading-relaxed">
+								Add your own free Google AI Studio API key in Settings, and log meals with no trial
+								limit, no daily cap, and no subscription — forever.
+							</p>
+						</div>
 					</div>
 				</section>
 
@@ -216,60 +230,108 @@ export default async function Home(props: {
 				</section>
 
 				{/* Pricing Section */}
-				<section className="mx-auto mb-24 max-w-md text-center">
+				<section className="mx-auto mb-24 max-w-3xl text-center">
 					<h2 className="mb-2 text-2xl font-semibold">Simple, transparent pricing</h2>
 					<p className="text-secondary mb-8 text-sm">
-						Choose the subscription plan that works for you.
+						Pay us, or bring your own key and pay nothing. Your choice.
 					</p>
 
-					<div className="rounded-card border-subtle bg-surface flex flex-col gap-6 border p-8 text-left">
-						<div>
-							<h3 className="text-primary text-xl font-semibold">Personal</h3>
-							<p className="text-secondary mt-1 text-sm">
-								For people who want fast meal logging and a clear daily record.
-							</p>
+					<div className="grid gap-6 sm:grid-cols-2">
+						<div className="rounded-card border-subtle bg-surface flex flex-col gap-6 border p-8 text-left">
+							<div>
+								<h3 className="text-primary text-xl font-semibold">Personal</h3>
+								<p className="text-secondary mt-1 text-sm">
+									For people who want fast meal logging and a clear daily record.
+								</p>
+							</div>
+
+							<div className="flex items-baseline gap-1">
+								<span className="text-primary text-3xl font-bold tracking-tight">$2.99</span>
+								<span className="text-muted text-sm">/ month</span>
+							</div>
+
+							<ul className="text-secondary border-subtle space-y-3 border-t pt-6 text-sm">
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Meal logging from web and Telegram
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Estimated calories and macros
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Daily and weekly history
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Nutrition analytics
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Targets and day-specific adjustments
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Google Sheets copy
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Data export
+								</li>
+							</ul>
+
+							<form action={handleSignIn} className="mt-4 w-full">
+								<button
+									type="submit"
+									className={cn(
+										"rounded-btn w-full cursor-pointer py-3 text-center text-base font-semibold transition-all",
+										PRIMARY_BTN
+									)}
+								>
+									Start free for 7 days
+								</button>
+							</form>
 						</div>
 
-						<div className="flex items-baseline gap-1">
-							<span className="text-primary text-3xl font-bold tracking-tight">$2.99</span>
-							<span className="text-muted text-sm">/ month</span>
+						<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
+							<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-[10px] font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
+								Free forever
+							</span>
+							<div>
+								<h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
+									<KeyRound className="text-accent h-5 w-5" /> Bring Your Own Key
+								</h3>
+								<p className="text-secondary mt-1 text-sm">
+									For people happy to use their own free Google AI Studio key.
+								</p>
+							</div>
+
+							<div className="flex items-baseline gap-1">
+								<span className="text-primary text-3xl font-bold tracking-tight">$0</span>
+								<span className="text-muted text-sm">/ month, always</span>
+							</div>
+
+							<ul className="text-secondary border-subtle space-y-3 border-t pt-6 text-sm">
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> No trial limit, no daily cap
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Everything in Personal
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Your key, your Google billing
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Free within Google's generous quota
+								</li>
+								<li className="flex items-center gap-2">
+									<span className="text-accent">✓</span> Remove your key anytime
+								</li>
+							</ul>
+
+							<form action={handleSignIn} className="mt-4 w-full">
+								<button
+									type="submit"
+									className="border-subtle bg-elevated text-primary hover:bg-canvas rounded-btn w-full cursor-pointer border py-3 text-center text-base font-semibold transition-all"
+								>
+									Sign up & add my key
+								</button>
+							</form>
 						</div>
-
-						<ul className="text-secondary border-subtle space-y-3 border-t pt-6 text-sm">
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Meal logging from web and Telegram
-							</li>
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Estimated calories and macros
-							</li>
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Daily and weekly history
-							</li>
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Nutrition analytics
-							</li>
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Targets and day-specific adjustments
-							</li>
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Google Sheets copy
-							</li>
-							<li className="flex items-center gap-2">
-								<span className="text-accent">✓</span> Data export
-							</li>
-						</ul>
-
-						<form action={handleSignIn} className="mt-4 w-full">
-							<button
-								type="submit"
-								className={cn(
-									"rounded-btn w-full cursor-pointer py-3 text-center text-base font-semibold transition-all",
-									PRIMARY_BTN
-								)}
-							>
-								Start free for 7 days
-							</button>
-						</form>
 					</div>
 				</section>
 
