@@ -1,5 +1,7 @@
 "use client"
 
+import { Mascot } from "@/components/mascot"
+
 type TopFood = {
 	name: string
 	totalKcal: number
@@ -23,7 +25,12 @@ function FoodTable({
 	valueKey: "totalKcal" | "totalProteinG"
 }) {
 	if (foods.length === 0) {
-		return <p className="text-muted py-2 text-xs">No data yet.</p>
+		return (
+			<div className="flex flex-col items-center gap-1.5 py-3">
+				<Mascot pose="idle" className="h-8 w-8 opacity-70" />
+				<p className="text-muted text-xs">No data yet.</p>
+			</div>
+		)
 	}
 
 	// Find max value for relative bar length scaling
