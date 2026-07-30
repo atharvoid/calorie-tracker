@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-reac
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { CalorieProgress } from "./calorie-progress"
 import { MacroSummary } from "./macro-summary"
 import { MealGroup } from "./meal-group"
@@ -154,13 +155,16 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 		<div className="space-y-4">
 			{/* Date navigator */}
 			<div className="bg-surface border-subtle flex items-center justify-between rounded-xl border p-1">
-				<button
-					onClick={goToPrev}
-					className="text-muted hover:text-primary hover:bg-elevated flex h-11 w-11 items-center justify-center rounded-lg transition-colors"
-					aria-label="Previous day"
-				>
-					<ChevronLeft className="h-5 w-5" />
-				</button>
+				<Tooltip>
+					<TooltipTrigger
+						onClick={goToPrev}
+						className="text-muted hover:text-primary hover:bg-elevated flex h-11 w-11 items-center justify-center rounded-lg transition-colors"
+						aria-label="Previous day"
+					>
+						<ChevronLeft className="h-5 w-5" />
+					</TooltipTrigger>
+					<TooltipContent>Previous day</TooltipContent>
+				</Tooltip>
 
 				<div
 					onClick={handleDateClick}
@@ -171,7 +175,7 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 					<p className="text-primary text-sm leading-tight font-semibold sm:text-base">
 						{dateLabel}
 					</p>
-					<p className="text-muted mt-0.5 text-[11px] tracking-wide">{date}</p>
+					<p className="text-muted mt-0.5 text-2xs tracking-wide">{date}</p>
 					<input
 						ref={dateInputRef}
 						type="date"
@@ -186,14 +190,17 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 				</div>
 
 				<div className="flex items-center gap-1">
-					<button
-						onClick={goToNext}
-						disabled={nextDisabled}
-						className="text-muted hover:text-primary hover:bg-elevated flex h-11 w-11 items-center justify-center rounded-lg transition-colors disabled:pointer-events-none disabled:opacity-30"
-						aria-label="Next day"
-					>
-						<ChevronRight className="h-5 w-5" />
-					</button>
+					<Tooltip>
+						<TooltipTrigger
+							onClick={goToNext}
+							disabled={nextDisabled}
+							className="text-muted hover:text-primary hover:bg-elevated flex h-11 w-11 items-center justify-center rounded-lg transition-colors disabled:pointer-events-none disabled:opacity-30"
+							aria-label="Next day"
+						>
+							<ChevronRight className="h-5 w-5" />
+						</TooltipTrigger>
+						<TooltipContent>Next day</TooltipContent>
+					</Tooltip>
 
 					{!isToday(date, TZ) && (
 						<button

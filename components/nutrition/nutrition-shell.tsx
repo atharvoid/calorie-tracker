@@ -233,7 +233,7 @@ export function NutritionShell({ userId, user }: Props) {
 								<div className="border-subtle bg-elevated animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-56 rounded-xl border p-2 shadow-xl duration-150">
 									<div className="border-subtle/50 mb-1 border-b px-3 py-2">
 										<p className="text-primary truncate text-xs font-semibold">{user.name}</p>
-										<p className="text-muted truncate text-[10px]">{user.email}</p>
+										<p className="text-muted truncate text-2xs">{user.email}</p>
 									</div>
 									<form action={signOutAction} className="w-full">
 										<button
@@ -368,7 +368,7 @@ export function NutritionShell({ userId, user }: Props) {
 								>
 									<Icon className="h-5 w-5" />
 								</div>
-								<span className="mt-0.5 text-[10px] tracking-wide">{displayLabel}</span>
+								<span className="mt-0.5 text-2xs tracking-wide">{displayLabel}</span>
 							</button>
 						)
 					})}

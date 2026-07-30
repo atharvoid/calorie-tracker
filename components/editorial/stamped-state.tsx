@@ -1,19 +1,21 @@
-import React from "react"
 import { cn } from "@/lib/utils"
+import type { LucideIcon } from "lucide-react"
 
-interface StampedStateProps extends React.HTMLAttributes<HTMLDivElement> {
+type Props = {
+	icon: LucideIcon
 	label: string
+	className?: string
 }
 
-export function StampedState({ label, className, ...props }: StampedStateProps) {
+export function StampedState({ icon: Icon, label, className }: Props) {
 	return (
 		<div
 			className={cn(
-				"border-accent/40 text-accent/80 inline-flex rotate-[-2deg] items-center justify-center rounded border-2 border-dashed px-2.5 py-1 font-mono text-[11px] font-black tracking-widest uppercase select-none",
+				"border-subtle text-muted inline-flex items-center gap-1.5 rounded-full border border-dashed px-3 py-1 font-mono text-2xs font-bold tracking-wider uppercase",
 				className
 			)}
-			{...props}
 		>
+			<Icon className="h-3 w-3" />
 			{label}
 		</div>
 	)

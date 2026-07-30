@@ -73,7 +73,7 @@ export function ImprintLegend() {
         Not repeated per-meal. One product-level statement only.
       */}
 			<p
-				className="border-subtle/20 text-muted border-t px-4 py-2.5 text-center font-mono text-[10px] font-medium"
+				className="border-subtle/20 text-muted border-t px-4 py-2.5 text-center font-mono text-2xs font-medium"
 				data-testid="imprint-estimated-disclosure"
 			>
 				Nutrition values are estimates and can be edited.

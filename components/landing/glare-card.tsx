@@ -39,7 +39,7 @@ export function GlareCard({ children, className }: { children: ReactNode; classN
 			className={cn("group relative [transform-style:preserve-3d]", className)}
 			style={{
 				transform: "rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg))",
-				transition: "transform 300ms cubic-bezier(0.16, 1, 0.3, 1)",
+				transition: "transform 300ms var(--ease-premium)",
 			}}
 		>
 			<div

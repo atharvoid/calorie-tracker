@@ -62,7 +62,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 				{/* Status badge */}
 				<div
 					className={cn(
-						"rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide uppercase",
+						"rounded-full px-2.5 py-0.5 text-2xs font-bold tracking-wide uppercase",
 						STATUS_BG[status] ?? "bg-elevated",
 						STATUS_COLOR[status] ?? "text-muted"
 					)}
@@ -100,7 +100,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 							style={{ width: `${progressPct}%` }}
 						/>
 					</div>
-					<div className="text-muted flex justify-between text-[10px] font-medium sm:text-xs">
+					<div className="text-muted flex justify-between text-2xs font-medium sm:text-xs">
 						<span>0 kcal</span>
 						<span>{progressPct}% filled</span>
 						<span>{target.toLocaleString("en-IN")} kcal</span>
@@ -112,7 +112,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
 				{target !== null && (
 					<div className="bg-elevated/50 border-subtle/30 flex flex-col justify-between rounded-xl border p-2.5 sm:p-3">
-						<p className="text-muted text-[10px] font-medium tracking-wider uppercase sm:text-xs">
+						<p className="text-muted text-2xs font-medium tracking-wider uppercase sm:text-xs">
 							{isOver ? "Over target" : "Remaining"}
 						</p>
 						<p
@@ -125,25 +125,25 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 								? `+${Math.abs(targetDelta ?? 0).toLocaleString("en-IN")}`
 								: (remainingToTarget ?? 0).toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted mt-0.5 text-[9px] sm:text-[10px]">kcal</span>
+						<span className="text-muted mt-0.5 text-[9px] sm:text-2xs">kcal</span>
 					</div>
 				)}
 
 				{target !== null && (
 					<div className="bg-elevated/50 border-subtle/30 flex flex-col justify-between rounded-xl border p-2.5 sm:p-3">
-						<p className="text-muted text-[10px] font-medium tracking-wider uppercase sm:text-xs">
+						<p className="text-muted text-2xs font-medium tracking-wider uppercase sm:text-xs">
 							Target
 						</p>
 						<p className="tabular text-primary mt-1 font-mono text-base leading-none font-bold sm:text-lg">
 							{target.toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted mt-0.5 text-[9px] sm:text-[10px]">kcal / day</span>
+						<span className="text-muted mt-0.5 text-[9px] sm:text-2xs">kcal / day</span>
 					</div>
 				)}
 
 				{maintenance !== null && (
 					<div className="bg-elevated/50 border-subtle/30 col-span-2 flex flex-col justify-between rounded-xl border p-2.5 sm:col-span-1 sm:p-3">
-						<p className="text-muted text-[10px] font-medium tracking-wider uppercase sm:text-xs">
+						<p className="text-muted text-2xs font-medium tracking-wider uppercase sm:text-xs">
 							vs Maintenance
 						</p>
 						<p
@@ -155,7 +155,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 							{(maintenanceBalance ?? 0) > 0 ? "+" : ""}
 							{(maintenanceBalance ?? 0).toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted mt-0.5 text-[9px] sm:text-[10px]">
+						<span className="text-muted mt-0.5 text-[9px] sm:text-2xs">
 							kcal ({maintenance.toLocaleString("en-IN")} maint.)
 						</span>
 					</div>
@@ -164,7 +164,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 
 			{/* No target configured */}
 			{status === "unconfigured" && (
-				<p className="text-muted text-[11px] leading-relaxed">
+				<p className="text-muted text-2xs leading-relaxed">
 					Set your daily target in <span className="text-accent font-semibold">Settings</span> to
 					track progress.
 				</p>

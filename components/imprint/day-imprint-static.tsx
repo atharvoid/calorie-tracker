@@ -94,7 +94,7 @@ function renderShape(
 					x={shape.centerX}
 					y={shape.centerY - shape.height / 2 - 12}
 					textAnchor="middle"
-					className="fill-current font-mono text-[10px] font-bold"
+					className="fill-current font-mono text-2xs font-bold"
 					style={{ fill: color }}
 				>
 					{shape.mealType || "Other"}
@@ -200,7 +200,7 @@ export function DayImprintStatic({ scene, highlightedMealId, onMealClick }: DayI
 								x={tick.x}
 								y={520 - SAFE.bottom + 20}
 								textAnchor="middle"
-								className="fill-current text-[10px] font-bold"
+								className="fill-current text-2xs font-bold"
 							>
 								{tick.label}
 							</text>

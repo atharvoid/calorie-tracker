@@ -66,7 +66,7 @@ export function AnalyticsKpis({ kpi, loading = false }: Props) {
 			{cards.map((card) => (
 				<Panel key={card.label} className="flex min-h-[90px] flex-col justify-between p-3.5">
 					<div>
-						<p className="text-muted text-[10px] font-bold tracking-wider uppercase sm:text-xs">
+						<p className="text-muted text-2xs font-bold tracking-wider uppercase sm:text-xs">
 							{card.label}
 						</p>
 						<p
@@ -78,7 +78,7 @@ export function AnalyticsKpis({ kpi, loading = false }: Props) {
 							{card.value}
 						</p>
 					</div>
-					<p className="text-muted mt-1.5 text-[10px] leading-tight sm:text-xs">{card.sub}</p>
+					<p className="text-muted mt-1.5 text-2xs leading-tight sm:text-xs">{card.sub}</p>
 				</Panel>
 			))}
 		</div>

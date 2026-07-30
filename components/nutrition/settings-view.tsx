@@ -616,7 +616,7 @@ export function SettingsView({ refreshKey }: Props) {
 										Personal Annual — $24.99/yr
 									</button>
 								</div>
-								<p className="text-muted text-center text-[10px] leading-relaxed">
+								<p className="text-muted text-center text-2xs leading-relaxed">
 									Both plans include unlimited meals on the web, 25 daily AI Telegram logs, custom
 									targets, Google Sheets sync, and full data export. Or add your own API key above to
 									skip payment entirely.

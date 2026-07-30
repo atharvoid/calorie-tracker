@@ -46,7 +46,7 @@ export function MealItemRow({ item, onDelete, onEdit }: Props) {
 				<span className="text-primary line-clamp-2 text-sm leading-snug font-semibold break-words">
 					{item.name}
 				</span>
-				<div className="text-muted mt-0.5 flex items-center gap-1.5 text-[11px] font-medium">
+				<div className="text-muted mt-0.5 flex items-center gap-1.5 text-2xs font-medium">
 					{item.grams !== null && <span className="tabular font-mono">{item.grams}g</span>}
 					{item.grams !== null && item.notes && <span>·</span>}
 					{item.notes && <span className="max-w-[180px] truncate italic">{item.notes}</span>}
@@ -57,9 +57,9 @@ export function MealItemRow({ item, onDelete, onEdit }: Props) {
 			<div className="shrink-0 pl-2 text-right">
 				<p className="tabular text-primary font-mono text-sm leading-tight font-bold">
 					{item.kcal.toLocaleString("en-IN")}{" "}
-					<span className="text-muted text-[10px] font-normal">kcal</span>
+					<span className="text-muted text-2xs font-normal">kcal</span>
 				</p>
-				<p className="text-muted tabular mt-0.5 text-[11px] font-medium">
+				<p className="text-muted tabular mt-0.5 text-2xs font-medium">
 					P {item.proteinG.toFixed(1)}g
 				</p>
 			</div>
