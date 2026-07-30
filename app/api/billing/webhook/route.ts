@@ -1,13 +1,52 @@
 import { NextRequest, NextResponse } from "next/server"
 import { db } from "@/db"
 import { billingCustomers, subscriptions, productEntitlements } from "@/db/schema"
+import type { BillingProvider, SubscriptionStatus } from "@/db/schema"
 import { eq, desc } from "drizzle-orm"
 import { dodo } from "@/lib/dodo"
 import { resolveAccessState } from "@/lib/entitlements"
 
 export const dynamic = "force-dynamic"
 
-// Define a minimal interface for Dodo Subscription based on SDK types
+/**
+ * This row previously wrote the literal "dodopayments", but BillingProvider is
+ * "stripe" | "dodo". Every billing_customer row created by this webhook carried
+ * a provider value no other code path recognises.
+ */
+const PROVIDER: BillingProvider = "dodo"
+
+/**
+ * Dodo's status vocabulary is not ours, so `status as SubscriptionStatus` was
+ * asserting something untrue — "on_hold" and "cancelled" would have been
+ * written verbatim into a column typed as neither.
+ *
+ * Unrecognised values fail closed to "incomplete" rather than "active". An
+ * unknown billing status must never be the reason someone gets free access.
+ */
+const DODO_STATUS_MAP: Record<string, SubscriptionStatus> = {
+  pending: "incomplete",
+  trialing: "trialing",
+  active: "active",
+  on_hold: "past_due",
+  past_due: "past_due",
+  paused: "paused",
+  cancelled: "canceled",
+  canceled: "canceled",
+  expired: "canceled",
+  failed: "unpaid",
+  unpaid: "unpaid",
+}
+
+function toSubscriptionStatus(raw: string): SubscriptionStatus {
+  const mapped = DODO_STATUS_MAP[raw]
+  if (!mapped) {
+    console.warn(`[webhook] unrecognised Dodo status "${raw}"; treating as incomplete`)
+    return "incomplete"
+  }
+  return mapped
+}
+
+// Minimal shape of the Dodo subscription payload we rely on.
 interface DodoSubscriptionShim {
   subscription_id: string
   status: string
@@ -17,7 +56,7 @@ interface DodoSubscriptionShim {
   next_billing_date: string | null
   cancel_at_next_billing_date: boolean
   product_id: string
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
   customer: {
     customer_id: string
     email: string
@@ -25,9 +64,14 @@ interface DodoSubscriptionShim {
   }
 }
 
+function readUserIdFromMetadata(metadata: Record<string, unknown> | undefined): string {
+  const value = metadata?.userId
+  return typeof value === "string" ? value : ""
+}
+
 async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
   // 1. Resolve userId from Dodo metadata or billing_customer record
-  let userId = (dodoSub.metadata?.userId as string) || ""
+  let userId = readUserIdFromMetadata(dodoSub.metadata)
   const customerId = dodoSub.customer?.customer_id || ""
 
   if (!userId && customerId) {
@@ -50,7 +94,7 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
       .insert(billingCustomers)
       .values({
         userId,
-        provider: "dodopayments",
+        provider: PROVIDER,
         providerCustomerId: customerId,
       })
       .onConflictDoNothing()
@@ -61,7 +105,10 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
   const annualProductId = process.env.DODO_PRODUCT_ANNUAL_ID || "p_annual_placeholder"
   const planKey = productId === annualProductId ? "personal_annual" : "personal_monthly"
 
-  const currentPeriodStart = new Date(dodoSub.previous_billing_date || dodoSub.created_at || new Date())
+  const status = toSubscriptionStatus(dodoSub.status)
+  const currentPeriodStart = new Date(
+    dodoSub.previous_billing_date || dodoSub.created_at || new Date()
+  )
   const currentPeriodEnd = new Date(dodoSub.next_billing_date || new Date())
 
   // 3. Upsert subscription table record
@@ -75,7 +122,7 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
     await db
       .update(subscriptions)
       .set({
-        status: dodoSub.status,
+        status,
         providerPriceId: productId,
         planKey,
         currency: dodoSub.currency || "USD",
@@ -90,7 +137,7 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
       userId,
       providerSubscriptionId: dodoSub.subscription_id,
       providerPriceId: productId,
-      status: dodoSub.status,
+      status,
       planKey,
       currency: dodoSub.currency || "USD",
       currentPeriodStart,
@@ -106,7 +153,6 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
     .where(eq(productEntitlements.userId, userId))
     .limit(1)
 
-  // Query latest sub
   const [latestSub] = await db
     .select()
     .from(subscriptions)
@@ -144,30 +190,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Missing signature headers or secret key" }, { status: 400 })
   }
 
+  const rawBody = await req.text()
+
+  // Signature verification is separated from processing on purpose. Previously
+  // both returned 400, so a transient database error looked identical to a
+  // forged request — and Dodo stops retrying on 4xx, meaning a real payment
+  // event could be dropped permanently because the database blipped.
+  let event: { type: string; data: unknown }
   try {
-    const rawBody = await req.text()
-    
-    // Unwrap webhook using Dodo SDK (validates signature)
-    const event = dodo.webhooks.unwrap(rawBody, {
+    event = dodo.webhooks.unwrap(rawBody, {
       headers: {
         "webhook-id": webhookId,
         "webhook-signature": signature,
         "webhook-timestamp": webhookTimestamp,
       },
       key: webhookSecret,
-    })
+    }) as { type: string; data: unknown }
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error("[webhook] signature verification failed:", msg)
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
+  }
 
+  try {
     console.log(`[webhook] Received Dodo event: ${event.type}`)
 
     if (event.type.startsWith("subscription.")) {
-      const subscription = event.data as any
-      await handleSubscriptionChange(subscription)
+      await handleSubscriptionChange(event.data as DodoSubscriptionShim)
     }
 
     return NextResponse.json({ received: true })
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
-    console.error("[webhook] error handling webhook:", msg)
-    return NextResponse.json({ error: `Webhook Error: ${msg}` }, { status: 400 })
+    console.error("[webhook] error handling verified webhook:", msg)
+    // 5xx so Dodo retries. The subscription upsert is keyed on
+    // provider_subscription_id, so replaying the same event is safe.
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 })
   }
 }

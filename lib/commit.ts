@@ -5,11 +5,16 @@ import { nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { broadcastNutritionChanged } from "@/lib/realtime"
 import { localDate } from "@/lib/nutrition-date"
 
+// Derived from the schema rather than restated, so these cannot drift from the
+// column definitions the way a hand-copied union would.
+type MealItemInsert = typeof mealItems.$inferInsert
+type DbMealType = MealItemInsert["mealType"]
+type DbLogSource = MealItemInsert["source"]
 
 type CommitInput = {
   userId: string
   nutrition: NutritionResult
-  source?: string
+  source?: DbLogSource
   captureId?: string
   timezone?: string
   logDate?: string
@@ -40,7 +45,7 @@ export async function commitNutrition({
   }
 
   const date = logDate || localDate(timezone)
-  const dbRows: (typeof mealItems.$inferInsert)[] = []
+  const dbRows: MealItemInsert[] = []
 
   // Intermediate shape before we have IDs
   type PendingSheetRow = Omit<MealRow, "id">
@@ -48,11 +53,16 @@ export async function commitNutrition({
 
   let idx = 0
   for (const meal of validated.data.meals) {
+    // nutritionSchema has already constrained meal_type, but Zod infers it as a
+    // plain string. Narrowing here is safe because of that validation; if the
+    // schema ever widens, this is the line that should start failing.
+    const mealType = (meal.meal_type ?? null) as DbMealType
+
     for (const item of meal.items) {
       dbRows.push({
         userId,
         date,
-        mealType: meal.meal_type ?? null,
+        mealType,
         timeHint: meal.time_hint ?? null,
         name: item.name,
         grams: item.grams != null ? String(item.grams) : null,
