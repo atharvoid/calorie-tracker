@@ -15,6 +15,16 @@ import {
 import { toast } from "sonner"
 import { Panel } from "@/components/ui/panel"
 import { Button } from "@/components/ui/button"
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog"
 import { ConnectTelegram } from "../connect-telegram"
 import { signOutAction } from "../auth-actions"
 import { ByokPanel } from "./byok-panel"
@@ -665,15 +675,34 @@ export function SettingsView({ refreshKey }: Props) {
 						{exporting ? "Exporting…" : "Export Logged Meals (JSON)"}
 					</button>
 
-					<form action={signOutAction} className="w-full">
-						<button
-							type="submit"
-							className="rounded-btn border-danger/25 bg-danger/5 text-danger hover:bg-danger/10 flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none"
-						>
+					<Dialog>
+						<DialogTrigger className="rounded-btn border-danger/25 bg-danger/5 text-danger hover:bg-danger/10 flex h-10 w-full cursor-pointer items-center justify-center gap-1.5 border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none">
 							<LogOut className="h-4 w-4" />
 							Sign Out
-						</button>
-					</form>
+						</DialogTrigger>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Sign out?</DialogTitle>
+								<DialogDescription>
+									You'll need to sign back in to log meals or view your history.
+								</DialogDescription>
+							</DialogHeader>
+							<DialogFooter>
+								<DialogClose className="rounded-btn border-subtle bg-elevated text-primary hover:bg-surface cursor-pointer border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none">
+									Cancel
+								</DialogClose>
+								<form action={signOutAction}>
+									<button
+										type="submit"
+										className="rounded-btn border-danger/25 bg-danger/5 text-danger hover:bg-danger/10 flex w-full cursor-pointer items-center justify-center gap-1.5 border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none"
+									>
+										<LogOut className="h-4 w-4" />
+										Sign Out
+									</button>
+								</form>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				</div>
 			</Panel>
 		</div>
