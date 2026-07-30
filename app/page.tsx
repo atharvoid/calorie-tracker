@@ -261,7 +261,7 @@ export default async function Home(props: {
 
 						<GlareCard className="rounded-card">
 							<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
-								<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-[10px] font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
+								<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-2xs font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
 									Free forever
 								</span>
 								<div>
@@ -319,7 +319,7 @@ export default async function Home(props: {
 						</span>
 					</div>
 					<div>&copy; {new Date().getFullYear()} Calorie Tracker. All rights reserved.</div>
-					<div className="text-muted flex justify-center gap-4 text-[11px]">
+					<div className="text-muted flex justify-center gap-4 text-2xs">
 						<Link
 							href="/privacy"
 							className="hover:text-secondary transition-colors hover:underline"
