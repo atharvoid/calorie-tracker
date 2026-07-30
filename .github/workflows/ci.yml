@@ -12,38 +12,39 @@ concurrency:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
-          run_install: false
+          # Pinned explicitly because package.json has no packageManager field.
+          # Without this the action fails before installing anything.
+          version: 10
 
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - run: pnpm typecheck
 
-      - name: Lint
-        run: pnpm lint
+      - run: pnpm lint
 
-      - name: Format check
-        run: pnpm format:check
+      - run: pnpm test:run
 
-      - name: Unit tests
-        run: pnpm test:run
-
-      - name: Build
-        run: pnpm build
+      # The build imports every route module to collect page data. Client
+      # construction is lazy now, so these placeholders are only needed for the
+      # variables read at module scope.
+      - run: pnpm build
         env:
-          # Build-time placeholders only. No real secrets in CI.
-          DATABASE_URL: postgres://postgres:postgres@127.0.0.1:5432/postgres
-          AUTH_SECRET: ci-placeholder-secret-not-used-at-runtime
+          DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
+          AUTH_SECRET: ci-placeholder-value-never-used-at-runtime
           NEXT_PUBLIC_APP_URL: http://localhost:3000
+
+# A format:check step belongs here, but prettier is not yet in devDependencies
+# and adding it from a tool that cannot regenerate pnpm-lock.yaml would break
+# --frozen-lockfile. Tracked in issue #10: run `pnpm add -D prettier
+# prettier-plugin-tailwindcss`, add the scripts, commit the lockfile, then add
+# the step back here.
