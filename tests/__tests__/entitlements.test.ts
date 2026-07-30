@@ -16,6 +16,12 @@ describe("resolveAccessState", () => {
     paidAiLogsToday: 0,
     paidAiLogDate: null,
     accessState: "trial",
+    byokProvider: null,
+    byokKeyEnvelope: null,
+    byokKeyLast4: null,
+    byokVerifiedAt: null,
+    byokFailureCount: 0,
+    byokLastFailureAt: null,
     createdAt: new Date(),
     updatedAt: new Date(),
     ...overrides,
@@ -59,14 +65,14 @@ describe("resolveAccessState", () => {
     expect(state).toBe("grace")
   })
 
-  it("returns expired if subscription is past_due by more than 3 days", () => {
+  it("returns trial_ended if subscription is past_due by more than 3 days", () => {
     const sub = mockSubscription({
       status: "past_due",
       currentPeriodEnd: new Date("2026-08-01T00:00:00Z"),
     })
     const now = new Date("2026-08-05T00:00:00Z") // 4 days past due
     const state = resolveAccessState(null, sub, now)
-    expect(state).toBe("expired")
+    expect(state).toBe("trial_ended")
   })
 
   it("returns active if subscription is canceled but still before currentPeriodEnd", () => {
@@ -79,14 +85,14 @@ describe("resolveAccessState", () => {
     expect(state).toBe("active")
   })
 
-  it("returns expired if subscription is canceled and currentPeriodEnd is in past", () => {
+  it("returns trial_ended if subscription is canceled and currentPeriodEnd is in past", () => {
     const sub = mockSubscription({
       status: "canceled",
       currentPeriodEnd: new Date("2026-08-01T00:00:00Z"),
     })
     const now = new Date("2026-08-02T00:00:00Z")
     const state = resolveAccessState(null, sub, now)
-    expect(state).toBe("expired")
+    expect(state).toBe("trial_ended")
   })
 
   it("returns pre_trial if no entitlement or subscription row exists", () => {
@@ -94,16 +100,16 @@ describe("resolveAccessState", () => {
     expect(state).toBe("pre_trial")
   })
 
-  it("returns expired if free trial period has elapsed", () => {
+  it("returns trial_ended if free trial period has elapsed", () => {
     const ent = mockEntitlement({
       trialEndsAt: new Date("2026-07-08T00:00:00Z"),
     })
     const now = new Date("2026-07-09T00:00:00Z")
     const state = resolveAccessState(ent, null, now)
-    expect(state).toBe("expired")
+    expect(state).toBe("trial_ended")
   })
 
-  it("returns expired if free trial log count matches or exceeds limits", () => {
+  it("returns quota_exhausted if free trial log count matches or exceeds limits", () => {
     const ent = mockEntitlement({
       trialAiLogsUsed: 50,
       trialAiLogLimit: 50,
@@ -111,7 +117,7 @@ describe("resolveAccessState", () => {
     })
     const now = new Date("2026-07-05T00:00:00Z") // before end date
     const state = resolveAccessState(ent, null, now)
-    expect(state).toBe("expired")
+    expect(state).toBe("quota_exhausted")
   })
 
   it("returns trial if free trial is still active and count is within limits", () => {

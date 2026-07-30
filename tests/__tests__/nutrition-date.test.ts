@@ -115,9 +115,8 @@ describe("dateRange", () => {
     expect(dateRange("2026-07-17", "2026-07-16")).toEqual([])
   })
 
-  it("caps at 366 entries", () => {
-    const range = dateRange("2020-01-01", "2025-12-31")
-    expect(range.length).toBe(366)
+  it("throws when range exceeds 366 entries", () => {
+    expect(() => dateRange("2020-01-01", "2025-12-31")).toThrow("exceeds the 366-day maximum")
   })
 
   it("wraps month boundaries correctly", () => {

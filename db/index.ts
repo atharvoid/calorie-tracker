@@ -44,6 +44,30 @@ function resolveConnectionString(): string {
 	)
 }
 
+function parseConnectionOptions(connectionString: string) {
+	try {
+		const parsed = new URL(connectionString)
+		return {
+			host: parsed.hostname || "127.0.0.1",
+			port: parsed.port ? parseInt(parsed.port, 10) : 5432,
+			database: parsed.pathname ? parsed.pathname.replace(/^\//, "") : "postgres",
+			username: decodeURIComponent(parsed.username || "postgres"),
+			password: decodeURIComponent(parsed.password || "postgres"),
+			ssl: connectionString.includes("sslmode=require") || connectionString.includes("supabase.com") ? ("require" as const) : false,
+			prepare: false,
+		}
+	} catch {
+		return {
+			host: "127.0.0.1",
+			port: 5432,
+			database: "postgres",
+			username: "postgres",
+			password: "postgres",
+			prepare: false,
+		}
+	}
+}
+
 /**
  * Serverless functions get a single connection because each invocation is its
  * own isolate; a pool would leak connections. Local dev uses the driver default
@@ -52,8 +76,10 @@ function resolveConnectionString(): string {
 const MAX_CONNECTIONS_SERVERLESS = 1
 
 function createClient() {
-	return postgres(resolveConnectionString(), {
-		prepare: false,
+	const connStr = resolveConnectionString()
+	const options = parseConnectionOptions(connStr)
+	return postgres({
+		...options,
 		max: process.env.NODE_ENV === "production" ? MAX_CONNECTIONS_SERVERLESS : undefined,
 	})
 }
