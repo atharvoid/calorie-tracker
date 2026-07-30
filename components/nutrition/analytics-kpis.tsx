@@ -2,6 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { Panel } from "@/components/ui/panel"
+import { Skeleton } from "@/components/ui/skeleton"
 
 type Kpi = {
 	avgKcal: number | null
@@ -21,9 +22,9 @@ type Props = { kpi: Kpi; loading?: boolean }
 export function AnalyticsKpis({ kpi, loading = false }: Props) {
 	if (loading) {
 		return (
-			<div className="grid animate-pulse grid-cols-2 gap-3 md:grid-cols-4">
+			<div className="grid grid-cols-2 gap-3 md:grid-cols-4">
 				{[0, 1, 2, 3].map((i) => (
-					<div key={i} className="bg-elevated h-24 rounded-xl" />
+					<Skeleton key={i} className="h-24 rounded-xl" />
 				))}
 			</div>
 		)
