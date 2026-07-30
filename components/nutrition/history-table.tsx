@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { EmptyState } from "@/components/ui/empty-state"
 import type { DailyNutritionSummary } from "@/lib/nutrition-types"
 
 const STATUS_LABEL: Record<string, string> = {
@@ -94,7 +95,11 @@ export function HistoryTable({
 			</div>
 
 			{summaries.length === 0 && (
-				<p className="text-muted py-8 text-center text-sm">No data matches your filter.</p>
+				<EmptyState
+					title="No data matches your filter"
+					hint="Try a different sort or filter option."
+					className="h-[200px]"
+				/>
 			)}
 
 			{/* Desktop table */}
