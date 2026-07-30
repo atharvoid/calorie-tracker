@@ -29,11 +29,11 @@ export function MealGroup({ group, onDeleteItem, onEditItem }: Props) {
 			>
 				<div className="min-w-0 flex-1 pr-2">
 					<span className="text-primary font-semibold">{label}</span>
-					<span className="text-muted ml-1.5 text-[11px] font-medium">
+					<span className="text-muted ml-1.5 text-2xs font-medium">
 						({group.subtotal.itemCount} {group.subtotal.itemCount === 1 ? "item" : "items"})
 					</span>
 					{timeLabel && (
-						<span className="text-muted bg-elevated mt-0.5 block w-max rounded px-1.5 py-0.5 text-[10px] font-normal sm:mt-0 sm:ml-2 sm:inline sm:text-xs">
+						<span className="text-muted bg-elevated mt-0.5 block w-max rounded px-1.5 py-0.5 text-2xs font-normal sm:mt-0 sm:ml-2 sm:inline sm:text-xs">
 							{group.timeHint}
 						</span>
 					)}
@@ -42,9 +42,9 @@ export function MealGroup({ group, onDeleteItem, onEditItem }: Props) {
 					<div className="text-right">
 						<p className="tabular text-primary font-mono text-sm leading-tight font-bold">
 							{group.subtotal.kcal.toLocaleString("en-IN")}{" "}
-							<span className="text-muted text-[10px] font-normal">kcal</span>
+							<span className="text-muted text-2xs font-normal">kcal</span>
 						</p>
-						<p className="text-muted tabular mt-0.5 text-[11px] font-medium">
+						<p className="text-muted tabular mt-0.5 text-2xs font-medium">
 							P {group.subtotal.proteinG.toFixed(1)}g C {group.subtotal.carbsG.toFixed(1)}g F{" "}
 							{group.subtotal.fatG.toFixed(1)}g
 						</p>
