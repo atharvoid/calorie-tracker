@@ -240,6 +240,15 @@
 	   rest of the type-scale/spacing audit until there's a live render to
 	   iterate against. */
 	--ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
+
+	/* Consolidates the app's two ad hoc micro-text sizes (10px and 11px,
+	   scattered across ~20 components for kcal/gram units, timestamps, and
+	   badge captions) into one named size. The 1px difference between them
+	   was imperceptible and unintentional — this removes duplicate ad hoc
+	   values without changing intended visual hierarchy. Creates the
+	   `text-2xs` Tailwind utility. */
+	--text-2xs: 0.6875rem;
+	--text-2xs--line-height: 1rem;
 }
 
 /* Base resets */
