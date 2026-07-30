@@ -11,6 +11,7 @@ import {
 	Tooltip,
 	Cell,
 } from "recharts"
+import { Mascot } from "@/components/mascot"
 
 type MealContrib = {
 	mealType: string
@@ -70,7 +71,12 @@ export function MealContribution({ data, loading = false }: Props) {
 		return <div className="bg-elevated h-[180px] animate-pulse rounded-xl" />
 	}
 	if (data.length === 0) {
-		return <p className="text-muted py-4 text-center text-sm">No data yet.</p>
+		return (
+			<div className="flex flex-col items-center gap-2 py-6">
+				<Mascot pose="idle" className="h-9 w-9 opacity-70" />
+				<p className="text-muted text-sm">No data yet.</p>
+			</div>
+		)
 	}
 
 	return (
