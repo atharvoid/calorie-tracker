@@ -230,6 +230,16 @@
 	--spacing-mobile-nav: calc(76px + env(safe-area-inset-bottom));
 	--spacing-safe-bottom: env(safe-area-inset-bottom);
 	--spacing-safe-top: env(safe-area-inset-top);
+
+	/* Single shared easing curve for intentional, "premium" motion — see
+	   docs/BYOK_UI_REDESIGN_PLAN.md Phase 3 ("one consistent easing curve ...
+	   standardize on it everywhere instead of default ease/ease-out"). Creates
+	   the `ease-premium` Tailwind utility. Only applied to motion this redesign
+	   effort already owns (tab-enter, the pricing GlareCard tilt); broader
+	   retrofitting of unrelated components' transitions is deferred with the
+	   rest of the type-scale/spacing audit until there's a live render to
+	   iterate against. */
+	--ease-premium: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Base resets */
@@ -323,7 +333,7 @@ body {
 }
 
 .animate-tab-enter {
-	animation: tab-enter 180ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+	animation: tab-enter 180ms var(--ease-premium) forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {
