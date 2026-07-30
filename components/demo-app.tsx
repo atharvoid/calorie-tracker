@@ -1,7 +1,6 @@
 "use client"
 
 import { Suspense } from "react"
-import { Utensils } from "lucide-react"
 import { EmptyState } from "@/components/ui/empty-state"
 import { NutritionShell } from "./nutrition/nutrition-shell"
 
@@ -24,7 +23,7 @@ export function DemoApp({ signedIn = false, userId, user }: DemoAppProps) {
 				</Suspense>
 			) : (
 				<EmptyState
-					icon={<Utensils className="h-8 w-8" />}
+					mascotPose="wave"
 					title="Sign in to see your Calorie Tracker"
 					hint="Your logged meals from Telegram will appear here live."
 				/>
