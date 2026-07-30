@@ -249,6 +249,15 @@ export async function getMealItemsForRange(
     .orderBy(mealItems.date, mealItems.createdAt)
 }
 
+/**
+ * Derived from the schema rather than declared as `string | null`. The column
+ * is a narrowed union, so a plain string does not assign — and casting the
+ * write site to `any` would let any arbitrary value through to the database.
+ * Typing the input instead pushes the constraint out to the API boundary,
+ * where a bad value can be rejected with a 400.
+ */
+type DbMealType = (typeof mealItems.$inferInsert)["mealType"]
+
 export type ItemUpdateInput = {
   name?: string
   grams?: number | null
@@ -257,7 +266,7 @@ export type ItemUpdateInput = {
   carbsG?: number
   fatG?: number
   notes?: string | null
-  mealType?: string | null
+  mealType?: DbMealType
 }
 
 export async function updateMealItem(
