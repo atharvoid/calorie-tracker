@@ -4,13 +4,14 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import { db } from "@/db"
 import { accounts, sessions, users, verificationTokens } from "@/db/schema"
 
-if (!process.env.AUTH_URL && !process.env.NEXTAUTH_URL && !process.env.VERCEL_URL) {
+if (!process.env.AUTH_URL && !process.env.NEXTAUTH_URL) {
 	process.env.AUTH_URL = process.env.NEXT_PUBLIC_APP_URL || "https://logcals.vercel.app"
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
 	basePath: "/api/auth",
 	trustHost: true,
+	secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
 	adapter: DrizzleAdapter(db, {
 		usersTable: users,
 		accountsTable: accounts,
