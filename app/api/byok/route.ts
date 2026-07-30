@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server"
-import { eq } from "drizzle-orm"
 import { auth } from "@/auth"
-import { db } from "@/db"
-import { productEntitlements } from "@/db/schema"
-import {
-	ByokError,
-	encryptApiKey,
-	isByokEnabled,
-	keyFingerprint,
-	verifyGoogleApiKey,
-} from "@/lib/byok"
-import { getUserEntitlement } from "@/lib/entitlements"
+import { isByokEnabled } from "@/lib/byok"
+import { getUserEntitlement, setByokKey, clearByokKey } from "@/lib/entitlements"
+import { ByokError } from "@/lib/byok"
 
 // node:crypto is required for AES-GCM, so this route cannot run on the edge.
 export const runtime = "nodejs"
@@ -25,6 +17,9 @@ export const dynamic = "force-dynamic"
  *   - Keys are verified against the provider before being stored, so a typo
  *     fails here rather than on the user's next meal log.
  *   - A rejected key is never silently replaced with the platform key.
+ *
+ * Storage and verification are shared with the Telegram /setkey command via
+ * lib/entitlements.ts (setByokKey/clearByokKey), so the two paths cannot drift.
  */
 
 function unauthorized() {
@@ -78,33 +73,7 @@ export async function PUT(request: Request) {
 	}
 
 	try {
-		await verifyGoogleApiKey(apiKey)
-
-		const now = new Date()
-		await db
-			.insert(productEntitlements)
-			.values({
-				userId,
-				byokProvider: "google",
-				byokKeyEnvelope: encryptApiKey(apiKey),
-				byokKeyLast4: keyFingerprint(apiKey),
-				byokVerifiedAt: now,
-				byokFailureCount: 0,
-				byokLastFailureAt: null,
-			})
-			.onConflictDoUpdate({
-				target: productEntitlements.userId,
-				set: {
-					byokProvider: "google",
-					byokKeyEnvelope: encryptApiKey(apiKey),
-					byokKeyLast4: keyFingerprint(apiKey),
-					byokVerifiedAt: now,
-					byokFailureCount: 0,
-					byokLastFailureAt: null,
-				},
-			})
-
-		const entitlement = await getUserEntitlement(userId)
+		const entitlement = await setByokKey(userId, apiKey)
 		return NextResponse.json({
 			hasKey: true,
 			keyLast4: entitlement.byokKeyLast4,
@@ -127,18 +96,6 @@ export async function DELETE() {
 	const userId = session?.user?.id
 	if (!userId) return unauthorized()
 
-	await db
-		.update(productEntitlements)
-		.set({
-			byokProvider: null,
-			byokKeyEnvelope: null,
-			byokKeyLast4: null,
-			byokVerifiedAt: null,
-			byokFailureCount: 0,
-			byokLastFailureAt: null,
-		})
-		.where(eq(productEntitlements.userId, userId))
-
-	const entitlement = await getUserEntitlement(userId)
+	const entitlement = await clearByokKey(userId)
 	return NextResponse.json({ hasKey: false, accessState: entitlement.accessState })
 }
