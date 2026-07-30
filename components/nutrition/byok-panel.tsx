@@ -5,6 +5,16 @@ import { KeyRound, Loader2, ShieldCheck, Trash2, ExternalLink } from "lucide-rea
 import { toast } from "sonner"
 import { Panel } from "@/components/ui/panel"
 import { Button } from "@/components/ui/button"
+import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog"
 
 type ByokStatus = {
 	enabled: boolean
@@ -23,6 +33,7 @@ export function ByokPanel({ onChanged }: Props) {
 	const [apiKey, setApiKey] = useState("")
 	const [saving, setSaving] = useState(false)
 	const [removing, setRemoving] = useState(false)
+	const [confirmOpen, setConfirmOpen] = useState(false)
 
 	const load = useCallback(async () => {
 		try {
@@ -71,6 +82,7 @@ export function ByokPanel({ onChanged }: Props) {
 			const res = await fetch("/api/byok", { method: "DELETE" })
 			if (!res.ok) throw new Error("Could not remove key")
 			toast.success("API key removed")
+			setConfirmOpen(false)
 			await load()
 			onChanged?.()
 		} catch (e) {
@@ -110,18 +122,41 @@ export function ByokPanel({ onChanged }: Props) {
 						<ShieldCheck className="text-accent h-3.5 w-3.5" />
 						Key saved •••• {status.keyLast4}
 					</span>
-					<button
-						onClick={handleRemove}
-						disabled={removing}
-						className="border-danger/25 bg-danger/5 text-danger hover:bg-danger/10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
-					>
-						{removing ? (
-							<Loader2 className="h-3.5 w-3.5 animate-spin" />
-						) : (
+					<Dialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+						<DialogTrigger
+							disabled={removing}
+							className="border-danger/25 bg-danger/5 text-danger hover:bg-danger/10 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
+						>
 							<Trash2 className="h-3.5 w-3.5" />
-						)}
-						Remove key
-					</button>
+							Remove key
+						</DialogTrigger>
+						<DialogContent>
+							<DialogHeader>
+								<DialogTitle>Remove your API key?</DialogTitle>
+								<DialogDescription>
+									You'll go back to trial or subscription limits for AI meal logging. You can add a
+									new key anytime.
+								</DialogDescription>
+							</DialogHeader>
+							<DialogFooter>
+								<DialogClose className="rounded-btn border-subtle bg-elevated text-primary hover:bg-surface cursor-pointer border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none">
+									Cancel
+								</DialogClose>
+								<button
+									onClick={handleRemove}
+									disabled={removing}
+									className="rounded-btn border-danger/25 bg-danger/5 text-danger hover:bg-danger/10 inline-flex cursor-pointer items-center justify-center gap-1.5 border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none"
+								>
+									{removing ? (
+										<Loader2 className="h-3.5 w-3.5 animate-spin" />
+									) : (
+										<Trash2 className="h-3.5 w-3.5" />
+									)}
+									{removing ? "Removing…" : "Remove key"}
+								</button>
+							</DialogFooter>
+						</DialogContent>
+					</Dialog>
 				</div>
 			) : (
 				<div className="space-y-3">
