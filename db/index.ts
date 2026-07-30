@@ -45,6 +45,45 @@ function resolveConnectionString(): string {
 }
 
 /**
+ * Fails with the variable name instead of `TypeError: Invalid URL`.
+ *
+ * When a connection string is malformed, the driver throws from inside a
+ * bundled vendor chunk and Next.js redacts the offending value to
+ * `[SENSITIVE]` because it matched an environment variable. The result names
+ * neither the variable nor the problem. This check runs first so the error
+ * says what to go and fix.
+ *
+ * Nothing secret is interpolated: only the scheme, the host, and which env
+ * file the value came from.
+ */
+function assertParseableConnectionString(connectionString: string): void {
+	let parsed: URL
+	try {
+		parsed = new URL(connectionString)
+	} catch {
+		throw new Error(
+			"DATABASE_URL is not a parseable URL. Expected " +
+				"postgres://user:password@host:5432/dbname.\n" +
+				"Common causes: surrounding quotes kept from a copy-paste, a literal " +
+				'"[YOUR-PASSWORD]" placeholder, a line break in the middle of the ' +
+				"value, or an unescaped @ / : / # in the password (percent-encode it).\n" +
+				"Note the file precedence: .env.production.local overrides .env.local " +
+				"during `next build`, so check that file first."
+		)
+	}
+
+	if (!/^postgres(ql)?:$/.test(parsed.protocol)) {
+		throw new Error(
+			`DATABASE_URL has scheme "${parsed.protocol}", expected postgres: or postgresql:.`
+		)
+	}
+
+	if (!parsed.hostname) {
+		throw new Error("DATABASE_URL has no host.")
+	}
+}
+
+/**
  * Serverless functions get a single connection because each invocation is its
  * own isolate; a pool would leak connections. Local dev uses the driver default
  * so hot reloads stay responsive.
@@ -72,7 +111,9 @@ const MAX_CONNECTIONS_SERVERLESS = 1
  * parser.
  */
 function createClient() {
-	return postgres(resolveConnectionString(), {
+	const connectionString = resolveConnectionString()
+	assertParseableConnectionString(connectionString)
+	return postgres(connectionString, {
 		prepare: false,
 		max: process.env.NODE_ENV === "production" ? MAX_CONNECTIONS_SERVERLESS : undefined,
 	})
