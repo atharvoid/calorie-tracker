@@ -13,7 +13,7 @@ export function RuledSection({ label, children, className, ...props }: RuledSect
 			{...props}
 		>
 			{label && (
-				<span className="bg-surface text-muted absolute -top-2.5 left-4 px-1.5 font-mono text-[10px] font-bold tracking-wider uppercase">
+				<span className="bg-surface text-muted absolute -top-2.5 left-4 px-1.5 font-mono text-2xs font-bold tracking-wider uppercase">
 					{label}
 				</span>
 			)}
