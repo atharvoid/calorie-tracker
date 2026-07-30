@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Geist, Geist_Mono } from "next/font/google"
+import { Geist, Geist_Mono, Fraunces } from "next/font/google"
 import { Toaster } from "sonner"
 import { ThemeProvider } from "@/components/theme-provider"
 import "./globals.css"
@@ -12,6 +12,14 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
 	variable: "--font-geist-mono",
 	subsets: ["latin"],
+})
+
+// Expressive display face reserved for hero + onboarding headlines only —
+// everyday UI keeps the Geist sans body font (see docs/UI_CHARACTER_REDESIGN_PLAN.md).
+const fraunces = Fraunces({
+	variable: "--font-fraunces",
+	subsets: ["latin"],
+	style: ["normal", "italic"],
 })
 
 export const metadata: Metadata = {
@@ -33,7 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			lang="en"
 			data-theme="dark"
 			suppressHydrationWarning
-			className={`dark ${geistSans.variable} ${geistMono.variable}`}
+			className={`dark ${geistSans.variable} ${geistMono.variable} ${fraunces.variable}`}
 		>
 			<head>
 				<script

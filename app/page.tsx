@@ -7,6 +7,10 @@ import { PRIMARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
 import { ShieldAlert, KeyRound } from "lucide-react"
 import { HeroDemo } from "@/components/landing/hero-demo"
+import { Spotlight } from "@/components/landing/spotlight"
+import { BentoGrid, BentoGridItem } from "@/components/landing/bento-grid"
+import { GlareCard } from "@/components/landing/glare-card"
+import { Mascot } from "@/components/mascot"
 import { getActiveExperience } from "@/lib/experience-mode"
 
 async function handleSignIn() {
@@ -78,13 +82,18 @@ export default async function Home(props: {
 				</div>
 
 				{/* Hero Section */}
-				<section className="mb-20 flex flex-col items-center justify-between gap-12 md:flex-row">
+				<section className="relative mb-20 flex flex-col items-center justify-between gap-12 md:flex-row">
+					<Spotlight />
 					<div className="flex-1 space-y-6 text-left">
-						<div className="bg-accent/10 text-accent inline-flex items-center rounded-full px-3 py-1 text-xs font-medium">
-							Your food, rendered as a day.
+						<div className="flex items-center gap-3">
+							<Mascot pose="wave" className="h-12 w-12 shrink-0 sm:h-14 sm:w-14" />
+							<div className="bg-accent/10 text-accent inline-flex items-center rounded-full px-3 py-1 text-xs font-medium">
+								Your food, rendered as a day.
+							</div>
 						</div>
-						<h1 className="text-primary text-4xl leading-tight font-semibold tracking-tight sm:text-6xl">
-							Track naturally. Visualise daily.
+						<h1 className="text-primary font-display text-4xl leading-[1.05] font-semibold tracking-tight sm:text-6xl">
+							Track naturally. <br className="hidden sm:block" />
+							Visualise daily.
 						</h1>
 						<p className="text-secondary text-base leading-relaxed sm:text-lg">
 							Describe what you ate in your own words. Confirm the estimation, and build a
@@ -117,85 +126,48 @@ export default async function Home(props: {
 				{/* Narrative Sections */}
 				<section
 					id="features"
-					className="border-subtle/40 mb-24 scroll-mt-20 space-y-20 border-t pt-16"
+					className="border-subtle/40 mb-24 scroll-mt-20 border-t pt-16"
 				>
-					<div className="mx-auto max-w-2xl space-y-16">
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								01 · Input
-							</span>
-							<h2 className="text-primary text-xl font-bold">Say it naturally.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								No complex database searches or rigid food lookups. Describe mixed meals, home
-								cooking, or restaurant dishes in plain English or Hinglish.
-							</p>
-						</div>
-
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								02 · Resolution
-							</span>
-							<h2 className="text-primary text-xl font-bold">See what was understood.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								Your descriptions resolve instantly into clean, structured food items with estimated
-								calories and macros. Edit and customize quantities or notes at any time.
-							</p>
-						</div>
-
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								03 · Representation
-							</span>
-							<h2 className="text-primary text-xl font-bold">Watch the day take shape.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								Every confirmed day creates a unique visual imprint. Calorie counts scale the
-								shapes, protein levels nested contours, and fat share the color opacity.
-							</p>
-						</div>
-
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								04 · Archive
-							</span>
-							<h2 className="text-primary text-xl font-bold">Return to an archive of days.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								Navigate back in time to review past imprints, add entries, or edit historical logs.
-								Missing days remain unlogged, preventing false zero statistics.
-							</p>
-						</div>
-
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								05 · Observations
-							</span>
-							<h2 className="text-primary text-xl font-bold">Notice patterns.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								See macro balances, rhythmic logging trends, and recurring items over weeks or
-								months, structured into clean, deterministic summaries.
-							</p>
-						</div>
-
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								06 · Mobile Companion
-							</span>
-							<h2 className="text-primary text-xl font-bold">Log on the go with Telegram.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								Connect your account to the companion bot. Log your meals by sending a quick message
-								on the run, and watch it sync to your dashboard instantly.
-							</p>
-						</div>
-
-						<div className="space-y-3">
-							<span className="text-accent font-mono text-[10px] font-bold tracking-wider uppercase">
-								07 · Bring Your Own Key
-							</span>
-							<h2 className="text-primary text-xl font-bold">Or don't pay us at all.</h2>
-							<p className="text-secondary text-sm leading-relaxed">
-								Add your own free Google AI Studio API key in Settings, and log meals with no trial
-								limit, no daily cap, and no subscription — forever.
-							</p>
-						</div>
+					<div className="mx-auto max-w-5xl">
+						<BentoGrid>
+							<BentoGridItem
+								index="01 · Input"
+								title="Say it naturally."
+								description="No complex database searches or rigid food lookups. Describe mixed meals, home cooking, or restaurant dishes in plain English or Hinglish."
+							/>
+							<BentoGridItem
+								index="02 · Resolution"
+								title="See what was understood."
+								description="Your descriptions resolve instantly into clean, structured food items with estimated calories and macros. Edit and customize quantities or notes at any time."
+							/>
+							<BentoGridItem
+								index="03 · Representation"
+								title="Watch the day take shape."
+								description="Every confirmed day creates a unique visual imprint. Calorie counts scale the shapes, protein levels nested contours, and fat share the color opacity."
+								className="sm:col-span-2 lg:col-span-1"
+							/>
+							<BentoGridItem
+								index="04 · Archive"
+								title="Return to an archive of days."
+								description="Navigate back in time to review past imprints, add entries, or edit historical logs. Missing days remain unlogged, preventing false zero statistics."
+							/>
+							<BentoGridItem
+								index="05 · Observations"
+								title="Notice patterns."
+								description="See macro balances, rhythmic logging trends, and recurring items over weeks or months, structured into clean, deterministic summaries."
+							/>
+							<BentoGridItem
+								index="06 · Mobile Companion"
+								title="Log on the go with Telegram."
+								description="Connect your account to the companion bot. Log your meals by sending a quick message on the run, and watch it sync to your dashboard instantly."
+							/>
+							<BentoGridItem
+								index="07 · Bring Your Own Key"
+								title="Or don't pay us at all."
+								description="Add your own free Google AI Studio API key in Settings, and log meals with no trial limit, no daily cap, and no subscription — forever."
+								className="sm:col-span-2 lg:col-span-1"
+							/>
+						</BentoGrid>
 					</div>
 				</section>
 
@@ -287,51 +259,53 @@ export default async function Home(props: {
 							</form>
 						</div>
 
-						<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
-							<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-[10px] font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
-								Free forever
-							</span>
-							<div>
-								<h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
-									<KeyRound className="text-accent h-5 w-5" /> Bring Your Own Key
-								</h3>
-								<p className="text-secondary mt-1 text-sm">
-									For people happy to use their own free Google AI Studio key.
-								</p>
+						<GlareCard className="rounded-card">
+							<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
+								<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-[10px] font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
+									Free forever
+								</span>
+								<div>
+									<h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
+										<KeyRound className="text-accent h-5 w-5" /> Bring Your Own Key
+									</h3>
+									<p className="text-secondary mt-1 text-sm">
+										For people happy to use their own free Google AI Studio key.
+									</p>
+								</div>
+
+								<div className="flex items-baseline gap-1">
+									<span className="text-primary text-3xl font-bold tracking-tight">$0</span>
+									<span className="text-muted text-sm">/ month, always</span>
+								</div>
+
+								<ul className="text-secondary border-subtle space-y-3 border-t pt-6 text-sm">
+									<li className="flex items-center gap-2">
+										<span className="text-accent">✓</span> No trial limit, no daily cap
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-accent">✓</span> Everything in Personal
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-accent">✓</span> Your key, your Google billing
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-accent">✓</span> Free within Google's generous quota
+									</li>
+									<li className="flex items-center gap-2">
+										<span className="text-accent">✓</span> Remove your key anytime
+									</li>
+								</ul>
+
+								<form action={handleSignIn} className="mt-4 w-full">
+									<button
+										type="submit"
+										className="border-subtle bg-elevated text-primary hover:bg-canvas rounded-btn w-full cursor-pointer border py-3 text-center text-base font-semibold transition-all"
+									>
+										Sign up & add my key
+									</button>
+								</form>
 							</div>
-
-							<div className="flex items-baseline gap-1">
-								<span className="text-primary text-3xl font-bold tracking-tight">$0</span>
-								<span className="text-muted text-sm">/ month, always</span>
-							</div>
-
-							<ul className="text-secondary border-subtle space-y-3 border-t pt-6 text-sm">
-								<li className="flex items-center gap-2">
-									<span className="text-accent">✓</span> No trial limit, no daily cap
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-accent">✓</span> Everything in Personal
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-accent">✓</span> Your key, your Google billing
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-accent">✓</span> Free within Google's generous quota
-								</li>
-								<li className="flex items-center gap-2">
-									<span className="text-accent">✓</span> Remove your key anytime
-								</li>
-							</ul>
-
-							<form action={handleSignIn} className="mt-4 w-full">
-								<button
-									type="submit"
-									className="border-subtle bg-elevated text-primary hover:bg-canvas rounded-btn w-full cursor-pointer border py-3 text-center text-base font-semibold transition-all"
-								>
-									Sign up & add my key
-								</button>
-							</form>
-						</div>
+						</GlareCard>
 					</div>
 				</section>
 
