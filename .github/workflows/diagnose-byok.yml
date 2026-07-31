@@ -9,8 +9,8 @@ permissions:
 
 jobs:
   diagnose:
-    # Loop guard: never react to our own diagnostics commit.
-    if: "!contains(github.event.head_commit.message, '[diagnostics]')"
+    # Loop guard: never react to our own automated commits.
+    if: "!contains(github.event.head_commit.message, '[format]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,33 +23,13 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
 
-      - name: Run each step and capture output
-        run: |
-          set +e
-          {
-            echo "===== typecheck ====="
-            pnpm typecheck 2>&1
-            echo "----- exit code: $? -----"
-            echo "===== lint ====="
-            pnpm lint 2>&1
-            echo "----- exit code: $? -----"
-            echo "===== test:run ====="
-            pnpm test:run 2>&1
-            echo "----- exit code: $? -----"
-            echo "===== format:check ====="
-            pnpm format:check 2>&1
-            echo "----- exit code: $? -----"
-          } > byok-diagnostics.txt
-          cat byok-diagnostics.txt
-        env:
-          DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
-          AUTH_SECRET: ci-placeholder-value-never-used-at-runtime
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
+      - name: Apply canonical Prettier formatting
+        run: pnpm format
 
-      - name: Commit the output back
+      - name: Commit the formatted result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add byok-diagnostics.txt
-          git commit -m "chore: byok diagnostics output [diagnostics]" || exit 0
+          git add -A
+          git commit -m "style: apply prettier formatting [format]" || exit 0
           git push
