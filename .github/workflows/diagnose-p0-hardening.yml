@@ -28,6 +28,9 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Apply canonical formatting
+        run: pnpm exec prettier --write lib/admin.ts tests/__tests__/admin.test.ts
+
       - name: Capture checks
         shell: bash
         run: |
@@ -39,10 +42,10 @@ jobs:
             echo "exit_code=$?" >> ci-diagnostics.txt
           done
 
-      - name: Commit diagnostics
+      - name: Commit formatting and diagnostics
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ci-diagnostics.txt
-          git commit -m "chore(ci): record hardening diagnostics" || exit 0
+          git add lib/admin.ts tests/__tests__/admin.test.ts ci-diagnostics.txt
+          git commit -m "chore(ci): format hardening changes" || exit 0
           git push
