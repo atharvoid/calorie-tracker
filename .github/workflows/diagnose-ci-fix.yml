@@ -1,47 +1,10 @@
 name: Diagnose CI fix
 
 on:
-  push:
-    branches:
-      - fix/ci-eslint-format
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  diagnose:
-    if: github.actor != 'github-actions[bot]'
+  disabled:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
-      AUTH_SECRET: ci-placeholder-value-never-used-at-runtime
-      NEXT_PUBLIC_APP_URL: http://localhost:3000
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Capture first failing verify step
-        shell: bash
-        run: |
-          set +e
-          : > ci-diagnostics.txt
-          for command in "pnpm typecheck" "pnpm lint" "pnpm test:run" "pnpm format:check" "pnpm build"; do
-            echo "===== $command =====" | tee -a ci-diagnostics.txt
-            bash -lc "$command" >> ci-diagnostics.txt 2>&1
-            status=$?
-            echo "exit_code=$status" | tee -a ci-diagnostics.txt
-            if [ "$status" -ne 0 ]; then
-              break
-            fi
-          done
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ci-diagnostics.txt
-          git commit -m "chore(ci): record verification diagnostics"
-          git push
+      - run: echo "One-time diagnostics completed"
