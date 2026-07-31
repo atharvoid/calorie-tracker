@@ -28,7 +28,7 @@ export function MobileUserSheet({ user }: MobileUserSheetProps) {
 	return (
 		<Sheet>
 			<SheetTrigger
-				className="focus-visible:ring-accent flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-full transition-transform ease-premium active:scale-95 focus-visible:ring-2 focus-visible:outline-none"
+				className="focus-visible:ring-accent ease-premium flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-full transition-transform focus-visible:ring-2 focus-visible:outline-none active:scale-95"
 				aria-label="Open account menu"
 			>
 				{user.image ? (
@@ -65,7 +65,7 @@ export function MobileUserSheet({ user }: MobileUserSheetProps) {
 					<form action={signOutAction} className="w-full">
 						<button
 							type="submit"
-							className="border-danger/20 bg-danger/5 text-danger hover:bg-danger/10 focus-visible:ring-danger flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors ease-premium focus-visible:ring-2 focus-visible:outline-none"
+							className="border-danger/20 bg-danger/5 text-danger hover:bg-danger/10 focus-visible:ring-danger ease-premium flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl border px-4 text-sm font-semibold transition-colors focus-visible:ring-2 focus-visible:outline-none"
 						>
 							<LogOut className="h-4 w-4" />
 							Sign out

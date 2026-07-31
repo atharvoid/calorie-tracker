@@ -1,8 +1,8 @@
 "use client"
 
-import { useCallback, useEffect, useState, useRef } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { BarChart2, Clock, Settings, Utensils, Plus, LogOut } from "lucide-react"
+import { BarChart2, Clock, Settings, Utensils, Plus } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RealtimeListener } from "@/components/realtime-listener"
 import { TodayView } from "./today-view"
@@ -12,9 +12,10 @@ import { SettingsView } from "./settings-view"
 import { PaywallAlert } from "./paywall-alert"
 import { OnboardingTour } from "@/components/onboarding-tour"
 import Link from "next/link"
-import { signOutAction } from "@/components/auth-actions"
 import { getActiveExperience } from "@/lib/experience-mode"
 import { ThemeToggle } from "@/components/theme-toggle"
+import { MobileUserSheet } from "./mobile-user-sheet"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 type Tab = "today" | "history" | "analytics" | "settings"
 
@@ -92,8 +93,6 @@ export function NutritionShell({ userId, user }: Props) {
 	const [refreshKey, setRefreshKey] = useState(0)
 	const [billing, setBilling] = useState<EntitlementStatus | null>(null)
 	const [billingLoading, setBillingLoading] = useState(true)
-	const [menuOpen, setMenuOpen] = useState(false)
-	const menuRef = useRef<HTMLDivElement>(null)
 
 	const loadBilling = useCallback(async () => {
 		try {
@@ -128,19 +127,6 @@ export function NutritionShell({ userId, user }: Props) {
 			window.removeEventListener("local_nutrition_changed", handler)
 		}
 	}, [handleNutritionChanged])
-
-	// Close avatar menu when clicking outside
-	useEffect(() => {
-		function handleClickOutside(event: MouseEvent) {
-			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-				setMenuOpen(false)
-			}
-		}
-		document.addEventListener("mousedown", handleClickOutside)
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside)
-		}
-	}, [])
 
 	const experience = getActiveExperience(searchParams)
 	const isImprint = experience === "imprint"
@@ -199,56 +185,20 @@ export function NutritionShell({ userId, user }: Props) {
 				<div className="flex items-center gap-2">
 					<ThemeToggle />
 					{activeTab === "today" && (
-						<button
-							onClick={() => window.dispatchEvent(new CustomEvent("open_meal_composer"))}
-							className="bg-accent/15 text-accent hover:bg-accent/25 rounded-full p-1.5 focus:outline-none"
-							aria-label="Add meal"
-						>
-							<Plus className="h-4 w-4" />
-						</button>
-					)}
-
-					{/* User profile dropdown */}
-					{user && (
-						<div className="relative" ref={menuRef}>
-							<button
-								onClick={() => setMenuOpen(!menuOpen)}
-								className="flex items-center rounded-full focus:outline-none"
-								aria-label="Open user menu"
-								aria-expanded={menuOpen}
+						<Tooltip>
+							<TooltipTrigger
+								onClick={() => window.dispatchEvent(new CustomEvent("open_meal_composer"))}
+								className="bg-accent/15 text-accent hover:bg-accent/25 focus-visible:ring-accent ease-premium flex min-h-11 min-w-11 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none"
+								aria-label="Add meal"
 							>
-								{user.image ? (
-									// eslint-disable-next-line @next/next/no-img-element
-									<img
-										src={user.image}
-										alt={user.name ?? ""}
-										className="border-subtle ring-accent/20 h-7 w-7 rounded-full border ring-1"
-									/>
-								) : (
-									<div className="border-subtle bg-elevated text-primary flex h-7 w-7 items-center justify-center rounded-full border text-xs font-semibold">
-										{(user.name ?? user.email ?? "?")[0].toUpperCase()}
-									</div>
-								)}
-							</button>
-
-							{menuOpen && (
-								<div className="border-subtle bg-elevated animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-56 rounded-xl border p-2 shadow-xl duration-150">
-									<div className="border-subtle/50 mb-1 border-b px-3 py-2">
-										<p className="text-primary truncate text-xs font-semibold">{user.name}</p>
-										<p className="text-muted text-2xs truncate">{user.email}</p>
-									</div>
-									<form action={signOutAction} className="w-full">
-										<button
-											type="submit"
-											className="text-secondary hover:text-danger hover:bg-surface flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-left text-xs transition-colors"
-										>
-											<LogOut className="h-3.5 w-3.5" /> Sign out
-										</button>
-									</form>
-								</div>
-							)}
-						</div>
+								<Plus className="h-4 w-4" />
+							</TooltipTrigger>
+							<TooltipContent>Add meal</TooltipContent>
+						</Tooltip>
 					)}
+
+					{/* User profile sheet */}
+					{user && <MobileUserSheet user={user} />}
 				</div>
 			</header>
 

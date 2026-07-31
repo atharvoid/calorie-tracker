@@ -262,7 +262,7 @@ body {
 ::view-transition-old(root),
 ::view-transition-new(root) {
 	animation-duration: 180ms;
-	animation-timing-function: ease-out;
+	animation-timing-function: var(--ease-premium);
 }
 
 @media (prefers-reduced-motion: reduce) {

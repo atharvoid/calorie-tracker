@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import {
 	sundayOfWeek,
 	addDays,
@@ -68,24 +69,30 @@ export function WeekNavigator({
 		<div>
 			{/* Week header */}
 			<div className="mb-3 flex items-center justify-between">
-				<button
-					onClick={goPrev}
-					className="text-muted hover:text-primary hover:bg-elevated rounded-lg p-1.5 transition-colors"
-					aria-label="Previous week"
-				>
-					<ChevronLeft className="h-4.5 w-4.5" />
-				</button>
+				<Tooltip>
+					<TooltipTrigger
+						onClick={goPrev}
+						className="text-muted hover:text-primary hover:bg-elevated focus-visible:ring-accent ease-premium flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none"
+						aria-label="Previous week"
+					>
+						<ChevronLeft className="h-4.5 w-4.5" />
+					</TooltipTrigger>
+					<TooltipContent>Previous week</TooltipContent>
+				</Tooltip>
 				<p className="text-secondary text-sm font-semibold">
 					{formatWeekLabel(weekMonday, sunday)}
 				</p>
-				<button
-					onClick={goNext}
-					disabled={allNextFuture}
-					className="text-muted hover:text-primary hover:bg-elevated rounded-lg p-1.5 transition-colors disabled:pointer-events-none disabled:opacity-30"
-					aria-label="Next week"
-				>
-					<ChevronRight className="h-4.5 w-4.5" />
-				</button>
+				<Tooltip>
+					<TooltipTrigger
+						onClick={goNext}
+						disabled={allNextFuture}
+						className="text-muted hover:text-primary hover:bg-elevated focus-visible:ring-accent ease-premium flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-30"
+						aria-label="Next week"
+					>
+						<ChevronRight className="h-4.5 w-4.5" />
+					</TooltipTrigger>
+					<TooltipContent>Next week</TooltipContent>
+				</Tooltip>
 			</div>
 
 			{/* Quick Navigation Controls */}
@@ -143,7 +150,7 @@ export function WeekNavigator({
 							disabled={future}
 							aria-label={`${date}${today ? " (today)" : ""}: ${kcal !== null ? `${kcal} kcal, ${status}` : "no data"}`}
 							className={cn(
-								"flex flex-col items-center rounded-xl px-1 py-2 text-center transition-colors focus:outline-none",
+								"focus-visible:ring-accent ease-premium flex min-h-16 flex-col items-center rounded-xl px-1 py-2 text-center transition-colors focus-visible:ring-2 focus-visible:outline-none",
 								selected ? "bg-accent/10 ring-accent ring-1" : "hover:bg-elevated",
 								future && "cursor-not-allowed opacity-40",
 								today && !selected && "ring-muted/50 ring-1"
@@ -168,7 +175,7 @@ export function WeekNavigator({
 							/>
 
 							{/* kcal or em dash - hidden on mobile, shown on tablet/desktop */}
-							<span className="tabular text-muted sm:text-2xs mt-0.5 hidden font-mono text-[9px] sm:inline">
+							<span className="tabular text-muted text-2xs mt-0.5 hidden font-mono sm:inline">
 								{hasData ? `${(kcal ?? 0).toLocaleString("en-IN")}` : "—"}
 							</span>
 						</button>

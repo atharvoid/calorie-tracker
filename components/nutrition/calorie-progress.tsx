@@ -109,9 +109,9 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 			)}
 
 			{/* Remaining / over amount cards */}
-			<div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+			<div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
 				{target !== null && (
-					<div className="bg-elevated/50 border-subtle/30 flex flex-col justify-between rounded-xl border p-2.5 sm:p-3">
+					<div className="bg-elevated/50 border-subtle/30 flex flex-col justify-between rounded-xl border p-3">
 						<p className="text-muted text-2xs font-medium tracking-wider uppercase sm:text-xs">
 							{isOver ? "Over target" : "Remaining"}
 						</p>
@@ -125,19 +125,19 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 								? `+${Math.abs(targetDelta ?? 0).toLocaleString("en-IN")}`
 								: (remainingToTarget ?? 0).toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted sm:text-2xs mt-0.5 text-[9px]">kcal</span>
+						<span className="text-muted text-2xs mt-1">kcal</span>
 					</div>
 				)}
 
 				{target !== null && (
-					<div className="bg-elevated/50 border-subtle/30 flex flex-col justify-between rounded-xl border p-2.5 sm:p-3">
+					<div className="bg-elevated/50 border-subtle/30 flex flex-col justify-between rounded-xl border p-3">
 						<p className="text-muted text-2xs font-medium tracking-wider uppercase sm:text-xs">
 							Target
 						</p>
 						<p className="tabular text-primary mt-1 font-mono text-base leading-none font-bold sm:text-lg">
 							{target.toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted sm:text-2xs mt-0.5 text-[9px]">kcal / day</span>
+						<span className="text-muted text-2xs mt-1">kcal / day</span>
 					</div>
 				)}
 
@@ -155,7 +155,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 							{(maintenanceBalance ?? 0) > 0 ? "+" : ""}
 							{(maintenanceBalance ?? 0).toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted sm:text-2xs mt-0.5 text-[9px]">
+						<span className="text-muted text-2xs mt-1">
 							kcal ({maintenance.toLocaleString("en-IN")} maint.)
 						</span>
 					</div>

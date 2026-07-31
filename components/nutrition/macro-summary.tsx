@@ -57,7 +57,7 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
 			<p className="text-muted text-xs font-semibold tracking-wider uppercase">Macros</p>
 
 			{/* 3-column responsive grid on mobile, falling back to vertical list on very narrow screens */}
-			<div className="grid grid-cols-3 gap-2 max-[349px]:grid-cols-1 sm:gap-4">
+			<div className="grid grid-cols-3 gap-3 max-[349px]:grid-cols-1 sm:gap-4">
 				{macros.map(({ label, value, target, unit, color }) => {
 					const pct =
 						target !== null && value > 0 ? Math.min(100, Math.round((value / target) * 100)) : null
@@ -65,7 +65,7 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
 					return (
 						<div
 							key={label}
-							className="bg-elevated border-subtle flex flex-col justify-between rounded-xl border p-2 sm:p-3"
+							className="bg-elevated border-subtle flex min-h-28 flex-col justify-between rounded-xl border p-3"
 						>
 							<div>
 								<p className="text-muted text-2xs font-medium tracking-wider uppercase">{label}</p>
@@ -74,7 +74,7 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
 									<span className="text-muted text-2xs ml-0.5 font-normal">{unit}</span>
 								</p>
 								{target !== null && (
-									<p className="text-muted tabular sm:text-2xs mt-0.5 text-[9px] leading-none">
+									<p className="text-muted tabular text-2xs mt-1 leading-tight">
 										/ {target.toFixed(0)}
 										{unit} target
 									</p>
@@ -90,7 +90,7 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
 											aria-label={`${label} ${pct}% of target`}
 										/>
 									</div>
-									<span className="text-muted mt-0.5 block text-right text-[9px] font-medium">
+									<span className="text-muted text-2xs mt-1 block text-right font-medium">
 										{pct}%
 									</span>
 								</div>

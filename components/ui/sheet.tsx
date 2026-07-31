@@ -49,7 +49,7 @@ function SheetContent({
 			<DialogPrimitive.Popup
 				data-slot="sheet-content"
 				className={cn(
-					"bg-surface border-subtle data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 fixed z-50 flex flex-col gap-4 p-5 shadow-2xl duration-200 ease-premium focus:outline-none",
+					"bg-surface border-subtle data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0 ease-premium fixed z-50 flex flex-col gap-4 p-5 shadow-2xl duration-200 focus:outline-none",
 					SIDE_CLASSES[side],
 					className
 				)}
@@ -60,7 +60,7 @@ function SheetContent({
 				)}
 				{children}
 				{showCloseButton && (
-					<DialogPrimitive.Close className="text-muted hover:text-primary hover:bg-elevated focus-visible:ring-accent absolute top-4 right-4 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-colors ease-premium focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none">
+					<DialogPrimitive.Close className="text-muted hover:text-primary hover:bg-elevated focus-visible:ring-accent ease-premium absolute top-4 right-4 flex h-9 w-9 cursor-pointer items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none disabled:pointer-events-none">
 						<XIcon className="h-4 w-4" />
 						<span className="sr-only">Close</span>
 					</DialogPrimitive.Close>
@@ -71,14 +71,23 @@ function SheetContent({
 }
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
-	return <div data-slot="sheet-header" className={cn("flex flex-col gap-1.5 pr-10", className)} {...props} />
+	return (
+		<div
+			data-slot="sheet-header"
+			className={cn("flex flex-col gap-1.5 pr-10", className)}
+			{...props}
+		/>
+	)
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
 	return (
 		<div
 			data-slot="sheet-footer"
-			className={cn("mt-auto flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end", className)}
+			className={cn(
+				"mt-auto flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end",
+				className
+			)}
 			{...props}
 		/>
 	)
