@@ -1,0 +1,85 @@
+name: Apply verified lint repairs
+
+on:
+  push:
+    branches:
+      - fix/ci-eslint-format
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Repair lint errors without weakening rules
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          def replace(path, old, new):
+              p = Path(path)
+              text = p.read_text()
+              if old not in text:
+                  raise SystemExit(f"Expected text not found in {path}: {old!r}")
+              p.write_text(text.replace(old, new))
+
+          def replace_on_line(path, number, old, new):
+              p = Path(path)
+              lines = p.read_text().splitlines(keepends=True)
+              line = lines[number - 1]
+              if old not in line:
+                  raise SystemExit(f"Expected text not found at {path}:{number}: {old!r} in {line!r}")
+              lines[number - 1] = line.replace(old, new)
+              p.write_text("".join(lines))
+
+          replace("app/api/billing/checkout/route.ts", 'import { db } from "@/db"\n', "")
+          replace("app/api/billing/checkout/route.ts", 'import { billingCustomers } from "@/db/schema"\n', "")
+          replace("app/api/billing/checkout/route.ts", 'import { eq } from "drizzle-orm"\n', "")
+
+          replace("components/nutrition/history-view.tsx", 'import { Loader2 } from "lucide-react"\n', "")
+          replace(
+              "components/nutrition/today-view.tsx",
+              'import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"',
+              'import { ChevronLeft, ChevronRight, Lightbulb, Plus } from "lucide-react"',
+          )
+
+          shell = Path("components/nutrition/nutrition-shell.tsx")
+          shell_text = shell.read_text()
+          shell_text, import_count = re.subn(r'\buseRouter,\s*', '', shell_text, count=1)
+          shell_text, declaration_count = re.subn(r'^\s*const router = useRouter\(\)\n', '', shell_text, count=1, flags=re.M)
+          if import_count != 1 or declaration_count != 1:
+              raise SystemExit("Could not remove the unused Next router cleanly")
+          shell.write_text(shell_text)
+
+          replace_on_line("app/page.tsx", 187, '"Calorie Tracker — Data Assistant"', '&ldquo;Calorie Tracker — Data Assistant&rdquo;')
+          replace_on_line("app/page.tsx", 289, "'", "&apos;")
+          replace_on_line("app/privacy/page.tsx", 86, '"Calorie Tracker"', '&ldquo;Calorie Tracker&rdquo;')
+          replace_on_line("app/terms/page.tsx", 33, '"Service"', '&ldquo;Service&rdquo;')
+          replace_on_line("app/terms/page.tsx", 96, '"as is"', '&ldquo;as is&rdquo;')
+          replace_on_line("app/terms/page.tsx", 96, '"as available"', '&ldquo;as available&rdquo;')
+          replace_on_line("components/nutrition/byok-panel.tsx", 115, "'", "&apos;")
+          replace_on_line("components/nutrition/byok-panel.tsx", 137, "'", "&apos;")
+          replace_on_line("components/nutrition/settings-view.tsx", 570, "'", "&apos;")
+          replace_on_line("components/nutrition/settings-view.tsx", 688, "'", "&apos;")
+          replace_on_line("components/onboarding-tour.tsx", 166, "'", "&apos;")
+          PY
+      - run: pnpm format
+      - name: Commit lint repairs
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git commit -m "fix(ci): resolve strict lint errors"
+          git push
