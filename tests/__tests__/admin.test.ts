@@ -9,9 +9,7 @@ describe("isAdminEmail", () => {
 	})
 
 	it("matches an explicitly configured email case-insensitively", () => {
-		expect(isAdminEmail(" Admin@Example.com ", "owner@example.com, admin@example.com ")).toBe(
-			true
-		)
+		expect(isAdminEmail(" Admin@Example.com ", "owner@example.com, admin@example.com ")).toBe(true)
 	})
 
 	it("rejects authenticated users outside the allowlist", () => {

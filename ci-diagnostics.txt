@@ -389,24 +389,24 @@ exit_code=0
 
 [1m[30m[46m RUN [49m[39m[22m [36mv4.1.10 [39m[90m/home/runner/work/calorie-tracker/calorie-tracker[39m
 
- [32m✓[39m tests/__tests__/nutrition-calculations.test.ts [2m([22m[2m38 tests[22m[2m)[22m[32m 9[2mms[22m[39m
- [32m✓[39m tests/__tests__/pattern-observation.test.ts [2m([22m[2m30 tests[22m[2m)[22m[32m 26[2mms[22m[39m
- [32m✓[39m tests/__tests__/nutrition-date.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 28[2mms[22m[39m
- [32m✓[39m tests/__tests__/theme-mode.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 4[2mms[22m[39m
- [32m✓[39m tests/__tests__/imprint-normalize.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 4[2mms[22m[39m
- [32m✓[39m tests/__tests__/imprint-scene.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 198[2mms[22m[39m
- [32m✓[39m tests/__tests__/imprint-summary.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 27[2mms[22m[39m
- [32m✓[39m tests/__tests__/entitlements.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/__tests__/dodo.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 5[2mms[22m[39m
- [32m✓[39m tests/__tests__/admin.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 3[2mms[22m[39m
- [32m✓[39m tests/__tests__/imprint-determinism.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 467[2mms[22m[39m
-     [33m[2m✓[22m[39m produces identical scene hash across 100 runs for all fixtures [33m 465[2mms[22m[39m
- [32m✓[39m tests/__tests__/telegram-date-parsing.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m tests/__tests__/pattern-observation.test.ts [2m([22m[2m30 tests[22m[2m)[22m[32m 27[2mms[22m[39m
+ [32m✓[39m tests/__tests__/nutrition-calculations.test.ts [2m([22m[2m38 tests[22m[2m)[22m[32m 17[2mms[22m[39m
+ [32m✓[39m tests/__tests__/nutrition-date.test.ts [2m([22m[2m28 tests[22m[2m)[22m[32m 35[2mms[22m[39m
+ [32m✓[39m tests/__tests__/theme-mode.test.ts [2m([22m[2m6 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m tests/__tests__/imprint-normalize.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/__tests__/imprint-scene.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 244[2mms[22m[39m
+ [32m✓[39m tests/__tests__/imprint-summary.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 25[2mms[22m[39m
+ [32m✓[39m tests/__tests__/dodo.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m tests/__tests__/entitlements.test.ts [2m([22m[2m10 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m tests/__tests__/admin.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m tests/__tests__/imprint-determinism.test.ts [2m([22m[2m1 test[22m[2m)[22m[33m 581[2mms[22m[39m
+     [33m[2m✓[22m[39m produces identical scene hash across 100 runs for all fixtures [33m 580[2mms[22m[39m
+ [32m✓[39m tests/__tests__/telegram-date-parsing.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 19[2mms[22m[39m
 
 [2m Test Files [22m [1m[32m12 passed[39m[22m[90m (12)[39m
 [2m      Tests [22m [1m[32m136 passed[39m[22m[90m (136)[39m
-[2m   Start at [22m 11:17:54
-[2m   Duration [22m 1.98s[2m (transform 431ms, setup 0ms, import 2.31s, tests 791ms, environment 1ms)[22m
+[2m   Start at [22m 11:19:50
+[2m   Duration [22m 2.38s[2m (transform 523ms, setup 0ms, import 2.79s, tests 980ms, environment 1ms)[22m
 
 exit_code=0
 ===== pnpm format:check =====
@@ -415,11 +415,8 @@ exit_code=0
 > prettier --check .
 
 Checking formatting...
-[[33mwarn[39m] lib/admin.ts
-[[33mwarn[39m] tests/__tests__/admin.test.ts
-[[33mwarn[39m] Code style issues found in 2 files. Run Prettier with --write to fix.
- ELIFECYCLE  Command failed with exit code 1.
-exit_code=1
+All matched files use Prettier code style!
+exit_code=0
 ===== pnpm build =====
 
 > calorie-tracker@0.1.0 build /home/runner/work/calorie-tracker/calorie-tracker
@@ -434,15 +431,15 @@ https://nextjs.org/telemetry
 ▲ Next.js 16.2.10 (Turbopack)
 
   Creating an optimized production build ...
-✓ Compiled successfully in 17.1s
+✓ Compiled successfully in 19.4s
   Running TypeScript ...
-  Finished TypeScript in 16.3s ...
+  Finished TypeScript in 19.0s ...
   Collecting page data using 3 workers ...
   Generating static pages using 3 workers (0/7) ...
   Generating static pages using 3 workers (1/7) 
   Generating static pages using 3 workers (3/7) 
   Generating static pages using 3 workers (5/7) 
-✓ Generating static pages using 3 workers (7/7) in 220ms
+✓ Generating static pages using 3 workers (7/7) in 232ms
   Finalizing page optimization ...
 
 Route (app)

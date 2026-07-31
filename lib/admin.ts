@@ -16,9 +16,5 @@ export function isAdminEmail(
 	const candidate = normalizeEmail(email)
 	if (!candidate) return false
 
-	return configuredEmails
-		.split(",")
-		.map(normalizeEmail)
-		.filter(Boolean)
-		.includes(candidate)
+	return configuredEmails.split(",").map(normalizeEmail).filter(Boolean).includes(candidate)
 }
