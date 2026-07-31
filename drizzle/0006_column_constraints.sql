@@ -31,6 +31,13 @@ UPDATE product_entitlement
 SET access_state = 'trial_ended'
 WHERE access_state = 'expired';
 
+-- Before PR #3 the annual plan key was stored as 'annual' instead of 'personal_annual'.
+-- One row with provider_price_id='founder' (founder lifetime subscription, period_days=36524)
+-- was confirmed to have annual cadence before this mapping was applied.
+UPDATE subscription
+SET plan_key = 'personal_annual'
+WHERE plan_key = 'annual';
+
 -- ------------------------------------------------------------
 -- 2. Abort on any remaining unlisted value.
 --    Deliberately not a coercion: an unrecognised value is a bug somewhere
