@@ -1,6 +1,5 @@
 import { db } from "@/db"
 import { mealItems } from "@/db/schema"
-import { appendMealRows, type MealRow } from "@/lib/sheets-sync"
 import { nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { broadcastNutritionChanged } from "@/lib/realtime"
 import { localDate } from "@/lib/nutrition-date"
@@ -47,10 +46,6 @@ export async function commitNutrition({
 	const date = logDate || localDate(timezone)
 	const dbRows: MealItemInsert[] = []
 
-	// Intermediate shape before we have IDs
-	type PendingSheetRow = Omit<MealRow, "id">
-	const pendingSheetRows: PendingSheetRow[] = []
-
 	let idx = 0
 	for (const meal of validated.data.meals) {
 		// nutritionSchema has already constrained meal_type, but Zod infers it as a
@@ -74,19 +69,6 @@ export async function commitNutrition({
 				source,
 				captureId: captureId ?? null,
 				itemIndex: captureId ? idx : null,
-			})
-			pendingSheetRows.push({
-				date,
-				mealType: meal.meal_type ?? null,
-				timeHint: meal.time_hint ?? null,
-				name: item.name,
-				grams: item.grams ?? null,
-				kcal: item.kcal,
-				proteinG: item.protein_g,
-				carbsG: item.carbs_g,
-				fatG: item.fat_g,
-				notes: item.notes ?? null,
-				source,
 			})
 			idx++
 		}
@@ -119,12 +101,6 @@ export async function commitNutrition({
 		}
 	}
 
-	// Pair DB IDs into sheet rows (same order guaranteed by Postgres RETURNING)
-	const sheetRows: MealRow[] = pendingSheetRows.map((r, i) => ({
-		...r,
-		id: insertedIds[i],
-	}))
-
 	// Broadcast nutrition_changed event (non-blocking)
 	if (insertedIds.length > 0) {
 		void broadcastNutritionChanged(userId, {
@@ -136,21 +112,11 @@ export async function commitNutrition({
 		})
 	}
 
-	// Write to Sheet — if it fails, preserve DB rows and return sync warning.
-	// We only sync if rows were actually inserted (insertedIds.length > 0).
-	// This prevents duplicating rows in Google Sheets on Telegram double-tap replays.
-	let spreadsheetId = ""
-	let syncWarning: string | undefined
-	if (insertedIds.length > 0) {
-		try {
-			spreadsheetId = await appendMealRows(userId, sheetRows)
-		} catch (err: unknown) {
-			const msg = err instanceof Error ? err.message : String(err)
-			console.error("[commit] Sheets sync failed (DB rows preserved):", msg)
-			syncWarning = `Sheet sync failed: ${msg}`
-			spreadsheetId = ""
-		}
+	return {
+		rowCount: insertedIds.length,
+		date,
+		spreadsheetId: "",
+		syncWarning: undefined,
+		insertedIds,
 	}
-
-	return { rowCount: insertedIds.length, date, spreadsheetId, syncWarning, insertedIds }
 }
