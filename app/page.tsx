@@ -162,7 +162,10 @@ export default async function Home(props: {
 						</p>
 
 						<div className="flex flex-col gap-3 pt-2 sm:flex-row">
-							<SignInForm label={`Start free for ${TRIAL_DAYS} days`} className="w-full sm:w-auto" />
+							<SignInForm
+								label={`Start free for ${TRIAL_DAYS} days`}
+								className="w-full sm:w-auto"
+							/>
 						</div>
 						<p className="text-muted text-xs">
 							Or bring your own free API key later — no card required, ever.
