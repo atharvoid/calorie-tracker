@@ -92,6 +92,16 @@ export async function extractNutrition(
 		)
 	}
 
+	// 3. Fair-use throttle for BYOK users (task B-12). Platform-key users are
+	// already bounded by their trial allowance or daily cap, so this only
+	// applies to user-owned keys. Deliberately outside the try below: a
+	// throttled request never reached the provider, so it must not be recorded
+	// as a failed AI call.
+	if (keyOwner === "user") {
+		const { assertByokRateLimit } = await import("@/lib/byok-rate-limit")
+		await assertByokRateLimit(userId)
+	}
+
 	try {
 		const { object, usage } = await generateObject({
 			model: getModel(apiKey),
@@ -103,7 +113,7 @@ export async function extractNutrition(
 		})
 		console.log("Raw Gemini response:", JSON.stringify(object, null, 2))
 
-		// 3. Record success usage event, attributing cost to whoever owns the key.
+		// 4. Record success usage event, attributing cost to whoever owns the key.
 		await recordAiUsage(userId, {
 			requestId,
 			source,
