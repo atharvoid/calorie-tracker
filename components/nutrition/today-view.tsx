@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from "react"
 import { useSearchParams } from "next/navigation"
-import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Lightbulb, Plus } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Skeleton } from "@/components/ui/skeleton"

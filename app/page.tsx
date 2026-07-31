@@ -184,7 +184,8 @@ export default async function Home(props: {
 							<li>
 								We request the <code className="text-accent">/auth/drive.file</code> scope, which
 								allows the app to create a dedicated spreadsheet named{" "}
-								<strong>"Calorie Tracker — Data Assistant"</strong> in your Google Drive.
+								<strong>&ldquo;Calorie Tracker — Data Assistant&rdquo;</strong> in your Google
+								Drive.
 							</li>
 							<li>
 								We write and append your daily meal logs, calorie counts, and macronutrient
@@ -286,7 +287,7 @@ export default async function Home(props: {
 										<span className="text-accent">✓</span> Your key, your Google billing
 									</li>
 									<li className="flex items-center gap-2">
-										<span className="text-accent">✓</span> Free within Google's generous quota
+										<span className="text-accent">✓</span> Free within Google&apos;s generous quota
 									</li>
 									<li className="flex items-center gap-2">
 										<span className="text-accent">✓</span> Remove your key anytime

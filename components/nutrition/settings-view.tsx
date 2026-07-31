@@ -567,8 +567,8 @@ export function SettingsView({ refreshKey }: Props) {
 
 						{billing.accessState === "byok" && (
 							<p className="text-accent text-xs leading-relaxed font-semibold">
-								You're logging with your own API key — unlimited and free, forever. No subscription
-								needed.
+								You&apos;re logging with your own API key — unlimited and free, forever. No
+								subscription needed.
 							</p>
 						)}
 
@@ -685,7 +685,7 @@ export function SettingsView({ refreshKey }: Props) {
 							<DialogHeader>
 								<DialogTitle>Sign out?</DialogTitle>
 								<DialogDescription>
-									You'll need to sign back in to log meals or view your history.
+									You&apos;ll need to sign back in to log meals or view your history.
 								</DialogDescription>
 							</DialogHeader>
 							<DialogFooter>

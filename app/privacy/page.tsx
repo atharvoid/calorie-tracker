@@ -83,8 +83,9 @@ export default function PrivacyPage() {
 						<ul className="list-disc space-y-2 pl-5">
 							<li>
 								<code className="text-accent">/auth/drive.file</code>: We request access solely to
-								create and update a dedicated "Calorie Tracker" sheet in your Google Drive. We do
-								not access, view, or modify any other files or folders in your Google Drive.
+								create and update a dedicated &ldquo;Calorie Tracker&rdquo; sheet in your Google
+								Drive. We do not access, view, or modify any other files or folders in your Google
+								Drive.
 							</li>
 							<li>
 								<code className="text-accent">openid</code> /{" "}

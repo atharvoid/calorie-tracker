@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState, useRef } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { BarChart2, Clock, Settings, Utensils, Plus, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RealtimeListener } from "@/components/realtime-listener"
@@ -56,7 +56,6 @@ type Props = {
 
 export function NutritionShell({ userId, user }: Props) {
 	const searchParams = useSearchParams()
-	const router = useRouter()
 
 	const [activeTab, setActiveTab] = useState<Tab>(() => {
 		if (typeof window !== "undefined") {

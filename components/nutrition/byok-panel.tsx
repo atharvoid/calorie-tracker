@@ -112,8 +112,8 @@ export function ByokPanel({ onChanged }: Props) {
 			</h2>
 			<p className="text-muted mb-3 text-xs leading-relaxed">
 				Add your own free Google AI Studio API key and log meals with no trial limit, no daily cap,
-				and no subscription — billed directly (and for free, within Google's generous quota) to your
-				own account.
+				and no subscription — billed directly (and for free, within Google&apos;s generous quota) to
+				your own account.
 			</p>
 
 			{status.hasKey ? (
@@ -134,8 +134,8 @@ export function ByokPanel({ onChanged }: Props) {
 							<DialogHeader>
 								<DialogTitle>Remove your API key?</DialogTitle>
 								<DialogDescription>
-									You'll go back to trial or subscription limits for AI meal logging. You can add a
-									new key anytime.
+									You&apos;ll go back to trial or subscription limits for AI meal logging. You can
+									add a new key anytime.
 								</DialogDescription>
 							</DialogHeader>
 							<DialogFooter>
