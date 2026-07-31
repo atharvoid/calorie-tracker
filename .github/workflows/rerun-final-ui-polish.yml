@@ -1,41 +1,10 @@
-name: Diagnose final UI polish
+name: Completed UI polish rerun
 
 on:
-  push:
-    branches:
-      - feat/ui-redesign-final-polish
-
-permissions:
-  contents: write
+  workflow_dispatch:
 
 jobs:
-  diagnose:
-    if: github.actor != 'github-actions[bot]'
+  disabled:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Capture corrected transformation failure
-        run: |
-          set +e
-          python3 - <<'PY' > ui-polish-error.txt 2>&1
-          from pathlib import Path
-
-          workflow = Path(".github/workflows/apply-final-ui-polish.yml").read_text()
-          start_marker = "          python3 - <<'PY'\n"
-          end_marker = "\n          PY\n"
-          script = workflow.split(start_marker, 1)[1].split(end_marker, 1)[0]
-          script = "\n".join(line[10:] if line.startswith("          ") else line for line in script.splitlines())
-          duplicate = '''replace("components/nutrition/calorie-progress.tsx", 'className="text-muted sm:text-2xs mt-0.5 text-[9px]"', 'className="text-muted text-2xs mt-1"', count=2)
-replace("components/nutrition/calorie-progress.tsx", 'className="text-muted sm:text-2xs mt-0.5 text-[9px]"', 'className="text-muted text-2xs mt-1"')'''
-          corrected = '''replace("components/nutrition/calorie-progress.tsx", 'className="text-muted sm:text-2xs mt-0.5 text-[9px]"', 'className="text-muted text-2xs mt-1"', count=3)'''
-          if duplicate not in script:
-              raise SystemExit("Could not locate the known calorie-card replacement issue")
-          exec(compile(script.replace(duplicate, corrected), "ui-polish-transform", "exec"))
-          PY
-          status=$?
-          echo "exit_code=$status" >> ui-polish-error.txt
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ui-polish-error.txt
-          git commit -m "chore(ui): record polish transformation diagnostics"
-          git push
+      - run: echo "Completed"
