@@ -1,4 +1,4 @@
-name: Rerun final UI polish
+name: Diagnose final UI polish
 
 on:
   push:
@@ -9,22 +9,15 @@ permissions:
   contents: write
 
 jobs:
-  polish:
+  diagnose:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - name: Run corrected audited transformations
+      - name: Capture corrected transformation failure
         run: |
-          python3 - <<'PY'
+          set +e
+          python3 - <<'PY' > ui-polish-error.txt 2>&1
           from pathlib import Path
 
           workflow = Path(".github/workflows/apply-final-ui-polish.yml").read_text()
@@ -39,11 +32,10 @@ replace("components/nutrition/calorie-progress.tsx", 'className="text-muted sm:t
               raise SystemExit("Could not locate the known calorie-card replacement issue")
           exec(compile(script.replace(duplicate, corrected), "ui-polish-transform", "exec"))
           PY
-      - run: pnpm format
-      - name: Commit final polish
-        run: |
+          status=$?
+          echo "exit_code=$status" >> ui-polish-error.txt
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --all
-          git commit -m "feat(ui): complete responsive spacing and tooltip audit"
+          git add ui-polish-error.txt
+          git commit -m "chore(ui): record polish transformation diagnostics"
           git push
