@@ -30,13 +30,24 @@ describe("byokRateLimitPerMinute", () => {
 		expect(byokRateLimitPerMinute("1000")).toBe(1000)
 	})
 
+	it("tolerates surrounding whitespace", () => {
+		expect(byokRateLimitPerMinute("  25  ")).toBe(25)
+	})
+
 	it("honours 0 as a deliberate kill switch rather than treating it as unset", () => {
 		// This matters: 0 must not silently become the default, or an operator
 		// trying to stop BYOK traffic would still be serving 10 requests a minute.
 		expect(byokRateLimitPerMinute("0")).toBe(0)
 	})
 
-	it.each(["abc", "10.5", "-1", "1e3", "NaN", "ten", "10abc"])(
+	it("rejects exponent notation instead of quietly inflating the limit", () => {
+		// Number("1e3") is 1000. Accepting that would turn a fat-fingered value
+		// into a 100x higher limit, which is the most dangerous direction to fail
+		// in, so it must fall back to the default instead.
+		expect(byokRateLimitPerMinute("1e3")).toBe(DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE)
+	})
+
+	it.each(["abc", "10.5", "-1", "1e3", "NaN", "ten", "10abc", "0x10", "+5", "Infinity"])(
 		"falls back to the default for unparseable value %s",
 		(raw) => {
 			expect(byokRateLimitPerMinute(raw)).toBe(DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE)
@@ -131,7 +142,9 @@ describe("byokRateLimitMessage", () => {
 
 	it("makes clear the user's own quota is not the problem", () => {
 		// Users paying Google directly will otherwise assume their key is broken.
-		expect(byokRateLimitMessage(10)).toContain("your own API key still has its full quota")
+		expect(byokRateLimitMessage(10).toLowerCase()).toContain(
+			"your own api key still has its full quota"
+		)
 	})
 
 	it("tells the user the situation resolves on its own", () => {
