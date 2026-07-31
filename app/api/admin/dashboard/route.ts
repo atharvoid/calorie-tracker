@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { db } from "@/db"
 import { sql } from "drizzle-orm"
+import { isAdminEmail } from "@/lib/admin"
 
 export const dynamic = "force-dynamic"
 
@@ -11,18 +12,7 @@ export async function GET() {
 		return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 	}
 
-	// Restrict admin dashboard access to explicitly configured admin emails or local development
-	const isDev = process.env.NODE_ENV === "development"
-	const userEmail = (session.user.email || "").toLowerCase().trim()
-	const envAdminEmails = process.env.ADMIN_EMAILS
-		? process.env.ADMIN_EMAILS.split(",")
-				.map((e) => e.toLowerCase().trim())
-				.filter(Boolean)
-		: ["atharvapatil.connect@gmail.com"]
-
-	const isAdmin = isDev || envAdminEmails.includes(userEmail)
-
-	if (!isAdmin) {
+	if (!isAdminEmail(session.user.email)) {
 		return NextResponse.json({ error: "Forbidden" }, { status: 403 })
 	}
 
@@ -101,7 +91,7 @@ export async function GET() {
 				},
 				costs: {
 					aiCostUsd,
-					databaseHostingEstimateUsd: 5.0, // base baseline references
+					databaseHostingEstimateUsd: 5.0,
 				},
 				financials: {
 					estimatedMonthlyRevenueUsd: estimatedMonthlyRev,
