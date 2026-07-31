@@ -124,10 +124,7 @@ export default async function Home(props: {
 				</section>
 
 				{/* Narrative Sections */}
-				<section
-					id="features"
-					className="border-subtle/40 mb-24 scroll-mt-20 border-t pt-16"
-				>
+				<section id="features" className="border-subtle/40 mb-24 scroll-mt-20 border-t pt-16">
 					<div className="mx-auto max-w-5xl">
 						<BentoGrid>
 							<BentoGridItem
@@ -261,7 +258,7 @@ export default async function Home(props: {
 
 						<GlareCard className="rounded-card">
 							<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
-								<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-2xs font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
+								<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
 									Free forever
 								</span>
 								<div>
@@ -319,7 +316,7 @@ export default async function Home(props: {
 						</span>
 					</div>
 					<div>&copy; {new Date().getFullYear()} Calorie Tracker. All rights reserved.</div>
-					<div className="text-muted flex justify-center gap-4 text-2xs">
+					<div className="text-muted text-2xs flex justify-center gap-4">
 						<Link
 							href="/privacy"
 							className="hover:text-secondary transition-colors hover:underline"

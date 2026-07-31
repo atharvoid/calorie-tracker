@@ -102,7 +102,7 @@ function renderAnimatedShape(
 					x={shape.centerX}
 					y={shape.centerY - shape.height / 2 - 12}
 					textAnchor="middle"
-					className="fill-current font-mono text-2xs font-bold"
+					className="text-2xs fill-current font-mono font-bold"
 					style={{ fill: color }}
 				>
 					{shape.mealType || "Other"}
@@ -221,7 +221,7 @@ export function DayImprintAnimated({
 								x={tick.x}
 								y={520 - SAFE.bottom + 20}
 								textAnchor="middle"
-								className="fill-current text-2xs font-bold"
+								className="text-2xs fill-current font-bold"
 							>
 								{tick.label}
 							</text>

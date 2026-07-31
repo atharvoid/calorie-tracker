@@ -111,9 +111,9 @@ export function ByokPanel({ onChanged }: Props) {
 				Bring Your Own Key
 			</h2>
 			<p className="text-muted mb-3 text-xs leading-relaxed">
-				Add your own free Google AI Studio API key and log meals with no trial limit, no daily
-				cap, and no subscription — billed directly (and for free, within Google's generous quota)
-				to your own account.
+				Add your own free Google AI Studio API key and log meals with no trial limit, no daily cap,
+				and no subscription — billed directly (and for free, within Google's generous quota) to your
+				own account.
 			</p>
 
 			{status.hasKey ? (

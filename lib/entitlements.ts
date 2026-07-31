@@ -11,7 +11,13 @@ import {
 import { eq, desc, sql } from "drizzle-orm"
 import { localDate } from "./nutrition-date"
 import { MODEL_PRICING_USD_PER_MTOK } from "./ai"
-import { decryptApiKey, encryptApiKey, isByokEnabled, keyFingerprint, verifyGoogleApiKey } from "./byok"
+import {
+	decryptApiKey,
+	encryptApiKey,
+	isByokEnabled,
+	keyFingerprint,
+	verifyGoogleApiKey,
+} from "./byok"
 
 export type { AccessState }
 

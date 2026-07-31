@@ -477,8 +477,8 @@ export function SettingsView({ refreshKey }: Props) {
 				</h2>
 				<p className="text-muted mb-3 text-xs leading-relaxed">
 					Connect your Telegram account to log meals by sending a message to the bot. Once
-					connected, use <code className="text-accent">/setkey</code> in the chat to add your own API
-					key there too.
+					connected, use <code className="text-accent">/setkey</code> in the chat to add your own
+					API key there too.
 				</p>
 				<ConnectTelegram />
 			</Panel>
@@ -588,7 +588,8 @@ export function SettingsView({ refreshKey }: Props) {
 							</div>
 						)}
 
-						{(billing.accessState === "trial_ended" || billing.accessState === "quota_exhausted") && (
+						{(billing.accessState === "trial_ended" ||
+							billing.accessState === "quota_exhausted") && (
 							<p className="text-danger text-xs leading-relaxed font-semibold">
 								Your trial is complete. Your meal history is still available. Add your own API key
 								above for free unlimited logging, or upgrade to keep using ours.
@@ -616,10 +617,10 @@ export function SettingsView({ refreshKey }: Props) {
 										Personal Annual — $24.99/yr
 									</button>
 								</div>
-								<p className="text-muted text-center text-2xs leading-relaxed">
+								<p className="text-muted text-2xs text-center leading-relaxed">
 									Both plans include unlimited meals on the web, 25 daily AI Telegram logs, custom
-									targets, Google Sheets sync, and full data export. Or add your own API key above to
-									skip payment entirely.
+									targets, Google Sheets sync, and full data export. Or add your own API key above
+									to skip payment entirely.
 								</p>
 							</div>
 						)}

@@ -54,7 +54,7 @@ function FoodTable({
 					<div key={f.name} className="space-y-1">
 						<div className="flex items-start justify-between gap-2 text-xs sm:text-sm">
 							<span className="text-secondary min-w-0 flex-1 leading-snug font-medium break-words">
-								<span className="text-muted mr-1 font-mono text-2xs">{idx + 1}.</span>
+								<span className="text-muted text-2xs mr-1 font-mono">{idx + 1}.</span>
 								{f.name}{" "}
 								<span className="text-muted text-2xs font-normal whitespace-nowrap">
 									({f.count}×)
@@ -95,13 +95,13 @@ export function TopFoods({ byKcal, byProtein, loading = false }: Props) {
 	return (
 		<div className="grid gap-6 md:grid-cols-2">
 			<div>
-				<p className="text-muted mb-3 text-2xs font-bold tracking-wider uppercase">
+				<p className="text-muted text-2xs mb-3 font-bold tracking-wider uppercase">
 					Top foods by calories
 				</p>
 				<FoodTable foods={byKcal} valueKey="totalKcal" />
 			</div>
 			<div>
-				<p className="text-muted mb-3 text-2xs font-bold tracking-wider uppercase">
+				<p className="text-muted text-2xs mb-3 font-bold tracking-wider uppercase">
 					Top foods by protein
 				</p>
 				<FoodTable foods={byProtein} valueKey="totalProteinG" />

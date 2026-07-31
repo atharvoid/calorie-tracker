@@ -184,7 +184,7 @@ export default function ImprintPrototypePage() {
 					{/* Viewport Sandbox container */}
 					<div className="border-subtle bg-surface/10 flex justify-center rounded-xl border border-dashed p-4">
 						<div style={{ width: viewportWidth }} className="space-y-4 transition-all duration-300">
-							<div className="text-muted flex items-center justify-between px-1 font-mono text-2xs">
+							<div className="text-muted text-2xs flex items-center justify-between px-1 font-mono">
 								<span>Viewport: {viewportWidth === "100%" ? "Fluid" : viewportWidth}</span>
 								<span>
 									Scene FNV-1a Hash: <span className="text-accent font-bold">{sceneHash}</span>

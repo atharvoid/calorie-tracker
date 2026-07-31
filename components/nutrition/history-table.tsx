@@ -201,7 +201,7 @@ export function HistoryTable({
 									<span className="text-muted text-2xs font-normal">kcal</span>
 								</p>
 								{s.goal.targetKcal !== null && (
-									<p className="text-muted mt-1 text-2xs font-medium">
+									<p className="text-muted text-2xs mt-1 font-medium">
 										of {s.goal.targetKcal.toLocaleString("en-IN")} target
 									</p>
 								)}
@@ -210,7 +210,7 @@ export function HistoryTable({
 
 						{s.totals !== null && (
 							<div className="border-subtle/50 flex flex-wrap items-center justify-between gap-2 border-t pt-2">
-								<div className="text-muted tabular flex gap-2.5 text-2xs font-semibold">
+								<div className="text-muted tabular text-2xs flex gap-2.5 font-semibold">
 									<span>
 										P: <strong className="text-secondary">{s.totals.proteinG.toFixed(0)}g</strong>
 									</span>
@@ -229,7 +229,7 @@ export function HistoryTable({
 						)}
 
 						{s.totals === null && (
-							<div className="border-subtle/50 text-muted border-t pt-2 text-2xs italic">
+							<div className="border-subtle/50 text-muted text-2xs border-t pt-2 italic">
 								No meals logged for this date. Tap to log.
 							</div>
 						)}

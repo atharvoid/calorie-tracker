@@ -16,9 +16,7 @@ export function MetricLine({ label, value, unit, className, ...props }: MetricLi
 			<span className="text-secondary tracking-tight">{label}</span>
 			<div className="text-primary tabular flex items-baseline gap-0.5 font-bold">
 				<span>{value}</span>
-				{unit && (
-					<span className="text-muted ml-0.5 text-2xs font-normal normal-case">{unit}</span>
-				)}
+				{unit && <span className="text-muted text-2xs ml-0.5 font-normal normal-case">{unit}</span>}
 			</div>
 		</div>
 	)

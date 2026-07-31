@@ -115,7 +115,7 @@ export function HeroDemo() {
 						>
 							<Sparkles className="h-4 w-4" /> Try Sample Log
 						</button>
-						<p className="text-muted text-center font-mono text-2xs italic">
+						<p className="text-muted text-2xs text-center font-mono italic">
 							Sample: &ldquo;{SAMPLE_LOG}&rdquo;
 						</p>
 					</div>
@@ -136,7 +136,7 @@ export function HeroDemo() {
 								{mealGroups[0].items.map((item) => (
 									<div
 										key={item.id}
-										className="text-secondary flex items-baseline justify-between font-mono text-2xs"
+										className="text-secondary text-2xs flex items-baseline justify-between font-mono"
 									>
 										<span>
 											{item.name} <span className="text-muted">({item.grams}g)</span>
@@ -170,7 +170,7 @@ export function HeroDemo() {
 							<p className="text-accent font-mono text-xs font-bold tracking-wider uppercase">
 								Saved to your Daily Imprint
 							</p>
-							<p className="text-muted font-mono text-2xs">{summary.date}</p>
+							<p className="text-muted text-2xs font-mono">{summary.date}</p>
 						</div>
 
 						{/* Imprint Renderer */}

@@ -175,7 +175,7 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 					<p className="text-primary text-sm leading-tight font-semibold sm:text-base">
 						{dateLabel}
 					</p>
-					<p className="text-muted mt-0.5 text-2xs tracking-wide">{date}</p>
+					<p className="text-muted text-2xs mt-0.5 tracking-wide">{date}</p>
 					<input
 						ref={dateInputRef}
 						type="date"
