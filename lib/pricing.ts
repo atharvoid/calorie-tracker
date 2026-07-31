@@ -1,5 +1,3 @@
-import { FREE_TRIAL_DAYS } from "./entitlements"
-
 /**
  * Single source of truth for user-facing pricing copy.
  *
@@ -7,9 +5,24 @@ import { FREE_TRIAL_DAYS } from "./entitlements"
  * `app/page.tsx`, which meant a price change had to be made in the billing
  * configuration and in JSX independently — and would silently disagree the
  * first time someone forgot one of them.
+ *
+ * This module is deliberately dependency-free. It must stay importable from
+ * client components, so it must not reach `lib/entitlements` (which pulls in
+ * the database client transitively).
  */
 
-export const TRIAL_DAYS = FREE_TRIAL_DAYS
+/**
+ * Kept in step with FREE_TRIAL_DAYS in lib/entitlements.ts. Both read the same
+ * environment variable; this copy exists only so marketing copy does not drag
+ * the database layer into the client bundle.
+ */
+export const TRIAL_DAYS = readPositiveInt(process.env.FREE_TRIAL_DAYS, 7)
+
+function readPositiveInt(raw: string | undefined, fallback: number): number {
+	if (raw === undefined || raw === "") return fallback
+	const parsed = Number(raw)
+	return Number.isInteger(parsed) && parsed > 0 ? parsed : fallback
+}
 
 export type PlanKeyPublic = "personal" | "byok"
 
