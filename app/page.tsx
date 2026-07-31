@@ -2,7 +2,9 @@ import { AuthButton } from "@/components/auth-button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { auth } from "@/auth"
 import Link from "next/link"
-import { DemoApp } from "@/components/demo-app"
+import { Suspense } from "react"
+import { NutritionShell } from "@/components/nutrition/nutrition-shell"
+import { EmptyState } from "@/components/ui/empty-state"
 import { PRIMARY_BTN } from "@/lib/ui"
 import { cn } from "@/lib/utils"
 import { Info, KeyRound } from "lucide-react"
@@ -119,7 +121,19 @@ export default async function Home(props: {
 						</div>
 					</div>
 
-					<DemoApp signedIn={true} userId={session?.user?.id} user={session?.user} />
+					<div className="w-full">
+						{session?.user?.id ? (
+							<Suspense fallback={null}>
+								<NutritionShell userId={session.user.id} user={session.user} />
+							</Suspense>
+						) : (
+							<EmptyState
+								mascotPose="wave"
+								title="Sign in to see your Calorie Tracker"
+								hint="Your logged meals from Telegram will appear here live."
+							/>
+						)}
+					</div>
 				</div>
 			</main>
 		)

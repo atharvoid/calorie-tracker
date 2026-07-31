@@ -1,17 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import {
-	Loader2,
-	Save,
-	CreditCard,
-	Send,
-	FileSpreadsheet,
-	Download,
-	LogOut,
-	RefreshCw,
-	ExternalLink,
-} from "lucide-react"
+import { Loader2, Save, CreditCard, Send, Download, LogOut } from "lucide-react"
 import { toast } from "sonner"
 import { Panel } from "@/components/ui/panel"
 import { Button } from "@/components/ui/button"
@@ -95,53 +85,6 @@ export function SettingsView({ refreshKey }: Props) {
 		proteinTargetG: "",
 		timezone: "Asia/Kolkata",
 	})
-
-	// Google Sheets compact state
-	const [sheetId, setSheetId] = useState<string | null>(null)
-	const [sheetRows, setSheetRows] = useState<number | null>(null)
-	const [sheetLoading, setSheetLoading] = useState(true)
-	const [sheetConnecting, setSheetConnecting] = useState(false)
-
-	const loadSheet = useCallback(async () => {
-		setSheetLoading(true)
-		try {
-			const res = await fetch("/api/sheet/preview")
-			if (res.ok) {
-				const data = (await res.json()) as { spreadsheetId: string | null; rows: string[][] }
-				setSheetId(data.spreadsheetId ?? null)
-				setSheetRows(data.rows?.length ?? null)
-			}
-		} catch {
-			// silent — sheet not connected
-		} finally {
-			setSheetLoading(false)
-		}
-	}, [])
-
-	useEffect(() => {
-		void loadSheet()
-	}, [loadSheet])
-
-	async function connectSheet() {
-		setSheetConnecting(true)
-		try {
-			const res = await fetch("/api/sheet/connect", { method: "POST" })
-			if (!res.ok) {
-				const body = await res.json().catch(() => ({}))
-				throw new Error(
-					(body as { detail?: string; error?: string })?.detail ||
-						(body as { error?: string })?.error ||
-						"Unknown error"
-				)
-			}
-			toast.success("Google Sheet connected")
-			await loadSheet()
-		} catch (e) {
-			toast.error(`Couldn't connect the sheet: ${(e as Error).message}`)
-		} finally {
-			setSheetConnecting(false)
-		}
-	}
 
 	const [billing, setBilling] = useState<EntitlementStatus | null>(null)
 	const [billingLoading, setBillingLoading] = useState(true)
@@ -233,9 +176,8 @@ export function SettingsView({ refreshKey }: Props) {
 		if (refreshKey !== undefined && refreshKey > 0) {
 			void load(true)
 			void loadBilling()
-			void loadSheet()
 		}
-	}, [refreshKey, load, loadBilling, loadSheet])
+	}, [refreshKey, load, loadBilling])
 
 	async function handleSave() {
 		const maintenance = parseNum(form.maintenanceKcal)
@@ -481,56 +423,6 @@ export function SettingsView({ refreshKey }: Props) {
 					API key there too.
 				</p>
 				<ConnectTelegram />
-			</Panel>
-
-			{/* Google Sheets Sync Section */}
-			<Panel>
-				<h2 className="text-primary mb-1 flex items-center gap-2 text-base font-bold">
-					<FileSpreadsheet className="text-accent h-4.5 w-4.5" />
-					Google Sheets Sync
-				</h2>
-				<p className="text-muted mb-3 text-xs leading-relaxed">
-					Mirror your meal log into a spreadsheet in your Google Drive.
-				</p>
-
-				{sheetLoading ? (
-					<div className="text-muted flex items-center gap-2 text-xs">
-						<Loader2 className="h-3.5 w-3.5 animate-spin" /> Checking connection…
-					</div>
-				) : sheetId ? (
-					<div className="flex flex-wrap items-center gap-2">
-						<span className="text-muted tabular text-xs font-medium">
-							{sheetRows !== null ? `${sheetRows} rows synced` : "Connected"}
-						</span>
-						<button
-							onClick={() => void loadSheet()}
-							className="border-subtle bg-elevated text-secondary hover:text-primary hover:bg-surface inline-flex cursor-pointer items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
-						>
-							<RefreshCw className="h-3.5 w-3.5" /> Refresh
-						</button>
-						<a
-							href={`{{https://docs.google.com/spreadsheets/d/${sheetId}}}`}
-							target="_blank"
-							rel="noreferrer"
-							className="border-subtle bg-elevated text-accent hover:bg-surface inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors"
-						>
-							Open in Google Sheets <ExternalLink className="h-3.5 w-3.5" />
-						</a>
-					</div>
-				) : (
-					<Button
-						onClick={connectSheet}
-						disabled={sheetConnecting}
-						className="flex cursor-pointer items-center gap-2"
-					>
-						{sheetConnecting ? (
-							<Loader2 className="h-4 w-4 animate-spin" />
-						) : (
-							<FileSpreadsheet className="h-4 w-4" />
-						)}
-						{sheetConnecting ? "Connecting…" : "Connect Google Sheet"}
-					</Button>
-				)}
 			</Panel>
 
 			{/* Subscription & Billing Section */}
