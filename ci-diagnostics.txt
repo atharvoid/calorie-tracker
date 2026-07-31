@@ -1,0 +1,25 @@
+===== pnpm typecheck =====
+
+> calorie-tracker@0.1.0 typecheck /home/runner/work/calorie-tracker/calorie-tracker
+> tsc --noEmit
+
+exit_code=0
+===== pnpm lint =====
+
+> calorie-tracker@0.1.0 lint /home/runner/work/calorie-tracker/calorie-tracker
+> eslint
+
+
+Oops! Something went wrong! :(
+
+ESLint: 9.39.4
+
+A configuration object specifies rule "react-hooks/set-state-in-effect", but could not find plugin "react-hooks".
+
+Common causes of this problem include:
+
+1. The "react-hooks" plugin is not defined in your configuration file.
+2. The "react-hooks" plugin is not defined within the same configuration object in which the "react-hooks/set-state-in-effect" rule is applied.
+
+ ELIFECYCLE  Command failed with exit code 2.
+exit_code=2
