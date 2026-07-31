@@ -1,8 +1,8 @@
-# TEMPORARY DIAGNOSTIC WORKFLOW — MUST BE DELETED BEFORE MERGE.
+# TEMPORARY WORKFLOW — MUST BE DELETED BEFORE MERGE.
 #
-# GitHub Actions log pages cannot be read from this environment, so this
-# workflow re-runs the same commands as `verify` and commits their combined
-# output back to the branch as a readable artefact.
+# Applies canonical Prettier formatting and commits the result. Needed because
+# prettier-plugin-tailwindcss sorts utility classes into an order that cannot
+# be reproduced reliably by hand.
 name: Diagnose backlog branch
 
 on:
@@ -31,33 +31,15 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
 
-      - name: Run every verify step and record the output
-        env:
-          DATABASE_URL: postgres://ci:ci@127.0.0.1:5432/ci
-          AUTH_SECRET: ci-placeholder-value-never-used-at-runtime
-          NEXT_PUBLIC_APP_URL: http://localhost:3000
-        run: |
-          set +e
-          : > ci-diagnostics.txt
+      - run: pnpm install --frozen-lockfile
 
-          run_step() {
-            echo "===== $1 =====" >> ci-diagnostics.txt
-            eval "$1" >> ci-diagnostics.txt 2>&1
-            echo "----- exit code: $? -----" >> ci-diagnostics.txt
-            echo "" >> ci-diagnostics.txt
-          }
+      - name: Apply canonical Prettier formatting
+        run: pnpm format
 
-          run_step "pnpm install --frozen-lockfile"
-          run_step "pnpm typecheck"
-          run_step "pnpm lint"
-          run_step "pnpm test:run"
-          run_step "pnpm format:check"
-          run_step "pnpm build"
-
-      - name: Commit the diagnostics
+      - name: Commit the formatted result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -f ci-diagnostics.txt
-          git commit -m "chore: record diagnostics output [diagnostics]" || exit 0
+          git add -A
+          git commit -m "style: apply canonical Prettier formatting [diagnostics]" || exit 0
           git push origin HEAD:chore/post-p0-backlog
