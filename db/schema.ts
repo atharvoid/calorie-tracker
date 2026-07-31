@@ -12,13 +12,23 @@ import {
 	boolean,
 } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
-import type { NutritionResult } from "@/lib/nutrition"
+// Imported from lib/nutrition-types (pure zod shapes) rather than lib/nutrition,
+// so the database layer does not pull in the AI SDK. See task S-6.
+import type { NutritionResult } from "@/lib/nutrition-types"
 
 /**
  * Column naming note: the Auth.js tables below use camelCase database column
  * names ("userId", "emailVerified") because the Drizzle adapter requires those
  * exact names. Application tables use snake_case. Do not "fix" the Auth.js
  * tables — renaming them breaks sign-in.
+ *
+ * Numeric precision note: nutrition `numeric` columns are declared with an
+ * explicit precision and scale. Bare `numeric` accepts unbounded input, and
+ * Drizzle returns every numeric as a JavaScript **string** regardless — which
+ * is why `Number()` coercion appears at each consumer, and why a missed
+ * coercion silently produces string concatenation instead of addition. The
+ * precision does not remove the coercion requirement, but it does stop the
+ * database accepting values the UI cannot render. See task S-3.
  */
 
 export const users = pgTable("user", {
@@ -69,7 +79,7 @@ export const verificationTokens = pgTable(
 	(vt) => [primaryKey({ columns: [vt.identifier, vt.token] })]
 )
 
-// ── Integrations ──────────────────────────────────────────────────────────────
+// ── Integrations ────────────────────────────────────────────────
 
 /**
  * @deprecated Carried over from the previous "Data Assistant" project. The
@@ -127,7 +137,7 @@ export const entries = pgTable("entry", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
-// ── Nutrition ────────────────────────────────────────────────────────────────
+// ── Nutrition ───────────────────────────────────────────────────
 
 export const pendingCaptures = pgTable("pending_capture", {
 	id: uuid("id").defaultRandom().primaryKey(),
@@ -143,6 +153,17 @@ export type MealType = "Breakfast" | "Lunch" | "Dinner" | "Snack"
 /** Allowed values for `mealItems.source` and `usageEvents.source`. */
 export type LogSource = "web" | "telegram"
 
+/**
+ * Runtime-enforced value lists. The `$type<>()` unions below are erased at
+ * compile time, so anything writing outside the Drizzle layer — a migration, a
+ * manual psql fix, a webhook handler with a typo — could previously insert an
+ * unlisted value unchallenged. These arrays are the single source the CHECK
+ * constraints in drizzle/0006_column_constraints.sql were generated from; keep
+ * them in step with that migration. See task S-2.
+ */
+export const MEAL_TYPES = ["Breakfast", "Lunch", "Dinner", "Snack"] as const
+export const LOG_SOURCES = ["web", "telegram"] as const
+
 export const mealItems = pgTable(
 	"meal_item",
 	{
@@ -154,11 +175,11 @@ export const mealItems = pgTable(
 		mealType: text("meal_type").$type<MealType>(),
 		timeHint: text("time_hint"),
 		name: text("name").notNull(),
-		grams: numeric("grams"),
-		kcal: numeric("kcal"),
-		proteinG: numeric("protein_g"),
-		carbsG: numeric("carbs_g"),
-		fatG: numeric("fat_g"),
+		grams: numeric("grams", { precision: 9, scale: 2 }),
+		kcal: numeric("kcal", { precision: 9, scale: 2 }),
+		proteinG: numeric("protein_g", { precision: 7, scale: 2 }),
+		carbsG: numeric("carbs_g", { precision: 7, scale: 2 }),
+		fatG: numeric("fat_g", { precision: 7, scale: 2 }),
 		notes: text("notes"),
 		source: text("source").$type<LogSource>().notNull().default("telegram"),
 		// References pending_capture.id (UUID with set-null on delete)
@@ -182,9 +203,9 @@ export const nutritionSettings = pgTable(
 			.references(() => users.id, { onDelete: "cascade" }),
 		maintenanceKcal: integer("maintenance_kcal"),
 		targetKcal: integer("target_kcal"),
-		proteinTargetG: numeric("protein_target_g"),
-		carbsTargetG: numeric("carbs_target_g"),
-		fatTargetG: numeric("fat_target_g"),
+		proteinTargetG: numeric("protein_target_g", { precision: 7, scale: 2 }),
+		carbsTargetG: numeric("carbs_target_g", { precision: 7, scale: 2 }),
+		fatTargetG: numeric("fat_target_g", { precision: 7, scale: 2 }),
 		targetToleranceKcal: integer("target_tolerance_kcal"),
 		timezone: text("timezone").notNull().default("Asia/Kolkata"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -206,9 +227,9 @@ export const nutritionDayOverrides = pgTable(
 		date: text("date").notNull(), // YYYY-MM-DD
 		maintenanceKcal: integer("maintenance_kcal"),
 		targetKcal: integer("target_kcal"),
-		proteinTargetG: numeric("protein_target_g"),
-		carbsTargetG: numeric("carbs_target_g"),
-		fatTargetG: numeric("fat_target_g"),
+		proteinTargetG: numeric("protein_target_g", { precision: 7, scale: 2 }),
+		carbsTargetG: numeric("carbs_target_g", { precision: 7, scale: 2 }),
+		fatTargetG: numeric("fat_target_g", { precision: 7, scale: 2 }),
 		reason: text("reason"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
@@ -221,9 +242,11 @@ export const nutritionDayOverrides = pgTable(
 	(t) => [unique("nutrition_day_override_user_date_unique").on(t.userId, t.date)]
 )
 
-// ── Billing and entitlements ─────────────────────────────────────────────────
+// ── Billing and entitlements ────────────────────────────────────────
 
 export type BillingProvider = "stripe" | "dodo"
+
+export const BILLING_PROVIDERS = ["stripe", "dodo"] as const
 
 export const billingCustomers = pgTable("billing_customer", {
 	userId: text("user_id")
@@ -242,6 +265,18 @@ export type SubscriptionStatus =
 	"trialing" | "active" | "past_due" | "canceled" | "unpaid" | "incomplete" | "paused"
 
 export type PlanKey = "personal_monthly" | "personal_annual"
+
+export const SUBSCRIPTION_STATUSES = [
+	"trialing",
+	"active",
+	"past_due",
+	"canceled",
+	"unpaid",
+	"incomplete",
+	"paused",
+] as const
+
+export const PLAN_KEYS = ["personal_monthly", "personal_annual"] as const
 
 export const subscriptions = pgTable(
 	"subscription",
@@ -288,8 +323,21 @@ export type AccessState =
 	| "quota_exhausted"
 	| "blocked"
 
+export const ACCESS_STATES = [
+	"pre_trial",
+	"trial",
+	"byok",
+	"active",
+	"grace",
+	"trial_ended",
+	"quota_exhausted",
+	"blocked",
+] as const
+
 /** AI provider a user can supply their own key for. */
 export type ByokProvider = "google"
+
+export const BYOK_PROVIDERS = ["google"] as const
 
 export const productEntitlements = pgTable("product_entitlement", {
 	id: uuid("id").defaultRandom().primaryKey(),
@@ -305,7 +353,7 @@ export const productEntitlements = pgTable("product_entitlement", {
 	paidAiLogDate: text("paid_ai_log_date"), // YYYY-MM-DD
 	accessState: text("access_state").$type<AccessState>().notNull().default("pre_trial"),
 
-	// ── BYOK (bring your own key) ────────────────────────────────────────────
+	// ── BYOK (bring your own key) ───────────────────────────────────
 	// The key is AES-256-GCM encrypted by lib/byok.ts. Plaintext is never
 	// stored and never logged. Only the last four characters are displayable.
 	byokProvider: text("byok_provider").$type<ByokProvider>(),
@@ -327,6 +375,8 @@ export const productEntitlements = pgTable("product_entitlement", {
 
 /** Who paid the provider for a given AI call. */
 export type KeyOwner = "platform" | "user"
+
+export const KEY_OWNERS = ["platform", "user"] as const
 
 export const usageEvents = pgTable(
 	"usage_event",
