@@ -10,16 +10,403 @@ exit_code=0
 > eslint
 
 
-Oops! Something went wrong! :(
+/home/runner/work/calorie-tracker/calorie-tracker/app/api/billing/checkout/route.ts
+   3:10  error    'db' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+   4:10  error    'billingCustomers' is defined but never used. Allowed unused vars must match /^_/u  @typescript-eslint/no-unused-vars
+   5:10  error    'eq' is defined but never used. Allowed unused vars must match /^_/u                @typescript-eslint/no-unused-vars
+  52:16  warning  Unexpected any. Specify a different type                                            @typescript-eslint/no-explicit-any
 
-ESLint: 9.39.4
+/home/runner/work/calorie-tracker/calorie-tracker/app/api/billing/webhook/route.ts
+  180:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  216:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
 
-A configuration object specifies rule "react-hooks/set-state-in-effect", but could not find plugin "react-hooks".
+/home/runner/work/calorie-tracker/calorie-tracker/app/api/nutrition/day/route.ts
+  107:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-Common causes of this problem include:
+/home/runner/work/calorie-tracker/calorie-tracker/app/api/nutrition/extract/route.ts
+  22:12  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  60:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
 
-1. The "react-hooks" plugin is not defined in your configuration file.
-2. The "react-hooks" plugin is not defined within the same configuration object in which the "react-hooks/set-state-in-effect" rule is applied.
+/home/runner/work/calorie-tracker/calorie-tracker/app/page.tsx
+  187:17  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  187:50  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  289:68  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
 
- ELIFECYCLE  Command failed with exit code 2.
-exit_code=2
+/home/runner/work/calorie-tracker/calorie-tracker/app/privacy/page.tsx
+  86:39  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  86:55  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/runner/work/calorie-tracker/calorie-tracker/app/terms/page.tsx
+  33:51  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  33:59  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  96:38  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  96:44  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  96:50  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  96:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/analytics-report.tsx
+  50:8  warning  The 'sourceRows' conditional could make the dependencies of useMemo Hook (at line 51) change on every render. To fix this, wrap the initialization of 'sourceRows' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/imprint/day-imprint.tsx
+  31:3  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/imprint/day-imprint.tsx:31:3
+  29 | 	useEffect(() => {
+  30 | 		const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
+> 31 | 		setReducedMotion(mediaQuery.matches)
+     | 		^^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  32 |
+  33 | 		const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches)
+  34 | 		mediaQuery.addEventListener("change", handler)  react-hooks/set-state-in-effect
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/imprint/imprint-legend.tsx
+  13:4  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/imprint/imprint-legend.tsx:13:4
+  11 | 		const shown = sessionStorage.getItem("imprint_legend_shown")
+  12 | 		if (!shown) {
+> 13 | 			setIsOpen(true)
+     | 			^^^^^^^^^ Avoid calling setState() directly within an effect
+  14 | 			sessionStorage.setItem("imprint_legend_shown", "true")
+  15 | 		}
+  16 | 	}, [])  react-hooks/set-state-in-effect
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/analytics-view.tsx
+  105:8  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/analytics-view.tsx:105:8
+  103 |
+  104 | 	useEffect(() => {
+> 105 | 		void load(range)
+      | 		     ^^^^ Avoid calling setState() directly within an effect
+  106 | 	}, [range, load])
+  107 |
+  108 | 	useEffect(() => {                                                           react-hooks/set-state-in-effect
+  110:9  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/analytics-view.tsx:110:9
+  108 | 	useEffect(() => {
+  109 | 		if (refreshKey !== undefined && refreshKey > 0) {
+> 110 | 			void load(range, true)
+      | 			     ^^^^ Avoid calling setState() directly within an effect
+  111 | 		}
+  112 | 	}, [refreshKey, range, load])
+  113 |  react-hooks/set-state-in-effect
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/byok-panel.tsx
+   50:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/byok-panel.tsx:50:8
+  48 |
+  49 | 	useEffect(() => {
+> 50 | 		void load()
+     | 		     ^^^^ Avoid calling setState() directly within an effect
+  51 | 	}, [load])
+  52 |
+  53 | 	async function handleSave() {  react-hooks/set-state-in-effect
+  115:71  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+  137:13  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            react/no-unescaped-entities
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/history-view.tsx
+   4:10  error    'Loader2' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     @typescript-eslint/no-unused-vars
+  53:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/history-view.tsx:53:8
+  51 | 	useEffect(() => {
+  52 | 		const isSilent = refreshKey !== undefined && refreshKey > 0
+> 53 | 		void loadWeek(weekMonday, isSilent)
+     | 		     ^^^^^^^^ Avoid calling setState() directly within an effect
+  54 | 	}, [weekMonday, loadWeek, refreshKey])
+  55 |
+  56 | 	// Load last 4 weeks history for table                    react-hooks/set-state-in-effect
+  82:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/history-view.tsx:82:8
+  80 | 	useEffect(() => {
+  81 | 		const isSilent = refreshKey !== undefined && refreshKey > 0
+> 82 | 		void loadHistory(sort, filter, isSilent)
+     | 		     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  83 | 	}, [sort, filter, loadHistory, refreshKey])
+  84 |
+  85 | 	function handleWeekChange(monday: string) {  react-hooks/set-state-in-effect
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/meal-composer.tsx
+  53:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  75:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/nutrition-shell.tsx
+   59:8  error    'router' is assigned a value but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               @typescript-eslint/no-unused-vars
+  114:8  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/nutrition-shell.tsx:114:8
+  112 |
+  113 | 	useEffect(() => {
+> 114 | 		void loadBilling()
+      | 		     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  115 | 	}, [loadBilling, searchParams])
+  116 |
+  117 | 	const handleNutritionChanged = useCallback(() => {  react-hooks/set-state-in-effect
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/paywall-alert.tsx
+  35:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/rhythm-strip.tsx
+  61:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/settings-view.tsx
+  122:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/settings-view.tsx:122:8
+  120 |
+  121 | 	useEffect(() => {
+> 122 | 		void loadSheet()
+      | 		     ^^^^^^^^^ Avoid calling setState() directly within an effect
+  123 | 	}, [loadSheet])
+  124 |
+  125 | 	async function connectSheet() {                                              react-hooks/set-state-in-effect
+  165:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/settings-view.tsx:165:8
+  163 |
+  164 | 	useEffect(() => {
+> 165 | 		void loadBilling()
+      | 		     ^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  166 | 	}, [loadBilling])
+  167 |
+  168 | 	async function handleUpgrade(plan: "monthly" | "annual") {             react-hooks/set-state-in-effect
+  182:15  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  201:15  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  229:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/settings-view.tsx:229:8
+  227 |
+  228 | 	useEffect(() => {
+> 229 | 		void load()
+      | 		     ^^^^ Avoid calling setState() directly within an effect
+  230 | 	}, [load])
+  231 |
+  232 | 	useEffect(() => {                                                                           react-hooks/set-state-in-effect
+  234:9   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/settings-view.tsx:234:9
+  232 | 	useEffect(() => {
+  233 | 		if (refreshKey !== undefined && refreshKey > 0) {
+> 234 | 			void load(true)
+      | 			     ^^^^ Avoid calling setState() directly within an effect
+  235 | 			void loadBilling()
+  236 | 			void loadSheet()
+  237 | 		}  react-hooks/set-state-in-effect
+  302:17  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           @typescript-eslint/no-explicit-any
+  570:12  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react/no-unescaped-entities
+  688:13  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    react/no-unescaped-entities
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/today-view.tsx
+   5:37  error    'Loader2' is defined but never used. Allowed unused vars must match /^_/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         @typescript-eslint/no-unused-vars
+  68:8   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/today-view.tsx:68:8
+  66 |
+  67 | 	useEffect(() => {
+> 68 | 		void load(date)
+     | 		     ^^^^ Avoid calling setState() directly within an effect
+  69 | 	}, [date, load])
+  70 |
+  71 | 	useEffect(() => {                                                           react-hooks/set-state-in-effect
+  73:9   warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/nutrition/today-view.tsx:73:9
+  71 | 	useEffect(() => {
+  72 | 		if (refreshKey !== undefined && refreshKey > 0) {
+> 73 | 			void load(date, true)
+     | 			     ^^^^ Avoid calling setState() directly within an effect
+  74 | 		}
+  75 | 	}, [refreshKey, date, load])
+  76 |  react-hooks/set-state-in-effect
+  93:35  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/onboarding-tour.tsx
+   59:20  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/onboarding-tour.tsx:59:20
+  57 | 		try {
+  58 | 			const dismissed = window.localStorage.getItem(STORAGE_KEY)
+> 59 | 			if (!dismissed) setVisible(true)
+     | 			                ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  60 | 		} catch {
+  61 | 			// localStorage unavailable (e.g. privacy mode) — skip tour rather than throw
+  62 | 		}  react-hooks/set-state-in-effect
+  166:57  error    `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react/no-unescaped-entities
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/sheet-panel.tsx
+  34:8  warning  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/home/runner/work/calorie-tracker/calorie-tracker/components/sheet-panel.tsx:34:8
+  32 |
+  33 | 	useEffect(() => {
+> 34 | 		void load()
+     | 		     ^^^^ Avoid calling setState() directly within an effect
+  35 | 	}, [load])
+  36 |
+  37 | 	async function connect() {  react-hooks/set-state-in-effect
+
+/home/runner/work/calorie-tracker/calorie-tracker/db/index.ts
+  6:2  warning  Unused eslint-disable directive (no problems were reported from 'no-var')
+
+/home/runner/work/calorie-tracker/calorie-tracker/lib/nutrition.ts
+    6:8   warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+   45:8   warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  116:39  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+  164:3   warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  179:16  warning  Unexpected any. Specify a different type                                           @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/lib/telegram.ts
+  180:60  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  321:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  383:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/scripts/migrate.cjs
+  27:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  45:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  48:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  53:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  58:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  60:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/home/runner/work/calorie-tracker/calorie-tracker/scripts/migrate.mts
+  27:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  45:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  48:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  51:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  54:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  56:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/home/runner/work/calorie-tracker/calorie-tracker/scripts/start-dev.ts
+  13:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  18:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  24:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  28:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  35:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  43:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/home/runner/work/calorie-tracker/calorie-tracker/scripts/telegram-webhook.ts
+   8:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  24:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  25:5  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/home/runner/work/calorie-tracker/calorie-tracker/scripts/test-ssh.ts
+  20:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  24:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  28:2  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+/home/runner/work/calorie-tracker/calorie-tracker/tests/__tests__/dodo.test.ts
+  38:8  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/runner/work/calorie-tracker/calorie-tracker/tests/__tests__/imprint-perf.test.ts
+  139:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  140:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  143:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  145:4  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+  149:3  warning  Unexpected console statement. Only these console methods are allowed: warn, error  no-console
+
+✖ 93 problems (22 errors, 71 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+
+ ELIFECYCLE  Command failed with exit code 1.
+exit_code=1
