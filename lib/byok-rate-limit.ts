@@ -46,13 +46,19 @@ export class ByokRateLimitError extends Error {
  * malformed limit should not take meal logging down, and the default is the
  * safe direction to fail in. `0` is honoured as "no BYOK calls allowed", which
  * is a legitimate kill switch.
+ *
+ * Only plain digits are accepted. `Number()` alone would happily turn "1e3"
+ * into 1000, so a fat-fingered value could silently raise the limit a hundred
+ * fold instead of falling back to the safe default.
  */
 export function byokRateLimitPerMinute(
 	raw: string | undefined = process.env.BYOK_RATE_LIMIT_PER_MINUTE
 ): number {
-	if (raw === undefined || raw.trim() === "") return DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE
-	const parsed = Number(raw)
-	if (!Number.isInteger(parsed) || parsed < 0) return DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE
+	if (raw === undefined) return DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE
+	const trimmed = raw.trim()
+	if (!/^\d+$/.test(trimmed)) return DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE
+	const parsed = Number(trimmed)
+	if (!Number.isSafeInteger(parsed)) return DEFAULT_BYOK_RATE_LIMIT_PER_MINUTE
 	return parsed
 }
 
@@ -60,10 +66,10 @@ export function byokRateLimitPerMinute(
  * Pure decision function, separated from the query so the policy can be tested
  * without a database.
  */
-export function evaluateByokRateLimit(args: {
-	recentCallCount: number
-	limit: number
-}): { allowed: boolean; remaining: number } {
+export function evaluateByokRateLimit(args: { recentCallCount: number; limit: number }): {
+	allowed: boolean
+	remaining: number
+} {
 	const { recentCallCount, limit } = args
 	const allowed = recentCallCount < limit
 	return { allowed, remaining: Math.max(0, limit - recentCallCount) }
