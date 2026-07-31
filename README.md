@@ -4,10 +4,9 @@ Log what you ate in plain language — by web or Telegram — and get calories a
 macros back, tracked against your daily targets.
 
 > **Note on history:** this repository previously hosted a different project (an
-> invoice/order extraction tool called "Data Assistant"). Some of that code is
-> still present and is being removed. Anything marked `@deprecated` in
-> `db/schema.ts` or listed under "Legacy surface" below is not part of this
-> product. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
+> invoice/order extraction tool called "Data Assistant"). Most of that code has
+> been removed; what's left is tracked under "Legacy surface" below and in
+> [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
 ## How it works
 
@@ -23,7 +22,7 @@ There are three ways to use the app. The middle tier is the point: if you bring
 your own AI key, the app is free for you and costs the operator nothing.
 
 | Tier                   | Cost to you                                     | Cost to operator     | Limits                         |
-| ---------------------- | ----------------------------------------------- | -------------------- | ------------------------------ |
+| ---------------------- | ----------------------------------------------- | --------------------- | ------------------------------ |
 | **Free trial**         | Free                                            | Operator pays for AI | 7 days, 50 AI logs             |
 | **Bring your own key** | Free (you pay Google directly, usually pennies) | Nothing              | Unlimited AI logs              |
 | **Subscription**       | $2.99/month                                     | Operator pays for AI | Fair-use cap of 25 AI logs/day |
@@ -88,7 +87,7 @@ tunnel; point `setWebhook` at it and pass the same value as
 ## Scripts
 
 | Command                             | Purpose                                 |
-| ----------------------------------- | --------------------------------------- |
+| ------------------------------------ | --------------------------------------- |
 | `pnpm dev`                          | Dev server                              |
 | `pnpm dev:tunnel`                   | Dev server + public tunnel for Telegram |
 | `pnpm build` / `pnpm start`         | Production build / serve                |
@@ -135,11 +134,18 @@ docs/               Implementation plan and design notes
 
 ## Legacy surface
 
-Still present, not part of this product, and scheduled for removal:
-`/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`,
-`/api/sheet`, the `entry` and `sheet_connection` tables, and the spreadsheet-era
-components (`editable-table`, `transform-panel`, `charts`, `report-pdf`, and
-neighbours). Tracked as task group D in the implementation plan.
+Most of the "Data Assistant" leftovers are gone: the unauthenticated
+`/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`, and
+`/api/sheet` routes have been deleted, and so have the spreadsheet-era
+components (`editable-table`, `editable-cell`, `charts`, `kpi-card`,
+`status-pill`, `input-toggle`, `dropzone`, and neighbours).
+
+What's still outstanding: the `entry` and `sheet_connection` database tables.
+Their Drizzle schema exports have been removed (`db/schema.ts` no longer
+defines them), but the tables themselves still exist in the database. Dropping
+them needs `pnpm drizzle-kit generate` to produce the migration, a backup of
+both tables, and then `pnpm drizzle-kit migrate` against production. Tracked as
+task D-2 in the implementation plan.
 
 ## License
 
