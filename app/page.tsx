@@ -173,13 +173,17 @@ export default async function Home(props: {
 						</p>
 
 						<div className="flex flex-col gap-3 pt-2 sm:flex-row">
-							<SignInForm
-								label={`Start free for ${TRIAL_DAYS} days`}
-								className="w-full sm:w-auto"
-							/>
+							<SignInForm label={personal.ctaLabel} className="w-full sm:w-auto" />
 						</div>
+						{/*
+						 * The hero previously advertised the bring-your-own-key path here, which
+						 * made the free route the first thing a visitor read. The headline offer
+						 * is the subscription; the price and the card requirement belong here
+						 * instead, and BYOK is reachable further down the page.
+						 */}
 						<p className="text-muted text-xs">
-							Or bring your own free API key later — no card required, ever.
+							{personal.priceLabel} {personal.periodLabel} after your {TRIAL_DAYS}-day trial.
+							Card saved when the trial starts — cancel any time before it ends.
 						</p>
 					</div>
 
@@ -223,12 +227,6 @@ export default async function Home(props: {
 								title="Log on the go with Telegram."
 								description="Connect your account to the companion bot. Log your meals by sending a quick message on the run, and watch it sync to your dashboard instantly."
 							/>
-							<BentoGridItem
-								index="07 · Bring Your Own Key"
-								title="Or don't pay us at all."
-								description="Add your own free Google AI Studio API key in Settings, and log meals with no trial limit, no daily cap, and no subscription — forever."
-								className="sm:col-span-2 lg:col-span-1"
-							/>
 						</BentoGrid>
 					</div>
 				</section>
@@ -236,12 +234,21 @@ export default async function Home(props: {
 				{/* Pricing Section */}
 				<section className="mx-auto mb-24 max-w-3xl text-center">
 					<h2 className="mb-2 text-2xl font-semibold">Simple, transparent pricing</h2>
-					<p className="text-secondary mb-8 text-sm">
-						Pay us, or bring your own key and pay nothing. Your choice.
+					<p className="text-secondary mb-10 text-sm">
+						One plan, one price. Start with a {TRIAL_DAYS}-day trial.
 					</p>
 
-					<div className="grid gap-6 sm:grid-cols-2">
-						<div className="rounded-card border-subtle bg-surface flex flex-col gap-6 border p-8 text-left">
+					{/*
+					 * Single headline plan. This was a two-column grid where the BYOK card
+					 * carried the glare treatment, the accent border, and a "Free forever"
+					 * badge — so the free option outshouted the paid one and the two cards
+					 * competed for the same visual weight. The emphasis now sits on Personal.
+					 */}
+					<GlareCard className="rounded-card mx-auto max-w-md">
+						<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
+							<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
+								Recommended
+							</span>
 							<div>
 								<h3 className="text-primary text-xl font-semibold">{personal.name}</h3>
 								<p className="text-secondary mt-1 text-sm">{personal.tagline}</p>
@@ -256,33 +263,33 @@ export default async function Home(props: {
 
 							<PlanFeatures features={personal.features} />
 
-							<SignInForm label={personal.ctaLabel} className="mt-4 w-full" />
+							<SignInForm label={personal.ctaLabel} className="mt-2 w-full" />
+							{personal.footnote ? (
+								<p className="text-muted text-2xs leading-relaxed">{personal.footnote}</p>
+							) : null}
 						</div>
+					</GlareCard>
 
-						<GlareCard className="rounded-card">
-							<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
-								<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
-									Free forever
-								</span>
-								<div>
-									<h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
-										<KeyRound className="text-accent h-5 w-5" aria-hidden="true" /> {byok.name}
-									</h3>
-									<p className="text-secondary mt-1 text-sm">{byok.tagline}</p>
-								</div>
-
-								<div className="flex items-baseline gap-1">
-									<span className="text-primary text-3xl font-bold tracking-tight">
-										{byok.priceLabel}
-									</span>
-									<span className="text-muted text-sm">{byok.periodLabel}</span>
-								</div>
-
-								<PlanFeatures features={byok.features} />
-
-								<SignInForm label={byok.ctaLabel} variant="outline" className="mt-4 w-full" />
-							</div>
-						</GlareCard>
+					{/*
+					 * Secondary and deliberately understated: a documented escape hatch, set
+					 * below the fold of the pricing block so it cannot be mistaken for the
+					 * headline offer.
+					 */}
+					<div className="border-subtle/60 mx-auto mt-14 max-w-md border-t pt-8">
+						<div className="rounded-card border-subtle bg-surface/40 flex flex-col gap-3 border border-dashed p-6 text-left">
+							<h3 className="text-secondary flex items-center gap-2 text-sm font-semibold">
+								<KeyRound className="text-muted h-4 w-4" aria-hidden="true" />
+								{byok.name}
+							</h3>
+							<p className="text-muted text-xs leading-relaxed">{byok.tagline}</p>
+							<p className="text-muted text-2xs font-mono leading-relaxed">
+								{byok.features.join(" · ")}
+							</p>
+							{byok.footnote ? (
+								<p className="text-muted text-2xs leading-relaxed">{byok.footnote}</p>
+							) : null}
+							<SignInForm label={byok.ctaLabel} variant="outline" className="mt-1 w-full" />
+						</div>
 					</div>
 				</section>
 

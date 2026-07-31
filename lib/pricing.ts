@@ -35,6 +35,12 @@ export type PublicPlan = {
 	periodLabel: string
 	features: readonly string[]
 	ctaLabel: string
+	/**
+	 * Small print rendered under the call to action. The trial now requires card
+	 * details up front, and hiding that until the checkout page would be a
+	 * surprise the user is entitled to see before they sign up.
+	 */
+	footnote?: string
 }
 
 /** Personal plan price in whole US cents, so no floating point rounding. */
@@ -44,6 +50,12 @@ export function formatUsdCents(cents: number): string {
 	return `$${(cents / 100).toFixed(2)}`
 }
 
+/**
+ * Order is meaningful: the first entry is the plan the product leads with.
+ * Personal is the business; Bring Your Own Key is a deliberate escape hatch for
+ * the small slice of users who would rather run on their own provider quota, and
+ * it is presented that way rather than as a co-equal headline offer.
+ */
 export const PUBLIC_PLANS: readonly PublicPlan[] = [
 	{
 		key: "personal",
@@ -59,22 +71,24 @@ export const PUBLIC_PLANS: readonly PublicPlan[] = [
 			"Targets and day-specific adjustments",
 			"Data export",
 		],
-		ctaLabel: `Start free for ${TRIAL_DAYS} days`,
+		ctaLabel: `Start my ${TRIAL_DAYS}-day trial`,
+		footnote: `Card details are saved when the trial starts. Nothing is charged for ${TRIAL_DAYS} days, and you can cancel any time before then.`,
 	},
 	{
 		key: "byok",
-		name: "Bring Your Own Key",
-		tagline: "For people happy to use their own free Google AI Studio key.",
+		name: "Bring your own API key",
+		tagline:
+			"Already have a Google AI Studio key? Use it instead of a subscription and pay Google directly.",
 		priceLabel: "$0",
-		periodLabel: "/ month, always",
+		periodLabel: "/ month",
 		features: [
 			"No trial limit, no daily cap",
 			"Everything in Personal",
 			"Your key, your Google billing",
-			"Free within Google's generous quota",
 			"Remove your key anytime",
 		],
-		ctaLabel: "Sign up & add my key",
+		ctaLabel: "Use my own key instead",
+		footnote: "Takes a few minutes of setup. Add the key from Settings once you are signed in.",
 	},
 ]
 
