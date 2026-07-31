@@ -4,6 +4,15 @@ import { sheetConnections } from "@/db/schema"
 import { getGoogleAuth, sheetsClient } from "./google"
 import type { NormalizedRow } from "./types"
 
+/**
+ * Title given to spreadsheets this app creates.
+ *
+ * This string is quoted verbatim in the Google Drive scope justification on
+ * the landing page (app/page.tsx). Google's OAuth verification review compares
+ * the stated purpose against the public-facing copy, so the two must not drift.
+ */
+export const MEAL_SHEET_TITLE = "Calorie Tracker — Meal Log"
+
 // ─── Legacy Orders helpers (kept for backwards-compat with any stale routes) ──
 
 export async function getConnection(userId: string) {
@@ -15,7 +24,7 @@ export async function getConnection(userId: string) {
 	return conn ?? null
 }
 
-// ─── Calorie Tracker sheet helpers ────────────────────────────────────────────
+// ─── Calorie Tracker sheet helpers ─────────────────────────────────────
 
 const MEALS_HEADER = [
 	"Item ID",
@@ -39,7 +48,7 @@ export async function ensureMealSheet(userId: string): Promise<string> {
 	const sheets = sheetsClient(await getGoogleAuth(userId))
 	const created = await sheets.spreadsheets.create({
 		requestBody: {
-			properties: { title: "Calorie Tracker — Data Assistant" },
+			properties: { title: MEAL_SHEET_TITLE },
 			sheets: [{ properties: { title: "Meals" } }],
 		},
 	})
@@ -119,7 +128,7 @@ export async function readMealRows(userId: string, limit = 100) {
 	}
 }
 
-// ─── Legacy append/read (kept for any existing routes) ────────────────────────
+// ─── Legacy append/read (kept for any existing routes) ───────────────────────
 
 export async function appendRows(
 	userId: string,
