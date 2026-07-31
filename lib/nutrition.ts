@@ -1,73 +1,13 @@
-import { z } from "zod"
 import { generateObject } from "ai"
 import { getModel, MODEL_ID } from "@/lib/ai"
+import { nutritionSchema } from "@/lib/nutrition-types"
+import type { NutritionResult } from "@/lib/nutrition-types"
 
-const foodItemSchema = z.preprocess(
-	(val: any) => {
-		if (!val || typeof val !== "object") return val
-		const copy = { ...val }
-		if ("weight" in copy && copy.grams === undefined) {
-			copy.grams = copy.weight
-		}
-		if ("protein" in copy && copy.protein_g === undefined) {
-			copy.protein_g = copy.protein
-		}
-		if ("carbs" in copy && copy.carbs_g === undefined) {
-			copy.carbs_g = copy.carbs
-		}
-		if ("fat" in copy && copy.fat_g === undefined) {
-			copy.fat_g = copy.fat
-		}
-		return copy
-	},
-	z.object({
-		name: z.string().catch("Unknown item").describe("Cleaned item name, Title Case"),
-		grams: z
-			.number()
-			.nullable()
-			.default(null)
-			.catch(null)
-			.describe("Weight in grams, approximated if not stated"),
-		kcal: z.number().default(0).catch(0).describe("Estimated kilocalories"),
-		protein_g: z.number().default(0).catch(0).describe("Protein in grams"),
-		carbs_g: z.number().default(0).catch(0).describe("Carbohydrates in grams"),
-		fat_g: z.number().default(0).catch(0).describe("Fat in grams"),
-		notes: z
-			.string()
-			.nullable()
-			.default(null)
-			.catch(null)
-			.describe("Short note on assumptions, e.g. assumed raw, portion approx"),
-	})
-)
-
-const mealSchema = z.preprocess(
-	(val: any) => {
-		if (!val || typeof val !== "object") return val
-		const copy = { ...val }
-		if (!("meal_type" in copy) || copy.meal_type === undefined) {
-			copy.meal_type = null
-		}
-		return copy
-	},
-	z.object({
-		meal_type: z
-			.enum(["Breakfast", "Lunch", "Dinner", "Snack"])
-			.nullable()
-			.optional()
-			.default(null)
-			.catch(null),
-		time_hint: z.string().nullable().optional().default(null).catch(null),
-		items: z.array(foodItemSchema).min(1),
-	})
-)
-
-export const nutritionSchema = z.object({
-	meals: z.array(mealSchema).min(1),
-})
-
-export type NutritionResult = z.infer<typeof nutritionSchema>
-export type FoodItem = z.infer<typeof foodItemSchema>
+// The schemas themselves now live in lib/nutrition-types.ts so that db/schema.ts
+// can name NutritionResult without pulling the AI SDK into the database layer
+// (task S-6). Re-exported here so existing import sites keep working.
+export { foodItemSchema, mealSchema, nutritionSchema } from "@/lib/nutrition-types"
+export type { FoodItem, NutritionResult } from "@/lib/nutrition-types"
 
 export const NUTRITION_SYSTEM = `You are a global nutrition estimator.
 Given a free-form message describing what a person ate, extract EVERY food item and estimate its calories + macronutrients (protein, carbs, fat in grams).
