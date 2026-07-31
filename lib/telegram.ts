@@ -329,6 +329,14 @@ bot.on("message:text", async (ctx) => {
 			return
 		}
 
+		// Fair-use throttle (task B-12). This is temporary and self-resolving, so
+		// it must not be reported as a trial or key problem — nothing is wrong
+		// with the user's key or plan.
+		if (err.code === "byok_rate_limited") {
+			await ctx.reply(`⏳ ${err.userMessage || "Too many requests — please wait a moment."}`)
+			return
+		}
+
 		const isEntitlementError =
 			err.message?.includes("free trial") || err.message?.includes("limit reached")
 		if (isEntitlementError) {

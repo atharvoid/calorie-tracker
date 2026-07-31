@@ -65,6 +65,18 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			return errResponse("BYOK_KEY_INVALID", err.userMessage || msg, 400)
 		}
 
+		// Fair-use throttle (task B-12). This is transient and self-resolving, so
+		// it gets 429 + Retry-After rather than the 403 used for entitlement
+		// problems: the client should back off and retry, not show an upgrade
+		// prompt for a plan the user is already paying for themselves.
+		if (err.code === "byok_rate_limited") {
+			const retryAfter = String(err.retryAfterSeconds ?? 60)
+			return NextResponse.json(
+				{ error: { code: "BYOK_RATE_LIMITED", message: err.userMessage || msg } },
+				{ status: 429, headers: { "Retry-After": retryAfter } }
+			)
+		}
+
 		const isEntitlementError =
 			err.code === "trial_ended" ||
 			err.code === "trial_quota_exhausted" ||
