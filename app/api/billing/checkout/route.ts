@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
-import { db } from "@/db"
-import { billingCustomers } from "@/db/schema"
-import { eq } from "drizzle-orm"
 import { dodo } from "@/lib/dodo"
 
 export const dynamic = "force-dynamic"

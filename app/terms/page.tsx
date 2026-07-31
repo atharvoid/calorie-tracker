@@ -30,8 +30,9 @@ export default function TermsPage() {
 					<section className="space-y-3">
 						<h2 className="text-primary font-mono text-lg font-bold">1. Acceptance of Terms</h2>
 						<p>
-							By accessing or using Calorie Tracker (the "Service"), you agree to be bound by these
-							Terms of Service. If you do not agree to these terms, please do not use our Service.
+							By accessing or using Calorie Tracker (the &ldquo;Service&rdquo;), you agree to be
+							bound by these Terms of Service. If you do not agree to these terms, please do not use
+							our Service.
 						</p>
 					</section>
 
@@ -93,10 +94,10 @@ export default function TermsPage() {
 							6. Disclaimer of Warranties
 						</h2>
 						<p>
-							The Service is provided on an "as is" and "as available" basis. We make no
-							representations or warranties of any kind, express or implied, regarding the accuracy,
-							completeness, or reliability of any information, estimates, or data provided by the
-							Service.
+							The Service is provided on an &ldquo;as is&rdquo; and &ldquo;as available&rdquo;
+							basis. We make no representations or warranties of any kind, express or implied,
+							regarding the accuracy, completeness, or reliability of any information, estimates, or
+							data provided by the Service.
 						</p>
 					</section>
 

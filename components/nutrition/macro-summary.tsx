@@ -68,15 +68,13 @@ export function MacroSummary({ totals, goal, loading = false }: Props) {
 							className="bg-elevated border-subtle flex flex-col justify-between rounded-xl border p-2 sm:p-3"
 						>
 							<div>
-								<p className="text-muted text-2xs font-medium tracking-wider uppercase">
-									{label}
-								</p>
+								<p className="text-muted text-2xs font-medium tracking-wider uppercase">{label}</p>
 								<p className="tabular text-primary mt-1 font-mono text-sm font-bold whitespace-nowrap sm:text-base">
 									{value.toFixed(1)}
-									<span className="text-muted ml-0.5 text-2xs font-normal">{unit}</span>
+									<span className="text-muted text-2xs ml-0.5 font-normal">{unit}</span>
 								</p>
 								{target !== null && (
-									<p className="text-muted tabular mt-0.5 text-[9px] leading-none sm:text-2xs">
+									<p className="text-muted tabular sm:text-2xs mt-0.5 text-[9px] leading-none">
 										/ {target.toFixed(0)}
 										{unit} target
 									</p>

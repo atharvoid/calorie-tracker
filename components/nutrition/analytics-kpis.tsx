@@ -78,7 +78,7 @@ export function AnalyticsKpis({ kpi, loading = false }: Props) {
 							{card.value}
 						</p>
 					</div>
-					<p className="text-muted mt-1.5 text-2xs leading-tight sm:text-xs">{card.sub}</p>
+					<p className="text-muted text-2xs mt-1.5 leading-tight sm:text-xs">{card.sub}</p>
 				</Panel>
 			))}
 		</div>

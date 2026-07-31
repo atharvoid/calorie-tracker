@@ -112,7 +112,7 @@ export function MealComposer({
 								autoFocus
 							/>
 							{text.length > 400 && (
-								<span className="text-muted self-end text-2xs">{text.length}/500</span>
+								<span className="text-muted text-2xs self-end">{text.length}/500</span>
 							)}
 						</div>
 					) : (
@@ -134,7 +134,7 @@ export function MealComposer({
 												{meal.meal_type || "Other"}
 											</span>
 											{meal.time_hint && (
-												<span className="text-muted bg-elevated rounded px-1.5 py-0.5 text-2xs font-medium">
+												<span className="text-muted bg-elevated text-2xs rounded px-1.5 py-0.5 font-medium">
 													{meal.time_hint}
 												</span>
 											)}
@@ -150,14 +150,14 @@ export function MealComposer({
 														<span className="text-primary font-medium">
 															{item.name}
 															{item.grams != null && (
-																<span className="text-muted ml-1 text-2xs">({item.grams}g)</span>
+																<span className="text-muted text-2xs ml-1">({item.grams}g)</span>
 															)}
 														</span>
 														{item.notes && (
 															<span className="text-muted text-2xs italic">{item.notes}</span>
 														)}
 													</div>
-													<div className="mt-1 flex items-center gap-3 font-mono text-2xs sm:mt-0">
+													<div className="text-2xs mt-1 flex items-center gap-3 font-mono sm:mt-0">
 														<span className="text-primary font-semibold">{item.kcal} kcal</span>
 														<span className="text-muted">
 															P {item.protein_g}g | C {item.carbs_g}g | F {item.fat_g}g

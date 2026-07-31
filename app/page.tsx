@@ -124,10 +124,7 @@ export default async function Home(props: {
 				</section>
 
 				{/* Narrative Sections */}
-				<section
-					id="features"
-					className="border-subtle/40 mb-24 scroll-mt-20 border-t pt-16"
-				>
+				<section id="features" className="border-subtle/40 mb-24 scroll-mt-20 border-t pt-16">
 					<div className="mx-auto max-w-5xl">
 						<BentoGrid>
 							<BentoGridItem
@@ -187,7 +184,8 @@ export default async function Home(props: {
 							<li>
 								We request the <code className="text-accent">/auth/drive.file</code> scope, which
 								allows the app to create a dedicated spreadsheet named{" "}
-								<strong>"Calorie Tracker — Data Assistant"</strong> in your Google Drive.
+								<strong>&ldquo;Calorie Tracker — Data Assistant&rdquo;</strong> in your Google
+								Drive.
 							</li>
 							<li>
 								We write and append your daily meal logs, calorie counts, and macronutrient
@@ -261,7 +259,7 @@ export default async function Home(props: {
 
 						<GlareCard className="rounded-card">
 							<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
-								<span className="bg-accent absolute -top-3 left-6 rounded-full px-3 py-1 text-2xs font-bold text-[color:var(--accent-contrast)] uppercase tracking-wide">
+								<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
 									Free forever
 								</span>
 								<div>
@@ -289,7 +287,7 @@ export default async function Home(props: {
 										<span className="text-accent">✓</span> Your key, your Google billing
 									</li>
 									<li className="flex items-center gap-2">
-										<span className="text-accent">✓</span> Free within Google's generous quota
+										<span className="text-accent">✓</span> Free within Google&apos;s generous quota
 									</li>
 									<li className="flex items-center gap-2">
 										<span className="text-accent">✓</span> Remove your key anytime
@@ -319,7 +317,7 @@ export default async function Home(props: {
 						</span>
 					</div>
 					<div>&copy; {new Date().getFullYear()} Calorie Tracker. All rights reserved.</div>
-					<div className="text-muted flex justify-center gap-4 text-2xs">
+					<div className="text-muted text-2xs flex justify-center gap-4">
 						<Link
 							href="/privacy"
 							className="hover:text-secondary transition-colors hover:underline"

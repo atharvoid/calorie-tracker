@@ -1,18 +1,23 @@
-import { dirname } from "path"
-import { fileURLToPath } from "url"
-import { FlatCompat } from "@eslint/eslintrc"
+import { defineConfig, globalIgnores } from "eslint/config"
+import nextVitals from "eslint-config-next/core-web-vitals"
+import nextTs from "eslint-config-next/typescript"
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
+const reactHooksPlugin = nextVitals.find((config) => config.plugins?.["react-hooks"])?.plugins?.[
+	"react-hooks"
+]
 
-const compat = new FlatCompat({ baseDirectory: __dirname })
+if (!reactHooksPlugin) {
+	throw new Error("Next.js ESLint config did not expose the React Hooks plugin")
+}
 
-const eslintConfig = [
-	...compat.extends("next/core-web-vitals", "next/typescript"),
+const eslintConfig = defineConfig([
+	...nextVitals,
+	...nextTs,
+	globalIgnores([".next/**", "coverage/**", "drizzle/**", "node_modules/**"]),
 	{
-		ignores: [".next/**", "coverage/**", "drizzle/**", "node_modules/**"],
-	},
-	{
+		plugins: {
+			"react-hooks": reactHooksPlugin,
+		},
 		rules: {
 			// Previously "off", which hid real typing gaps project-wide.
 			// Staged as "warn" so CI stays green while the remaining sites are
@@ -27,6 +32,6 @@ const eslintConfig = [
 			"no-console": ["warn", { allow: ["warn", "error"] }],
 		},
 	},
-]
+])
 
 export default eslintConfig

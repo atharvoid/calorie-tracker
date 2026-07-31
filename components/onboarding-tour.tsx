@@ -163,7 +163,7 @@ export function OnboardingTour() {
 							className="border-subtle bg-elevated relative flex w-full flex-col items-center gap-2 overflow-visible rounded-2xl border p-6 text-center shadow-xl"
 						>
 							<Mascot pose="celebrate" className="h-14 w-14" />
-							<p className="text-primary text-sm font-bold">You're all set!</p>
+							<p className="text-primary text-sm font-bold">You&apos;re all set!</p>
 							{BURST_COLORS.map((color, i) => (
 								<motion.span
 									key={color}

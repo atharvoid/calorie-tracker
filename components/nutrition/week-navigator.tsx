@@ -168,7 +168,7 @@ export function WeekNavigator({
 							/>
 
 							{/* kcal or em dash - hidden on mobile, shown on tablet/desktop */}
-							<span className="tabular text-muted mt-0.5 hidden font-mono text-[9px] sm:inline sm:text-2xs">
+							<span className="tabular text-muted sm:text-2xs mt-0.5 hidden font-mono text-[9px] sm:inline">
 								{hasData ? `${(kcal ?? 0).toLocaleString("en-IN")}` : "—"}
 							</span>
 						</button>
@@ -187,7 +187,7 @@ export function WeekNavigator({
 							<>
 								{selectedSummary.totals.kcal.toLocaleString("en-IN")} kcal
 								{selectedSummary.goal.targetKcal !== null && (
-									<span className="text-muted ml-1 text-2xs font-normal">
+									<span className="text-muted text-2xs ml-1 font-normal">
 										/ {selectedSummary.goal.targetKcal.toLocaleString("en-IN")} target
 									</span>
 								)}

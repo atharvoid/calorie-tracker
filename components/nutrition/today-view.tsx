@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState, useRef } from "react"
 import { useSearchParams } from "next/navigation"
-import { ChevronLeft, ChevronRight, Loader2, Lightbulb, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Lightbulb, Plus } from "lucide-react"
 import { Panel } from "@/components/ui/panel"
 import { EmptyState } from "@/components/ui/empty-state"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -175,7 +175,7 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 					<p className="text-primary text-sm leading-tight font-semibold sm:text-base">
 						{dateLabel}
 					</p>
-					<p className="text-muted mt-0.5 text-2xs tracking-wide">{date}</p>
+					<p className="text-muted text-2xs mt-0.5 tracking-wide">{date}</p>
 					<input
 						ref={dateInputRef}
 						type="date"

@@ -1,7 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useState, useRef } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { BarChart2, Clock, Settings, Utensils, Plus, LogOut } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RealtimeListener } from "@/components/realtime-listener"
@@ -56,7 +56,6 @@ type Props = {
 
 export function NutritionShell({ userId, user }: Props) {
 	const searchParams = useSearchParams()
-	const router = useRouter()
 
 	const [activeTab, setActiveTab] = useState<Tab>(() => {
 		if (typeof window !== "undefined") {
@@ -170,7 +169,10 @@ export function NutritionShell({ userId, user }: Props) {
 	const rawTabTitle = TABS.find((t) => t.id === activeTab)?.label ?? "Calorie Tracker"
 	const tabTitle = isImprint && activeTab === "analytics" ? "Patterns" : rawTabTitle
 
-	const isPaywalled = billing?.accessState === "trial_ended" || billing?.accessState === "quota_exhausted" || billing?.accessState === "blocked"
+	const isPaywalled =
+		billing?.accessState === "trial_ended" ||
+		billing?.accessState === "quota_exhausted" ||
+		billing?.accessState === "blocked"
 
 	return (
 		<div className={cn("pb-mobile-nav w-full md:pb-0", isImprint && "theme-imprint")}>
@@ -233,7 +235,7 @@ export function NutritionShell({ userId, user }: Props) {
 								<div className="border-subtle bg-elevated animate-in fade-in slide-in-from-top-2 absolute right-0 z-50 mt-2 w-56 rounded-xl border p-2 shadow-xl duration-150">
 									<div className="border-subtle/50 mb-1 border-b px-3 py-2">
 										<p className="text-primary truncate text-xs font-semibold">{user.name}</p>
-										<p className="text-muted truncate text-2xs">{user.email}</p>
+										<p className="text-muted text-2xs truncate">{user.email}</p>
 									</div>
 									<form action={signOutAction} className="w-full">
 										<button
@@ -368,7 +370,7 @@ export function NutritionShell({ userId, user }: Props) {
 								>
 									<Icon className="h-5 w-5" />
 								</div>
-								<span className="mt-0.5 text-2xs tracking-wide">{displayLabel}</span>
+								<span className="text-2xs mt-0.5 tracking-wide">{displayLabel}</span>
 							</button>
 						)
 					})}

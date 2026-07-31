@@ -62,7 +62,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 				{/* Status badge */}
 				<div
 					className={cn(
-						"rounded-full px-2.5 py-0.5 text-2xs font-bold tracking-wide uppercase",
+						"text-2xs rounded-full px-2.5 py-0.5 font-bold tracking-wide uppercase",
 						STATUS_BG[status] ?? "bg-elevated",
 						STATUS_COLOR[status] ?? "text-muted"
 					)}
@@ -100,7 +100,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 							style={{ width: `${progressPct}%` }}
 						/>
 					</div>
-					<div className="text-muted flex justify-between text-2xs font-medium sm:text-xs">
+					<div className="text-muted text-2xs flex justify-between font-medium sm:text-xs">
 						<span>0 kcal</span>
 						<span>{progressPct}% filled</span>
 						<span>{target.toLocaleString("en-IN")} kcal</span>
@@ -125,7 +125,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 								? `+${Math.abs(targetDelta ?? 0).toLocaleString("en-IN")}`
 								: (remainingToTarget ?? 0).toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted mt-0.5 text-[9px] sm:text-2xs">kcal</span>
+						<span className="text-muted sm:text-2xs mt-0.5 text-[9px]">kcal</span>
 					</div>
 				)}
 
@@ -137,7 +137,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 						<p className="tabular text-primary mt-1 font-mono text-base leading-none font-bold sm:text-lg">
 							{target.toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted mt-0.5 text-[9px] sm:text-2xs">kcal / day</span>
+						<span className="text-muted sm:text-2xs mt-0.5 text-[9px]">kcal / day</span>
 					</div>
 				)}
 
@@ -155,7 +155,7 @@ export function CalorieProgress({ summary, loading = false }: Props) {
 							{(maintenanceBalance ?? 0) > 0 ? "+" : ""}
 							{(maintenanceBalance ?? 0).toLocaleString("en-IN")}
 						</p>
-						<span className="text-muted mt-0.5 text-[9px] sm:text-2xs">
+						<span className="text-muted sm:text-2xs mt-0.5 text-[9px]">
 							kcal ({maintenance.toLocaleString("en-IN")} maint.)
 						</span>
 					</div>
