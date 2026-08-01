@@ -48,7 +48,7 @@ type EntitlementStatus = {
 
 type Props = {
 	userId: string
-	user?: {
+	user: {
 		name?: string | null
 		email?: string | null
 		image?: string | null
@@ -197,8 +197,8 @@ export function NutritionShell({ userId, user }: Props) {
 						</Tooltip>
 					)}
 
-					{/* User profile sheet */}
-					{user && <MobileUserSheet user={user} />}
+					{/* Mobile user profile sheet (avatar & sign out) */}
+					<MobileUserSheet user={user} />
 				</div>
 			</header>
 
