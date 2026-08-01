@@ -46,15 +46,6 @@ export type PublicPlan = {
 /** Personal plan price in whole US cents, so no floating point rounding. */
 export const PERSONAL_MONTHLY_PRICE_CENTS = 299
 
-/**
- * Annual price in whole US cents.
- *
- * This number previously existed only as the string "$24.99/yr" hardcoded in
- * `components/nutrition/settings-view.tsx`, which meant the one module that is
- * supposed to own pricing did not know the annual plan existed at all.
- */
-export const PERSONAL_ANNUAL_PRICE_CENTS = 2499
-
 export function formatUsdCents(cents: number): string {
 	return `$${(cents / 100).toFixed(2)}`
 }
@@ -107,76 +98,40 @@ export function getPublicPlan(key: PlanKeyPublic): PublicPlan {
 	return plan
 }
 
-// ── Billing cadence options ────────────────────────────────────────────
+// ── Billing cadence ───────────────────────────────────────────────────
 
-/** The cadence values accepted by POST /api/billing/checkout. */
-export type BillingPlan = "monthly" | "annual"
+/**
+ * The cadence values accepted by POST /api/billing/checkout.
+ *
+ * Monthly is the only cadence sold. An annual plan was once half-built: the
+ * settings panel shipped a "$24.99/yr" button as the *primary* action, but no
+ * annual product existed in Dodo Payments, so `DODO_PRODUCT_ANNUAL_ID` was
+ * unset and the checkout route fell back to the literal string
+ * "p_annual_placeholder". Every click on the loudest button in the billing
+ * panel produced a provider error. The decision was to drop annual rather than
+ * finish it.
+ *
+ * Note that `db/schema.ts` deliberately keeps its `personal_annual` plan key: a
+ * real subscriber row already carries that value, and removing a plan from the
+ * storefront is not the same as rewriting history.
+ */
+export type BillingPlan = "monthly"
 
 export type BillingPlanOption = {
 	plan: BillingPlan
 	label: string
 	/** Price and cadence, already formatted for a button. */
 	priceLabel: string
-	/**
-	 * Exactly one option should be `primary`. It is the one the UI steers people
-	 * toward, so it must not be the cheapest-looking option by accident.
-	 */
-	emphasis: "primary" | "secondary"
-	note?: string
 }
 
 /**
- * Whether the annual cadence is offered.
- *
- * Currently false, deliberately. The annual plan was half-built: the settings UI
- * shipped an "$24.99/yr" button as the *primary* action, `db/schema.ts` has a
- * `personal_annual` plan key, and the webhook maps a product id to it — but no
- * annual product exists in Dodo Payments, so `DODO_PRODUCT_ANNUAL_ID` is unset
- * and the checkout route falls back to the literal string
- * "p_annual_placeholder". Anyone clicking that button hit a provider error.
- *
- * Flip this to true only once a real annual product exists and
- * DODO_PRODUCT_ANNUAL_ID is set in every environment. Nothing else needs to
- * change: the option is rendered from getEnabledBillingPlans().
+ * The single cadence the billing panel offers. Rendered from here rather than
+ * hardcoded in JSX so the settings panel cannot drift from the landing page,
+ * which was the original defect: the site advertised $2.99/mo everywhere while
+ * the billing panel's most prominent action was a different, unbuilt SKU.
  */
-export const ANNUAL_PLAN_ENABLED = false
-
-/**
- * Discount the annual price represents against twelve months at the monthly
- * rate. Computed rather than asserted, so the badge cannot claim a saving the
- * prices do not actually deliver.
- */
-export function annualSavingsPercent(): number {
-	const twelveMonths = PERSONAL_MONTHLY_PRICE_CENTS * 12
-	if (twelveMonths <= 0) return 0
-	const saved = twelveMonths - PERSONAL_ANNUAL_PRICE_CENTS
-	return Math.max(0, Math.round((saved / twelveMonths) * 100))
-}
-
-/**
- * The cadence buttons to render, in display order. Monthly leads: it is the
- * price quoted everywhere else on the site, so making annual the emphasised
- * button (as the settings panel previously did) meant the headline $2.99 figure
- * and the loudest button disagreed.
- */
-export function getEnabledBillingPlans(): readonly BillingPlanOption[] {
-	const monthly: BillingPlanOption = {
-		plan: "monthly",
-		label: "Personal Monthly",
-		priceLabel: `${formatUsdCents(PERSONAL_MONTHLY_PRICE_CENTS)}/mo`,
-		emphasis: "primary",
-	}
-
-	if (!ANNUAL_PLAN_ENABLED) return [monthly]
-
-	return [
-		monthly,
-		{
-			plan: "annual",
-			label: "Personal Annual",
-			priceLabel: `${formatUsdCents(PERSONAL_ANNUAL_PRICE_CENTS)}/yr`,
-			emphasis: "secondary",
-			note: `Save ${annualSavingsPercent()}%`,
-		},
-	]
+export const MONTHLY_PLAN_OPTION: BillingPlanOption = {
+	plan: "monthly",
+	label: "Personal Monthly",
+	priceLabel: `${formatUsdCents(PERSONAL_MONTHLY_PRICE_CENTS)}/mo`,
 }
