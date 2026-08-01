@@ -22,7 +22,7 @@ There are three ways to use the app. The middle tier is the point: if you bring
 your own AI key, the app is free for you and costs the operator nothing.
 
 | Tier                   | Cost to you                                     | Cost to operator     | Limits                         |
-| ---------------------- | ----------------------------------------------- | --------------------- | ------------------------------ |
+| ---------------------- | ----------------------------------------------- | -------------------- | ------------------------------ |
 | **Free trial**         | Free                                            | Operator pays for AI | 7 days, 50 AI logs             |
 | **Bring your own key** | Free (you pay Google directly, usually pennies) | Nothing              | Unlimited AI logs              |
 | **Subscription**       | $2.99/month                                     | Operator pays for AI | Fair-use cap of 25 AI logs/day |
@@ -87,7 +87,7 @@ tunnel; point `setWebhook` at it and pass the same value as
 ## Scripts
 
 | Command                             | Purpose                                 |
-| ------------------------------------ | --------------------------------------- |
+| ----------------------------------- | --------------------------------------- |
 | `pnpm dev`                          | Dev server                              |
 | `pnpm dev:tunnel`                   | Dev server + public tunnel for Telegram |
 | `pnpm build` / `pnpm start`         | Production build / serve                |
