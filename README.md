@@ -59,7 +59,7 @@ Implementation: [`lib/byok.ts`](lib/byok.ts),
 | Auth      | Auth.js (Google provider)                                    |
 | AI        | Google Gemini 2.5 Flash via the Vercel AI SDK                |
 | Messaging | Telegram bot (grammY)                                        |
-| Billing   | Stripe (Dodo Payments code also present — see plan task D-4) |
+| Billing   | Dodo Payments (Stripe code still present — see plan task D-6) |
 | Tests     | Vitest                                                       |
 
 The model ID lives in one place, [`lib/ai.ts`](lib/ai.ts), alongside its pricing
@@ -78,6 +78,11 @@ pnpm dev
 fails fast at boot if `DATABASE_URL` is missing rather than falling back to a
 localhost database.
 
+If `pnpm drizzle-kit migrate` reports migrations that are already applied, read
+[`docs/MIGRATION_STATE_RECOVERY.md`](docs/MIGRATION_STATE_RECOVERY.md) before
+forcing anything — the migration journal was repaired by hand and there is a
+backfill script for bringing a database's bookkeeping table back in line.
+
 ### Telegram development
 
 The webhook needs a public URL. `pnpm dev:tunnel` starts the dev server behind a
@@ -95,6 +100,7 @@ tunnel; point `setWebhook` at it and pass the same value as
 | `pnpm lint`                         | ESLint                                  |
 | `pnpm format` / `pnpm format:check` | Prettier                                |
 | `pnpm test` / `pnpm test:run`       | Vitest watch / single run               |
+| `pnpm db:backfill-migrations`       | Reconcile the Drizzle bookkeeping table |
 
 CI runs typecheck, lint, format check, tests, and build on every pull request.
 
@@ -134,18 +140,20 @@ docs/               Implementation plan and design notes
 
 ## Legacy surface
 
-Most of the "Data Assistant" leftovers are gone: the unauthenticated
-`/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`, and
-`/api/sheet` routes have been deleted, and so have the spreadsheet-era
-components (`editable-table`, `editable-cell`, `charts`, `kpi-card`,
-`status-pill`, `input-toggle`, `dropzone`, and neighbours).
+The "Data Assistant" leftovers are gone. The unauthenticated `/api/extract`,
+`/api/extract-image`, `/api/insights`, `/api/entries`, and `/api/sheet` routes
+have been deleted, and so have the spreadsheet-era components
+(`editable-table`, `editable-cell`, `charts`, `kpi-card`, `status-pill`,
+`input-toggle`, `dropzone`, and neighbours).
 
-What's still outstanding: the `entry` and `sheet_connection` database tables.
-Their Drizzle schema exports have been removed (`db/schema.ts` no longer
-defines them), but the tables themselves still exist in the database. Dropping
-them needs `pnpm drizzle-kit generate` to produce the migration, a backup of
-both tables, and then `pnpm drizzle-kit migrate` against production. Tracked as
-task D-2 in the implementation plan.
+The `entry` and `sheet_connection` tables have now been dropped as well. Their
+Drizzle schema exports were removed first, then the tables themselves were
+dropped by the `0007_drop_legacy_tables` migration. Task D-2 is complete.
+
+What genuinely remains: the `lib/` modules listed under task D-4 (`normalize`,
+`analytics`, `parse-file`, `export-xlsx`, `extraction`, `extract-core`,
+`types`, `sheets-sync`, `google`) and the dependencies they pin, tracked as
+D-5. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
 ## License
 

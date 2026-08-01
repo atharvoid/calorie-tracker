@@ -1,6 +1,13 @@
 # Nutrition Data Flow
 
-This document details the end-to-end nutrition data flow of the Calorie Tracker application, tracing a meal text log from Telegram to database and sheet persistence.
+This document traces a meal log end to end — from a Telegram message or a web
+submission, through extraction, to persistence in Postgres.
+
+> **Accuracy note (1 Aug 2026).** This document previously described a Google
+> Sheets write step and claimed the web and Telegram paths used different commit
+> functions. Neither is true any more: the Sheets backend was deleted in PR #34,
+> and both entry points converge on `commitNutrition()`. The stale sections have
+> been rewritten rather than deleted, so the history stays legible.
 
 ---
 
@@ -10,10 +17,9 @@ This document details the end-to-end nutrition data flow of the Calorie Tracker 
 sequenceDiagram
     autonumber
     actor User as Telegram User
-    participant Bot as grammY Bot (Long Polling)
+    participant Bot as grammY Bot
     participant DB as Supabase Postgres
     participant LLM as Gemini 2.5 Flash
-    participant Sheets as Google Sheets API
     participant Client as React Client (Realtime)
 
     User->>Bot: "breakfast - 60g rice, 200g uncooked chicken..."
@@ -27,63 +33,111 @@ sequenceDiagram
     User->>Bot: Clicks "✓ Save"
     Bot->>DB: read pending_capture payload
     Bot->>DB: insert into meal_item (rows)
-    Bot->>Sheets: appendMealRows(userId, rows)
     Bot->>DB: delete pending_capture row
-    Bot->>DB: broadcast entries (realtime event)
+    Bot->>DB: broadcast nutrition_changed (realtime event)
     DB-->>Client: toast: "Synced meals from phone"
 ```
 
 ### Flow Breakdown & Code References
 
+Line numbers are omitted deliberately — they went stale faster than the prose.
+Search for the named symbol instead.
+
 #### 1. Message Enters Telegram
 
-- **Entry point**: [lib/telegram.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/telegram.ts#L144) listener `bot.on("message:text")` intercepting incoming text logs.
+- **Entry point**: the `bot.on("message:text")` listener in
+  [`lib/telegram.ts`](../lib/telegram.ts).
 
 #### 2. Telegram User Resolves to Application User
 
-- **Code**: `userIdForTelegram(tgId)` in `lib/telegram.ts#L38-L47` queries the `telegram_link` table.
-- **Verification**: If no link is found, a nudge message is returned prompting account linking.
+- **Code**: `userIdForTelegram(tgId)` queries the `telegram_link` table.
+- **Verification**: if no link is found, a nudge message prompts the user to
+  connect their account from the web app.
 
-#### 3. Message/Date/Meal Hints are Parsed & Model Request Built
+#### 3. Date Hints Parsed, Model Request Built
 
-- **Code**: `extractNutrition(text)` in [lib/nutrition.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/nutrition.ts#L90) triggers `generateObject()`.
-- **System Instructions**: The system prompt (`NUTRITION_SYSTEM`) instructs the model to group foods by meal type (e.g. `morning` -> `Breakfast`, `lunch` -> `Lunch`) and parses out hints for date assumptions.
+- **Code**: `parseTelegramDate()` pulls "yesterday", `YYYY-MM-DD`, or "on 14
+  March" out of the message and returns the remaining text, so the meal is
+  logged against the intended day rather than today.
+- **Code**: `extractNutrition(text)` in [`lib/nutrition.ts`](../lib/nutrition.ts)
+  triggers `generateObject()`.
+- **System instructions**: `NUTRITION_SYSTEM` groups foods by meal type
+  (`morning` → Breakfast, `lunch` → Lunch) and carries the portion heuristics.
 
 #### 4. Model Response Validation & Assumptions
 
-- **Zod Schema**: `nutritionSchema` in `lib/nutrition.ts#L55` parses and validates the response structure.
-- **Normalization**: `z.preprocess()` helpers in `lib/nutrition.ts#L5-L22` and `L34-L42` auto-map legacy or alternate field names (e.g. `weight` -> `grams`, `protein` -> `protein_g`) and default missing macros to `0` instead of failing.
-- **Indian-food Rules**: `NUTRITION_SYSTEM` handles portion estimation rules (e.g. 1 roti ≈ 30g, 1 boiled egg ≈ 50g) and raw-vs-cooked chicken macro adjustments.
+- **Zod schema**: `nutritionSchema` parses and validates the response structure.
+- **Normalization**: `z.preprocess()` helpers auto-map alternate field names
+  (`weight` → `grams`, `protein` → `protein_g`) and default missing macros to
+  `0` instead of failing the whole extraction.
+- **Indian-food rules**: `NUTRITION_SYSTEM` carries portion estimation rules
+  (1 roti ≈ 30g, 1 boiled egg ≈ 50g) and raw-vs-cooked chicken adjustments.
 
 #### 5. Pending Confirmation Storage
 
-- **Code**: `presentNutritionConfirm()` in `lib/telegram.ts#L81` writes the raw parsed `NutritionResult` into the `pending_capture` table as a JSONB payload.
-- **User Action**: The bot replies with a formatted markdown summary and inline button options (`✓ Save` / `✏️ Fix`).
+- **Code**: `presentNutritionConfirm()` writes the parsed `NutritionResult` into
+  `pending_capture` as a JSONB payload, along with the resolved `logDate`.
+- **User action**: the bot replies with a Markdown summary and inline buttons
+  (`✓ Save` / `✏️ Fix`).
 
 #### 6. Save/Fix Callbacks Handled
 
-- **Fix Callback**: `bot.callbackQuery(/^edit:(.+)$/)` in `lib/telegram.ts#L208` drops the pending capture record and prompts the user to re-send.
-- **Save Callback**: `bot.callbackQuery(/^confirm:(.+)$/)` in `lib/telegram.ts#L176` initiates the commit.
+- **Fix callback**: `bot.callbackQuery(/^edit:(.+)$/)` drops the pending capture
+  and asks the user to re-send.
+- **Save callback**: `bot.callbackQuery(/^confirm:(.+)$/)` re-validates the
+  stored payload with `nutritionSchema` before committing — a payload written by
+  an older deployment cannot corrupt current rows.
 
-#### 7. Committing Rows to DB & Google Sheets
+#### 7. Committing Rows to Postgres
 
-- **Code**: `commitNutrition(userId, nutrition, "telegram")` in [lib/commit.ts](file:///c:/Users/Atharva%20Patil/Documents/projects/ai-automation/data-demo/lib/commit.ts#L11).
-- **Date Resolution**: Solves date grouping by checking the current time in `Asia/Kolkata` timezone (`todayIST()` helper).
-- **Postgres Write**: Inserts multiple records into the `meal_item` database table.
-- **Google Sheets Write**: `appendMealRows(userId, rows)` in `lib/sheets-sync.ts#L85` appends rows to the connected spreadsheet.
+- **Code**: `commitNutrition({ userId, nutrition, source, captureId, logDate })`
+  in [`lib/commit.ts`](../lib/commit.ts).
+- **Date resolution**: uses the caller's `logDate` when supplied, otherwise
+  `localDate(timezone)`.
+- **Postgres write**: inserts into `meal_item` with `onConflictDoNothing()`. The
+  partial unique index on `(user_id, capture_id, item_index)` absorbs a
+  double-tapped Save button instead of throwing, so `rowCount === 0` means
+  "already saved", not "failed".
+- **Trial start**: the first successfully committed meal moves a `pre_trial`
+  user into `trial`.
 
 #### 8. Realtime Broadcast Event
 
-- **Code**: `broadcastEntries(userId, rows)` in `lib/realtime.ts#L3` posts to Supabase's realtime broadcast endpoint.
-- **Client Toast**: The browser channel listener catches the event, pushes the new rows to the UI state, and displays a success notification without requiring a page refresh.
+- **Code**: `broadcastNutritionChanged(userId, payload)` in
+  [`lib/realtime.ts`](../lib/realtime.ts) posts to Supabase's realtime broadcast
+  endpoint. It is fired with `void` — a broadcast failure must never fail a
+  commit that already succeeded.
+- **Client toast**: the browser channel listener pushes new rows into UI state
+  and shows a notification without a page refresh.
 
 ---
 
-## 2. Inconsistencies & Convergence
+## 2. Commit Path Convergence (resolved)
 
-### Converged Commit Path
+This section used to record a real defect: the web path wrote through a legacy
+`appendRows()` + `db.insert(entries)` pipeline while Telegram used
+`commitNutrition()`, so the two produced different rows.
 
-- Currently, both the `/api/extract` POST endpoint (used for web inputs) and the Telegram Bot Save confirmation callback use **different** commit functions!
-  - Telegram save calls `commitNutrition()` from `lib/commit.ts`.
-  - The web input API route `/api/extract` uses the legacy `appendRows()` and `db.insert(entries)` orders pipeline.
-- **CRITICAL REQUIREMENT**: The next agent must align the web-entered meals so that they converge on the same canonical `commitNutrition()` function. This ensures that both Web and Telegram inputs produce identical schema rows in `meal_item` and append to the `Meals` sheet tab.
+**That divergence is gone.**
+
+- The legacy `/api/extract` route was deleted (task D-1).
+- The web path now posts to `/api/nutrition/day`, whose `POST` calls
+  `commitNutrition()` and returns its result verbatim.
+- Telegram's Save callback calls the same `commitNutrition()`.
+- The `entry` and `sheet_connection` tables were dropped by
+  `0007_drop_legacy_tables` (task D-2).
+
+`lib/commit.ts` is now the single write path into `meal_item`. Anything that
+needs to create meal rows should call it rather than inserting directly — that
+is what keeps idempotency, trial-start, and the realtime broadcast consistent
+across entry points.
+
+### Still worth knowing
+
+- `meal_item.capture_id` is only set when a commit originates from a pending
+  capture. Web commits pass no `captureId`, so they are **not** protected by the
+  idempotency index. A double-submitted web form can duplicate rows. Tracked in
+  the implementation plan alongside S-1.
+- `commitNutrition` validates with `nutritionSchema` again on entry even though
+  callers have usually already validated. This is intentional: it is the last
+  gate before the database.
