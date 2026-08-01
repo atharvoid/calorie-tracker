@@ -8,8 +8,6 @@ import type { NutritionResult } from "@/lib/nutrition"
 type CommitNutritionResult = {
 	rowCount: number
 	date: string
-	spreadsheetId: string
-	syncWarning?: string
 	insertedIds: string[]
 }
 
