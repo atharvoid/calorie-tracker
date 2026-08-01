@@ -32,14 +32,14 @@ export function ImprintLegend() {
 				<div className="border-subtle/40 text-secondary grid grid-cols-1 gap-4 border-t px-4 pt-1 pb-4 leading-relaxed sm:grid-cols-2">
 					<div className="space-y-2">
 						<div className="flex items-start gap-3">
-							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" />
+							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" aria-hidden="true" />
 							<div>
 								<span className="text-primary block font-bold">Meal Energy</span>
 								The width & height of the island correspond directly to the calorie count.
 							</div>
 						</div>
 						<div className="flex items-start gap-3">
-							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" />
+							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" aria-hidden="true" />
 							<div>
 								<span className="text-primary block font-bold">Protein Content</span>
 								The number of nested outline contours increases with higher protein ratios.
@@ -49,14 +49,14 @@ export function ImprintLegend() {
 
 					<div className="space-y-2">
 						<div className="flex items-start gap-3">
-							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" />
+							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" aria-hidden="true" />
 							<div>
 								<span className="text-primary block font-bold">Carbohydrate Ratio</span>
 								Higher carbohydrate concentration skews and leans the shape horizontally.
 							</div>
 						</div>
 						<div className="flex items-start gap-3">
-							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" />
+							<span className="bg-accent mt-1.5 h-2 w-2 shrink-0 rounded-full" aria-hidden="true" />
 							<div>
 								<span className="text-primary block font-bold">Fat Density</span>
 								The opacity of the color wash inside the shape represents fat energy percentage.

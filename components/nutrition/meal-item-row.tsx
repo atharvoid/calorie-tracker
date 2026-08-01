@@ -48,7 +48,7 @@ export function MealItemRow({ item, onDelete, onEdit }: Props) {
 				</span>
 				<div className="text-muted text-2xs mt-0.5 flex items-center gap-1.5 font-medium">
 					{item.grams !== null && <span className="tabular font-mono">{item.grams}g</span>}
-					{item.grams !== null && item.notes && <span>·</span>}
+					{item.grams !== null && item.notes && <span aria-hidden="true">·</span>}
 					{item.notes && <span className="max-w-[180px] truncate italic">{item.notes}</span>}
 				</div>
 			</div>

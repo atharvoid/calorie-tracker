@@ -7,7 +7,10 @@ export default function TermsPage() {
 			<div className="mx-auto max-w-3xl px-6 pt-10 pb-20 sm:pt-14">
 				{/* Header */}
 				<div className="border-subtle mb-12 flex items-center justify-between border-b pb-6">
-					<Link href="/" className="flex items-center gap-2 hover:opacity-90 focus:outline-none">
+					<Link
+						href="/"
+						className="focus-visible:ring-accent rounded-btn flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+					>
 						<span className="text-primary text-lg font-semibold tracking-tight">
 							Calorie <span className="text-accent">Tracker</span>
 						</span>

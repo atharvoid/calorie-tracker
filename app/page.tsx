@@ -209,7 +209,7 @@ export default async function Home(props: {
 							<BentoGridItem
 								index="03 · Representation"
 								title="Watch the day take shape."
-								description="Every confirmed day creates a unique visual imprint. Calorie counts scale the shapes, protein levels add nested contours, and fat shifts the colour opacity."
+								description="Every confirmed day creates a unique visual imprint. Calorie counts scale the shapes, protein levels set the nested contours, and fat share drives the colour opacity."
 								className="sm:col-span-2 lg:col-span-1"
 							/>
 							<BentoGridItem
