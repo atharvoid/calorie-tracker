@@ -1,6 +1,6 @@
 {
-  "id": "6b154b99-de26-40cd-8565-8266d3d8b16c",
-  "prevId": "3fd96f55-e0a6-4e5f-b52d-18db26864fed",
+  "id": "3fd96f55-e0a6-4e5f-b52d-18db26864fed",
+  "prevId": "7df14517-7770-4c60-8458-de96774b0bda",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -343,27 +343,6 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
-        },
-        "meal_item_capture_idx": {
-          "name": "meal_item_capture_idx",
-          "columns": [
-            {
-              "expression": "capture_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "item_index",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
         }
       },
       "foreignKeys": {
@@ -378,19 +357,6 @@
             "id"
           ],
           "onDelete": "cascade",
-          "onUpdate": "no action"
-        },
-        "meal_item_capture_id_pending_capture_id_fk": {
-          "name": "meal_item_capture_id_pending_capture_id_fk",
-          "tableFrom": "meal_item",
-          "tableTo": "pending_capture",
-          "columnsFrom": [
-            "capture_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
           "onUpdate": "no action"
         }
       },
