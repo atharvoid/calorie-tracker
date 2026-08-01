@@ -4,10 +4,9 @@ Log what you ate in plain language — by web or Telegram — and get calories a
 macros back, tracked against your daily targets.
 
 > **Note on history:** this repository previously hosted a different project (an
-> invoice/order extraction tool called "Data Assistant"). Some of that code is
-> still present and is being removed. Anything marked `@deprecated` in
-> `db/schema.ts` or listed under "Legacy surface" below is not part of this
-> product. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
+> invoice/order extraction tool called "Data Assistant"). Most of that code has
+> been removed; what's left is tracked under "Legacy surface" below and in
+> [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
 ## How it works
 
@@ -135,12 +134,18 @@ docs/               Implementation plan and design notes
 
 ## Legacy surface
 
-Routes `/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`,
-and `/api/sheet` have been removed. Still present and scheduled for removal:
-the `entry` and `sheet_connection` database tables, and the spreadsheet-era
-components `editable-table`, `editable-cell`, `charts`, `kpi-card`,
-`status-pill`, `input-toggle`, and `dropzone`. Tracked as task group D in the
-implementation plan.
+Most of the "Data Assistant" leftovers are gone: the unauthenticated
+`/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`, and
+`/api/sheet` routes have been deleted, and so have the spreadsheet-era
+components (`editable-table`, `editable-cell`, `charts`, `kpi-card`,
+`status-pill`, `input-toggle`, `dropzone`, and neighbours).
+
+What's still outstanding: the `entry` and `sheet_connection` database tables.
+Their Drizzle schema exports have been removed (`db/schema.ts` no longer
+defines them), but the tables themselves still exist in the database. Dropping
+them needs `pnpm drizzle-kit generate` to produce the migration, a backup of
+both tables, and then `pnpm drizzle-kit migrate` against production. Tracked as
+task D-2 in the implementation plan.
 
 ## License
 
