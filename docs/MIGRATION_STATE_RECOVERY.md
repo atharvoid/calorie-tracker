@@ -63,16 +63,16 @@ Migrations have been effectively manual ever since.
 
 ## The order the migrations actually ran
 
-| idx | tag | notes |
-| --- | --- | --- |
-| 0 | `0000_wild_human_torch` | initial schema |
-| 1 | `0001_nutrition_settings` | |
-| 2 | `0002_nutrition_idempotency` | created `capture_id` as plain `text` |
-| 3 | `0003_billing_entitlements` | |
-| 4 | `0004_byok_tier` | |
-| 5 | `0005_capture_id_uuid_fk` | converts `capture_id` text -> uuid, adds FK |
-| 6 | `0006_column_constraints` | CHECK constraints, numeric precision |
-| 7 | `0007_drop_legacy_tables` | drops `entry` and `sheet_connection` |
+| idx | tag                          | notes                                       |
+| --- | ---------------------------- | ------------------------------------------- |
+| 0   | `0000_wild_human_torch`      | initial schema                              |
+| 1   | `0001_nutrition_settings`    |                                             |
+| 2   | `0002_nutrition_idempotency` | created `capture_id` as plain `text`        |
+| 3   | `0003_billing_entitlements`  |                                             |
+| 4   | `0004_byok_tier`             |                                             |
+| 5   | `0005_capture_id_uuid_fk`    | converts `capture_id` text -> uuid, adds FK |
+| 6   | `0006_column_constraints`    | CHECK constraints, numeric precision        |
+| 7   | `0007_drop_legacy_tables`    | drops `entry` and `sheet_connection`        |
 
 Order matters here. `0006` touches `sheet_connection`, which `0007` drops, so
 `0006` must be recorded before `0007` or a from-zero bootstrap will fail.
