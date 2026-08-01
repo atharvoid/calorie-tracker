@@ -5,6 +5,8 @@ import { KeyRound, Loader2, ShieldCheck, Trash2, ExternalLink } from "lucide-rea
 import { toast } from "sonner"
 import { Panel } from "@/components/ui/panel"
 import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
+import { PRIMARY_BTN } from "@/lib/ui"
 import {
 	Dialog,
 	DialogClose,
@@ -172,7 +174,10 @@ export function ByokPanel({ onChanged }: Props) {
 						<Button
 							onClick={handleSave}
 							disabled={saving}
-							className="flex shrink-0 cursor-pointer items-center justify-center gap-2"
+							className={cn(
+								PRIMARY_BTN,
+								"flex shrink-0 cursor-pointer items-center justify-center gap-2"
+							)}
 						>
 							{saving && <Loader2 className="h-4 w-4 animate-spin" />}
 							{saving ? "Verifying…" : "Verify & Save"}

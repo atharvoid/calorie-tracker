@@ -238,58 +238,69 @@ export default async function Home(props: {
 						One plan, one price. Start with a {TRIAL_DAYS}-day trial.
 					</p>
 
-					{/*
-					 * Single headline plan. This was a two-column grid where the BYOK card
-					 * carried the glare treatment, the accent border, and a "Free forever"
-					 * badge — so the free option outshouted the paid one and the two cards
-					 * competed for the same visual weight. The emphasis now sits on Personal.
-					 */}
-					<GlareCard className="rounded-card mx-auto max-w-md">
-						<div className="rounded-card border-accent/40 bg-surface relative flex flex-col gap-6 border-2 p-8 text-left">
-							<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
-								Recommended
-							</span>
-							<div>
-								<h3 className="text-primary text-xl font-semibold">{personal.name}</h3>
-								<p className="text-secondary mt-1 text-sm">{personal.tagline}</p>
+					<div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
+						{/* Personal Plan */}
+						<GlareCard className="rounded-card h-full">
+							<div className="rounded-card border-accent/40 bg-surface relative flex h-full flex-col justify-between border-2 p-8 text-left">
+								<div>
+									<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
+										Recommended
+									</span>
+									<div className="mb-6">
+										<h3 className="text-primary text-xl font-semibold">{personal.name}</h3>
+										<p className="text-secondary mt-1 text-sm">{personal.tagline}</p>
+									</div>
+
+									<div className="mb-6 flex items-baseline gap-1">
+										<span className="text-primary text-3xl font-bold tracking-tight">
+											{personal.priceLabel}
+										</span>
+										<span className="text-muted text-sm">{personal.periodLabel}</span>
+									</div>
+
+									<PlanFeatures features={personal.features} />
+								</div>
+								<div className="mt-6 space-y-3">
+									<SignInForm label={personal.ctaLabel} className="w-full" />
+									{personal.footnote ? (
+										<p className="text-muted text-2xs leading-relaxed">{personal.footnote}</p>
+									) : null}
+								</div>
 							</div>
+						</GlareCard>
 
-							<div className="flex items-baseline gap-1">
-								<span className="text-primary text-3xl font-bold tracking-tight">
-									{personal.priceLabel}
-								</span>
-								<span className="text-muted text-sm">{personal.periodLabel}</span>
+						{/* BYOK Plan */}
+						<GlareCard className="rounded-card h-full">
+							<div className="rounded-card border-subtle bg-surface/90 relative flex h-full flex-col justify-between border p-8 text-left">
+								<div>
+									<span className="bg-muted text-secondary border-subtle text-2xs bg-surface absolute -top-3 left-6 rounded-full border px-3 py-1 font-bold tracking-wide uppercase">
+										Free forever
+									</span>
+									<div className="mb-6">
+										<h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
+											<KeyRound className="text-accent h-5 w-5" aria-hidden="true" />
+											{byok.name}
+										</h3>
+										<p className="text-secondary mt-1 text-sm">{byok.tagline}</p>
+									</div>
+
+									<div className="mb-6 flex items-baseline gap-1">
+										<span className="text-primary text-3xl font-bold tracking-tight">
+											{byok.priceLabel}
+										</span>
+										<span className="text-muted text-sm">{byok.periodLabel}</span>
+									</div>
+
+									<PlanFeatures features={byok.features} />
+								</div>
+								<div className="mt-6 space-y-3">
+									<SignInForm label={byok.ctaLabel} variant="outline" className="w-full" />
+									{byok.footnote ? (
+										<p className="text-muted text-2xs leading-relaxed">{byok.footnote}</p>
+									) : null}
+								</div>
 							</div>
-
-							<PlanFeatures features={personal.features} />
-
-							<SignInForm label={personal.ctaLabel} className="mt-2 w-full" />
-							{personal.footnote ? (
-								<p className="text-muted text-2xs leading-relaxed">{personal.footnote}</p>
-							) : null}
-						</div>
-					</GlareCard>
-
-					{/*
-					 * Secondary and deliberately understated: a documented escape hatch, set
-					 * below the fold of the pricing block so it cannot be mistaken for the
-					 * headline offer.
-					 */}
-					<div className="border-subtle/60 mx-auto mt-14 max-w-md border-t pt-8">
-						<div className="rounded-card border-subtle bg-surface/40 flex flex-col gap-3 border border-dashed p-6 text-left">
-							<h3 className="text-secondary flex items-center gap-2 text-sm font-semibold">
-								<KeyRound className="text-muted h-4 w-4" aria-hidden="true" />
-								{byok.name}
-							</h3>
-							<p className="text-muted text-xs leading-relaxed">{byok.tagline}</p>
-							<p className="text-muted text-2xs font-mono leading-relaxed">
-								{byok.features.join(" · ")}
-							</p>
-							{byok.footnote ? (
-								<p className="text-muted text-2xs leading-relaxed">{byok.footnote}</p>
-							) : null}
-							<SignInForm label={byok.ctaLabel} variant="outline" className="mt-1 w-full" />
-						</div>
+						</GlareCard>
 					</div>
 				</section>
 
