@@ -178,7 +178,7 @@ components, then lib, then tables.
 | E-4  | Re-enable the disabled ESLint rules. `@typescript-eslint/no-explicit-any` and `react-hooks/set-state-in-effect` were globally `off`, hiding real issues; both are now `warn`. Also added `eqeqeq`, `no-console`, and strict unused-vars. | done           | low    |
 | E-5  | Add Vitest coverage config with thresholds, and include `.tsx`.                                                                                                                                                                          | done           | low    |
 | E-6  | Add `LICENSE` (MIT) and a repository description and topics on GitHub.                                                                                                                                                                   | done (LICENSE) | low    |
-| E-7  | Add `format` and `format:check` scripts to `package.json`, plus `prettier` and `prettier-plugin-tailwindcss` as dev dependencies. **Required for CI to pass.** Done — both scripts are in `package.json` and CI runs `format:check`.     | done           | low    |
+| E-7  | Add `format` and `format:check` scripts to `package.json`, plus `prettier` and `prettier-plugin-tailwindcss` as dev dependencies. Done — both scripts and both dev dependencies are present, and `verify` does run `format:check`. **This does not mean CI is green**: as of 1 Aug 2026 `verify` fails on every open PR, including ones that touch no Markdown and no Prettier-relevant code, so a separate, still-undiagnosed failure exists elsewhere in the pipeline.     | done           | low    |
 | E-8  | Flip the two staged ESLint rules from `warn` to `error` once the warning count reaches zero.                                                                                                                                             | todo           | low    |
 | E-9  | Run `pnpm prettier --write .` once and commit the result as a single formatting-only commit, so it never pollutes a review diff again.                                                                                                   | todo           | low    |
 | E-10 | Add `jsdom` and a `setupFiles` entry so component tests become possible. `environment: "node"` is why there are currently zero React tests.                                                                                              | todo           | low    |
@@ -219,7 +219,9 @@ components, then lib, then tables.
 ## Merge checklist for this branch
 
 1. ~~`pnpm add -D prettier prettier-plugin-tailwindcss` and add the `format`
-   scripts~~ (**E-7 — done**).
+   scripts~~ (**E-7 — done**, but note `verify` is still red for a separate,
+   unresolved reason — see E-7's note above; this checklist item being struck
+   through does not mean CI is passing).
 2. `pnpm drizzle-kit generate && pnpm drizzle-kit migrate` (**B-8**). Read
    [`MIGRATION_STATE_RECOVERY.md`](MIGRATION_STATE_RECOVERY.md) first — the
    journal was repaired by hand and five snapshot files are still missing.
