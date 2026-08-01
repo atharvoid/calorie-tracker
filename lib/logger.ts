@@ -9,21 +9,29 @@ function serializeError(err: Error): Record<string, unknown> {
 		message: err.message,
 		stack: err.stack,
 	}
-	// Copy any custom enumerable properties attached to the Error object
 	for (const key of Object.keys(err)) {
-		serialized[key] = (err as Record<string, unknown>)[key]
+		serialized[key] = (err as unknown as Record<string, unknown>)[key]
 	}
 	return serialized
 }
 
-function normalizeValue(val: unknown): unknown {
+function normalizeValue(val: unknown, seen = new WeakSet<object>()): unknown {
 	if (val instanceof Error) {
 		return serializeError(val)
 	}
-	if (val && typeof val === "object" && !Array.isArray(val)) {
+	if (val && typeof val === "object") {
+		if (seen.has(val)) {
+			return "[Circular]"
+		}
+		seen.add(val)
+
+		if (Array.isArray(val)) {
+			return val.map((item) => normalizeValue(item, seen))
+		}
+
 		const result: Record<string, unknown> = {}
 		for (const [k, v] of Object.entries(val as Record<string, unknown>)) {
-			result[k] = normalizeValue(v)
+			result[k] = normalizeValue(v, seen)
 		}
 		return result
 	}
@@ -31,7 +39,9 @@ function normalizeValue(val: unknown): unknown {
 }
 
 function formatLog(level: "info" | "warn" | "error", message: string, meta?: LogMetadata) {
-	const normalizedMeta = meta ? (normalizeValue(meta) as Record<string, unknown>) : {}
+	const normalizedMeta = meta
+		? (normalizeValue(meta, new WeakSet<object>()) as Record<string, unknown>)
+		: {}
 	return {
 		timestamp: new Date().toISOString(),
 		level,
@@ -40,18 +50,26 @@ function formatLog(level: "info" | "warn" | "error", message: string, meta?: Log
 	}
 }
 
+function safeWriteLog(level: "info" | "warn" | "error", message: string, meta?: LogMetadata) {
+	try {
+		const entry = formatLog(level, message, meta)
+		const json = JSON.stringify(entry)
+		if (level === "error") {
+			console.error(json)
+		} else if (level === "warn") {
+			console.warn(json)
+		} else {
+			// eslint-disable-next-line no-console
+			console.log(json)
+		}
+	} catch (err) {
+		// Fall back to plain console.error if serialization fails so logging never crashes
+		console.error(`[LOGGER_FALLBACK] [${level.toUpperCase()}] ${message}`, err)
+	}
+}
+
 export const logger = {
-	info: (message: string, meta?: LogMetadata) => {
-		const entry = formatLog("info", message, meta)
-		// eslint-disable-next-line no-console
-		console.log(JSON.stringify(entry))
-	},
-	warn: (message: string, meta?: LogMetadata) => {
-		const entry = formatLog("warn", message, meta)
-		console.warn(JSON.stringify(entry))
-	},
-	error: (message: string, meta?: LogMetadata) => {
-		const entry = formatLog("error", message, meta)
-		console.error(JSON.stringify(entry))
-	},
+	info: (message: string, meta?: LogMetadata) => safeWriteLog("info", message, meta),
+	warn: (message: string, meta?: LogMetadata) => safeWriteLog("warn", message, meta),
+	error: (message: string, meta?: LogMetadata) => safeWriteLog("error", message, meta),
 }
