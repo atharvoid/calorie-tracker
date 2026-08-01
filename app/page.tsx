@@ -182,8 +182,8 @@ export default async function Home(props: {
 						 * instead, and BYOK is reachable further down the page.
 						 */}
 						<p className="text-muted text-xs">
-							{personal.priceLabel} {personal.periodLabel} after your {TRIAL_DAYS}-day trial.
-							Card saved when the trial starts — cancel any time before it ends.
+							{personal.priceLabel} {personal.periodLabel} after your {TRIAL_DAYS}-day trial. Card
+							saved when the trial starts — cancel any time before it ends.
 						</p>
 					</div>
 
