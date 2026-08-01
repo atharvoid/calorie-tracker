@@ -41,17 +41,18 @@ export async function POST(req: NextRequest) {
 		}
 
 		return NextResponse.json({ url: checkoutSession.checkout_url })
-	} catch (err: any) {
-		const status = err.status || 500
-		const msg = err.message || String(err)
+	} catch (err) {
+		const e = err as { status?: number; message?: string; error?: unknown }
+		const status = e.status || 500
+		const msg = e.message || String(err)
 		console.error(
 			"[billing-checkout] failed to create checkout session. Status:",
 			status,
 			"Message:",
 			msg
 		)
-		if (err.error) {
-			console.error("[billing-checkout] Provider error body:", JSON.stringify(err.error))
+		if (e.error) {
+			console.error("[billing-checkout] Provider error body:", JSON.stringify(e.error))
 		}
 
 		let friendlyMessage = msg

@@ -8,7 +8,7 @@ interface TrendPoint {
 	kcal: number | null
 	targetKcal: number | null
 	maintenanceKcal: number | null
-	status: string
+	status: DailyNutritionSummary["status"]
 }
 
 interface RhythmStripProps {
@@ -58,7 +58,7 @@ export function RhythmStrip({ trendPoints, loading }: RhythmStripProps) {
 						remainingToTarget: null,
 						targetDelta: null,
 						maintenanceBalance: null,
-						status: point.status as any,
+						status: point.status,
 						mealCount: point.kcal ? 3 : 0,
 						assumptionCount: 0,
 					}

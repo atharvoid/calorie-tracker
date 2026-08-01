@@ -94,8 +94,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	let dates: string[]
 	try {
 		dates = dateRange(start, end)
-	} catch (err: any) {
-		return errResponse("INVALID_DATE", err.message || "Invalid dates", 400)
+	} catch (err) {
+		return errResponse("INVALID_DATE", (err as Error | null)?.message || "Invalid dates", 400)
 	}
 	if (dates.length > 366) {
 		return errResponse("RANGE_TOO_LARGE", "Max 366 days", 400)

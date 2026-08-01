@@ -10,6 +10,7 @@ import { TopFoods } from "./top-foods"
 import { MealContribution } from "./meal-contribution"
 import { RhythmStrip } from "./rhythm-strip"
 import { getActiveExperience } from "@/lib/experience-mode"
+import type { DailyNutritionSummary } from "@/lib/nutrition-types"
 import { cn } from "@/lib/utils"
 import {
 	buildPatternObservation,
@@ -42,7 +43,7 @@ type TrendPoint = {
 	kcal: number | null
 	targetKcal: number | null
 	maintenanceKcal: number | null
-	status: string
+	status: DailyNutritionSummary["status"]
 }
 
 type TopFood = {

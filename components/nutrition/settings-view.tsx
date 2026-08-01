@@ -54,7 +54,6 @@ type ApiResponse = { settings: Settings | null }
 
 const TIMEZONES = [
 	"Asia/Kolkata",
-	"Asia/Mumbai",
 	"UTC",
 	"America/New_York",
 	"America/Los_Angeles",

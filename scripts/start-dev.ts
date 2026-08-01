@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { spawn, ChildProcess } from "child_process"
 import { config } from "dotenv"
 

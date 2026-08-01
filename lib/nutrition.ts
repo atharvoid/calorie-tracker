@@ -53,8 +53,9 @@ Meal Classification Rules:
 Return ONE JSON object matching the given schema. No commentary outside the JSON.`
 
 /** True for provider errors that mean "this specific key is bad", not "the service is down". */
-function isAuthLikeProviderError(err: any): boolean {
-	const status = err?.statusCode ?? err?.status ?? err?.response?.status
+function isAuthLikeProviderError(err: unknown): boolean {
+	const e = err as { statusCode?: number; status?: number; response?: { status?: number } } | null
+	const status = e?.statusCode ?? e?.status ?? e?.response?.status
 	return status === 400 || status === 401 || status === 403
 }
 
@@ -111,6 +112,7 @@ export async function extractNutrition(
 			temperature: 0,
 			abortSignal: AbortSignal.timeout(30000),
 		})
+		// eslint-disable-next-line no-console
 		console.log("Raw Gemini response:", JSON.stringify(object, null, 2))
 
 		// 4. Record success usage event, attributing cost to whoever owns the key.
@@ -126,8 +128,8 @@ export async function extractNutrition(
 		if (keyOwner === "user") await recordByokSuccess(userId)
 
 		return object
-	} catch (err: any) {
-		const isEntitlementError = err?.name === "EntitlementError"
+	} catch (err) {
+		const isEntitlementError = (err as Error | null)?.name === "EntitlementError"
 
 		// A BYOK key that the provider rejects (revoked, wrong project, no quota)
 		// must never fall back to the platform key — that would quietly move the
@@ -147,7 +149,7 @@ export async function extractNutrition(
 				source,
 				model: MODEL_ID,
 				success: false,
-				failureCategory: err.message || String(err),
+				failureCategory: (err as Error | null)?.message || String(err),
 				keyOwner,
 			})
 		}

@@ -11,6 +11,7 @@ import { CalorieProgress } from "./calorie-progress"
 import { MacroSummary } from "./macro-summary"
 import { MealGroup } from "./meal-group"
 import { MealComposer } from "./meal-composer"
+import type { CommitNutritionResult } from "./meal-composer"
 import { DayImprint } from "../imprint/day-imprint"
 import { getActiveExperience } from "@/lib/experience-mode"
 import { toast } from "sonner"
@@ -90,17 +91,10 @@ export function TodayView({ initialDate, refreshKey }: Props) {
 		void load(date)
 	}, [date, load])
 
-	function handleCommitted(result: any) {
+	function handleCommitted(_result: CommitNutritionResult) {
 		setShowComposer(false)
 
-		// If sheets failed but DB succeeded, show warning
-		if (result.syncWarning) {
-			toast.warning("Meal saved, but Google Sheet sync failed.", {
-				description: result.syncWarning,
-			})
-		} else {
-			toast.success(`Meal saved to ${formatShortDate(date)}.`)
-		}
+		toast.success(`Meal saved to ${formatShortDate(date)}.`)
 
 		// Dispatch local event for instant sibling/parent update
 		window.dispatchEvent(new CustomEvent("local_nutrition_changed", { detail: { date } }))

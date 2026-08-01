@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * imprint-perf.test.ts
  *

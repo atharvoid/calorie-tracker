@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /**
  * Backfill drizzle.__drizzle_migrations from drizzle/meta/_journal.json.
  *

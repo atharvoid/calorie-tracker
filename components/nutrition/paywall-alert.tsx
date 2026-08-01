@@ -32,8 +32,8 @@ export function PaywallAlert({ trialUsed, trialLimit, isLimitReached, onAddKey }
 			if (data.url) {
 				window.location.href = data.url
 			}
-		} catch (err: any) {
-			setError(err.message || String(err))
+		} catch (err) {
+			setError((err as Error | null)?.message || String(err))
 		} finally {
 			setLoading(false)
 		}

@@ -35,7 +35,7 @@ describe("Dodo Payments Webhook Integration", () => {
 				subscription_id: "sub_123",
 				status: "active",
 			},
-		} as any)
+		} as unknown as ReturnType<typeof dodo.webhooks.unwrap>)
 
 		const result = dodo.webhooks.unwrap(rawBody, {
 			headers,

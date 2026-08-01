@@ -28,7 +28,7 @@ describe("Input Validation and Body Size Caps", () => {
 	function createRequest(
 		url: string,
 		method: string,
-		body?: any,
+		body?: unknown,
 		headers?: Record<string, string>
 	): NextRequest {
 		return new NextRequest(url, {

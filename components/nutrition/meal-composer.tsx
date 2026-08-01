@@ -5,7 +5,7 @@ import { Loader2, Sparkles, X, Check, AlertCircle } from "lucide-react"
 import { formatShortDate } from "@/lib/nutrition-date"
 import type { NutritionResult } from "@/lib/nutrition"
 
-type CommitNutritionResult = {
+export type CommitNutritionResult = {
 	rowCount: number
 	date: string
 	insertedIds: string[]
@@ -48,8 +48,8 @@ export function MealComposer({
 				throw new Error(data.error?.message || "Failed to extract nutrition estimate")
 			}
 			setPreview(data)
-		} catch (err: any) {
-			setError(err.message || "Failed to parse meal description")
+		} catch (err) {
+			setError((err as Error | null)?.message || "Failed to parse meal description")
 		} finally {
 			setLoading(false)
 		}
@@ -70,8 +70,8 @@ export function MealComposer({
 				throw new Error(data.error?.message || "Failed to save meals")
 			}
 			onCommitted(data)
-		} catch (err: any) {
-			setError(err.message || "Failed to save meals")
+		} catch (err) {
+			setError((err as Error | null)?.message || "Failed to save meals")
 		} finally {
 			setCommitting(false)
 		}

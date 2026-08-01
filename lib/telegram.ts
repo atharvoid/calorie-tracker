@@ -177,7 +177,7 @@ async function presentNutritionConfirm(
 	const pending = await withRetry(async () => {
 		const [row] = await db
 			.insert(pendingCaptures)
-			.values({ userId, payload: { ...nutrition, logDate } as any })
+			.values({ userId, payload: { ...nutrition, logDate } as unknown as NutritionResult })
 			.returning({ id: pendingCaptures.id })
 		return row
 	})
@@ -318,13 +318,14 @@ bot.on("message:text", async (ctx) => {
 		// Delete the "thinking" message before showing results
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		await presentNutritionConfirm(ctx, userId, nutrition, targetDate)
-	} catch (err: any) {
+	} catch (err) {
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
 		console.error("[telegram] extractNutrition failed:", err)
 
-		if (err.code === "byok_key_invalid") {
+		const e = err as { code?: string; userMessage?: string; message?: string }
+		if (e.code === "byok_key_invalid") {
 			await ctx.reply(
-				`⚠️ ${err.userMessage || "Your saved API key was rejected."} Use /setkey to re-enter it, or /removekey to go back to the platform plan.`
+				`⚠️ ${e.userMessage || "Your saved API key was rejected."} Use /setkey to re-enter it, or /removekey to go back to the platform plan.`
 			)
 			return
 		}
@@ -332,13 +333,13 @@ bot.on("message:text", async (ctx) => {
 		// Fair-use throttle (task B-12). This is temporary and self-resolving, so
 		// it must not be reported as a trial or key problem — nothing is wrong
 		// with the user's key or plan.
-		if (err.code === "byok_rate_limited") {
-			await ctx.reply(`⏳ ${err.userMessage || "Too many requests — please wait a moment."}`)
+		if (e.code === "byok_rate_limited") {
+			await ctx.reply(`⏳ ${e.userMessage || "Too many requests — please wait a moment."}`)
 			return
 		}
 
 		const isEntitlementError =
-			err.message?.includes("free trial") || err.message?.includes("limit reached")
+			e.message?.includes("free trial") || e.message?.includes("limit reached")
 		if (isEntitlementError) {
 			const kb = new InlineKeyboard().url("View plans", `${appUrl}/?tab=settings`)
 			await ctx.reply(
@@ -388,7 +389,7 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 		return
 	}
 
-	const rawPayload = pending.payload as any
+	const rawPayload = pending.payload as Record<string, unknown>
 	const logDate = rawPayload.logDate as string | undefined
 
 	const nutrition = validationResult.data

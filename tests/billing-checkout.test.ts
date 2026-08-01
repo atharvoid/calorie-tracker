@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { POST as checkoutHandler } from "@/app/api/billing/checkout/route"
 import { dodo } from "@/lib/dodo"
@@ -23,7 +24,7 @@ describe("POST /api/billing/checkout", () => {
 		vi.resetAllMocks()
 	})
 
-	function createRequest(body: any): NextRequest {
+	function createRequest(body: unknown): NextRequest {
 		return new NextRequest("http://localhost/api/billing/checkout", {
 			method: "POST",
 			headers: {
@@ -34,7 +35,7 @@ describe("POST /api/billing/checkout", () => {
 	}
 
 	it("returns 401 if unauthenticated", async () => {
-		vi.mocked(auth as any).mockResolvedValueOnce(null)
+		vi.mocked(auth as () => Promise<unknown>).mockResolvedValueOnce(null)
 		const req = createRequest({ plan: "monthly" })
 		const res = await checkoutHandler(req)
 		expect(res.status).toBe(401)
@@ -43,7 +44,7 @@ describe("POST /api/billing/checkout", () => {
 	})
 
 	it("rejects annual plan selection", async () => {
-		vi.mocked(auth as any).mockResolvedValueOnce({
+		vi.mocked(auth as () => Promise<unknown>).mockResolvedValueOnce({
 			user: { id: "user-1", email: "user@example.com" },
 		})
 		const req = createRequest({ plan: "annual" })
@@ -54,7 +55,7 @@ describe("POST /api/billing/checkout", () => {
 	})
 
 	it("accepts monthly plan and creates checkout session", async () => {
-		vi.mocked(auth as any).mockResolvedValueOnce({
+		vi.mocked(auth as () => Promise<unknown>).mockResolvedValueOnce({
 			user: { id: "user-1", email: "user@example.com", name: "John Doe" },
 		})
 		vi.mocked(dodo.checkoutSessions.create).mockResolvedValueOnce({

@@ -19,9 +19,9 @@ import { z } from "zod"
  * loosening the schema keeps the stored shape stable.
  */
 export const foodItemSchema = z.preprocess(
-	(val: any) => {
+	(val: unknown) => {
 		if (!val || typeof val !== "object") return val
-		const copy = { ...val }
+		const copy = { ...(val as Record<string, unknown>) }
 		if ("weight" in copy && copy.grams === undefined) {
 			copy.grams = copy.weight
 		}
@@ -58,9 +58,9 @@ export const foodItemSchema = z.preprocess(
 )
 
 export const mealSchema = z.preprocess(
-	(val: any) => {
+	(val: unknown) => {
 		if (!val || typeof val !== "object") return val
-		const copy = { ...val }
+		const copy = { ...(val as Record<string, unknown>) }
 		if (!("meal_type" in copy) || copy.meal_type === undefined) {
 			copy.meal_type = null
 		}

@@ -49,35 +49,36 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 		const requestId = `web-${globalThis.crypto.randomUUID()}`
 		const result = await extractNutrition(text, userId, requestId, "web")
 		return NextResponse.json(result)
-	} catch (err: any) {
-		const msg = err.message || String(err)
+	} catch (err) {
+		const e = err as { code?: string; userMessage?: string; message?: string }
+		const msg = e.message || String(err)
 		console.error("[extract] failed:", err)
 
-		if (err.code === "byok_key_invalid") {
-			return errResponse("BYOK_KEY_INVALID", err.userMessage || msg, 400)
+		if (e.code === "byok_key_invalid") {
+			return errResponse("BYOK_KEY_INVALID", e.userMessage || msg, 400)
 		}
 
 		// Fair-use throttle (task B-12). This is transient and self-resolving, so
 		// it gets 429 + Retry-After rather than the 403 used for entitlement
 		// problems: the client should back off and retry, not show an upgrade
 		// prompt for a plan the user is already paying for themselves.
-		if (err.code === "byok_rate_limited") {
-			const retryAfter = String(err.retryAfterSeconds ?? 60)
+		if (e.code === "byok_rate_limited") {
+			const retryAfter = String((e as { retryAfterSeconds?: number }).retryAfterSeconds ?? 60)
 			return NextResponse.json(
-				{ error: { code: "BYOK_RATE_LIMITED", message: err.userMessage || msg } },
+				{ error: { code: "BYOK_RATE_LIMITED", message: e.userMessage || msg } },
 				{ status: 429, headers: { "Retry-After": retryAfter } }
 			)
 		}
 
 		const isEntitlementError =
-			err.code === "trial_ended" ||
-			err.code === "trial_quota_exhausted" ||
-			err.code === "daily_limit_reached" ||
-			err.code === "account_blocked" ||
+			e.code === "trial_ended" ||
+			e.code === "trial_quota_exhausted" ||
+			e.code === "daily_limit_reached" ||
+			e.code === "account_blocked" ||
 			msg.includes("free trial") ||
 			msg.includes("limit reached")
 		if (isEntitlementError) {
-			return errResponse("TRIAL_EXPIRED", err.userMessage || msg, 403)
+			return errResponse("TRIAL_EXPIRED", e.userMessage || msg, 403)
 		}
 		return errResponse("EXTRACTION_FAILED", msg, 500)
 	}

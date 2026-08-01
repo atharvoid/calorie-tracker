@@ -143,7 +143,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 			timezone,
 		})
 		return NextResponse.json(result)
-	} catch (err: any) {
-		return errResponse("COMMIT_FAILED", err.message || "Failed to commit", 500)
+	} catch (err) {
+		return errResponse("COMMIT_FAILED", (err as Error | null)?.message || "Failed to commit", 500)
 	}
 }

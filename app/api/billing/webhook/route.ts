@@ -177,6 +177,7 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
 			},
 		})
 
+	// eslint-disable-next-line no-console
 	console.log(`[webhook] Updated entitlement for user ${userId} to accessState: ${activeState}`)
 }
 
@@ -213,6 +214,7 @@ export async function POST(req: NextRequest) {
 	}
 
 	try {
+		// eslint-disable-next-line no-console
 		console.log(`[webhook] Received Dodo event: ${event.type}`)
 
 		if (event.type.startsWith("subscription.")) {
