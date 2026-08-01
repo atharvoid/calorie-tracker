@@ -80,22 +80,16 @@ export const verificationTokens = pgTable(
 )
 
 // ── Integrations ────────────────────────────────────────────────
-
-/**
- * @deprecated Carried over from the previous "Data Assistant" project. The
- * default sheet title "Orders" and the sheet sync path are not part of the
- * calorie tracker product. Scheduled for removal — see
- * docs/IMPLEMENTATION_PLAN.md, task D-2. Do not build on this table.
- */
-export const sheetConnections = pgTable("sheet_connection", {
-	id: uuid("id").defaultRandom().primaryKey(),
-	userId: text("user_id")
-		.notNull()
-		.references(() => users.id, { onDelete: "cascade" }),
-	spreadsheetId: text("spreadsheet_id").notNull(),
-	sheetTitle: text("sheet_title").notNull().default("Orders"),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-})
+//
+// The `sheet_connection` and `entry` tables that used to live here (Google
+// Sheets sync and invoice line items, both carried over from the previous
+// "Data Assistant" project) have been removed from the schema (task D-2).
+// Neither had any remaining code reference: the Sheets feature and its
+// settings UI were deleted in PR #35, and `entry` was always unused by this
+// product. This removes them from Drizzle's tracked schema; the tables
+// themselves still exist in the live database. To finish the cleanup, run
+// `pnpm drizzle-kit generate` to produce the DROP migration (back up both
+// tables first), then `pnpm drizzle-kit migrate`.
 
 export const telegramLinks = pgTable("telegram_link", {
 	telegramUserId: text("telegram_user_id").primaryKey(),
@@ -111,30 +105,6 @@ export const linkTokens = pgTable("link_token", {
 		.notNull()
 		.references(() => users.id, { onDelete: "cascade" }),
 	expiresAt: timestamp("expires_at").notNull(),
-})
-
-/**
- * @deprecated Carried over from the previous "Data Assistant" project. These are
- * trade/invoice line items (customer, quantity, rate, amount) and have nothing
- * to do with nutrition. Scheduled for removal — see
- * docs/IMPLEMENTATION_PLAN.md, task D-2. Use `mealItems` instead.
- */
-export const entries = pgTable("entry", {
-	id: uuid("id").defaultRandom().primaryKey(),
-	userId: text("user_id")
-		.notNull()
-		.references(() => users.id, { onDelete: "cascade" }),
-	customer: text("customer").notNull(),
-	quantity: numeric("quantity"),
-	unit: text("unit"),
-	rate: numeric("rate"),
-	amount: numeric("amount"),
-	date: text("date"),
-	status: text("status").notNull().default("Pending"),
-	confidence: numeric("confidence"),
-	flags: jsonb("flags").$type<string[]>().default([]),
-	source: text("source").notNull().default("site"),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
 // ── Nutrition ───────────────────────────────────────────────────
