@@ -57,7 +57,6 @@ export const PUBLIC_PLANS: readonly PublicPlan[] = [
 			"Daily and weekly history",
 			"Nutrition analytics",
 			"Targets and day-specific adjustments",
-			"Google Sheets copy",
 			"Data export",
 		],
 		ctaLabel: `Start free for ${TRIAL_DAYS} days`,

@@ -24,7 +24,7 @@ export default function PrivacyPage() {
 								Privacy Policy
 							</h1>
 						</div>
-						<p className="text-muted text-xs">Last Updated: July 18, 2026</p>
+						<p className="text-muted text-xs">Last Updated: July 31, 2026</p>
 					</header>
 
 					<section className="space-y-3">
@@ -44,11 +44,6 @@ export default function PrivacyPage() {
 								portions, and meal descriptions you submit via our web interface or companion
 								Telegram bot.
 							</li>
-							<li>
-								<strong className="text-primary">Integration Data:</strong> If you connect Google
-								Sheets to synchronize your logs, we store authorization tokens to write entries
-								directly to a spreadsheet created in your Google Drive.
-							</li>
 						</ul>
 					</section>
 
@@ -64,7 +59,6 @@ export default function PrivacyPage() {
 							<li>
 								To build your personalized dashboard, daily visual imprints, and historical archive.
 							</li>
-							<li>To synchronize entries to your designated Google Sheet in Google Drive.</li>
 						</ul>
 						<p>
 							We do not sell, trade, or share your personal data with third parties for marketing or
@@ -77,16 +71,10 @@ export default function PrivacyPage() {
 							3. Google API Scopes & User Data Permissions
 						</h2>
 						<p>
-							Our application uses Google API scopes to integrate Google Sheets synchronization. We
-							request only the minimum required access permissions:
+							Our application uses Google API scopes only for secure sign-in. We request only the
+							minimum required access permissions:
 						</p>
 						<ul className="list-disc space-y-2 pl-5">
-							<li>
-								<code className="text-accent">/auth/drive.file</code>: We request access solely to
-								create and update a dedicated &ldquo;Calorie Tracker&rdquo; sheet in your Google
-								Drive. We do not access, view, or modify any other files or folders in your Google
-								Drive.
-							</li>
 							<li>
 								<code className="text-accent">openid</code> /{" "}
 								<code className="text-accent">userinfo.email</code>: To authenticate your account
