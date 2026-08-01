@@ -2,6 +2,7 @@ import React from "react"
 import { describe, expect, it } from "vitest"
 import { render, screen } from "@testing-library/react"
 import { BentoGridItem } from "@/components/landing/bento-grid"
+import { TIMEZONES } from "@/components/nutrition/settings-view"
 
 describe("Component Layout Tests", () => {
 	it("renders BentoGridItem in jsdom environment", () => {
@@ -17,14 +18,8 @@ describe("Component Layout Tests", () => {
 		expect(screen.getByText("Log your daily food intake instantly.")).toBeInTheDocument()
 	})
 
-	it("verifies timezone options are valid IANA names", () => {
-		const TIMEZONES = [
-			"Asia/Kolkata",
-			"UTC",
-			"America/New_York",
-			"America/Los_Angeles",
-			"Europe/London",
-		]
+	it("verifies imported app TIMEZONES are valid IANA names", () => {
+		expect(TIMEZONES.length).toBeGreaterThan(0)
 		for (const tz of TIMEZONES) {
 			expect(() => Intl.DateTimeFormat(undefined, { timeZone: tz })).not.toThrow()
 		}

@@ -1,13 +1,15 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { defineConfig } from "vitest/config"
 import { resolve } from "path"
 
-export default defineConfig({
+export default (defineConfig as any)({
 	resolve: {
 		alias: { "@": resolve(__dirname, ".") },
 	},
 	test: {
 		globals: true,
-		environment: "jsdom",
+		environment: "node",
+		environmentMatchGlobs: [["tests/**/*.test.tsx", "jsdom"]],
 		setupFiles: ["./tests/setup.ts"],
 		include: ["tests/**/*.test.{ts,tsx}"],
 		// Performance assertions are timing-sensitive and flake on shared CI
