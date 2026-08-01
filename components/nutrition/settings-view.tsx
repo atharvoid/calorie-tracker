@@ -18,8 +18,7 @@ import {
 import { ConnectTelegram } from "../connect-telegram"
 import { signOutAction } from "../auth-actions"
 import { ByokPanel } from "./byok-panel"
-import { cn } from "@/lib/utils"
-import { getEnabledBillingPlans, TRIAL_DAYS, type BillingPlan } from "@/lib/pricing"
+import { MONTHLY_PLAN_OPTION, TRIAL_DAYS, type BillingPlan } from "@/lib/pricing"
 
 type EntitlementStatus = {
 	accessState:
@@ -91,10 +90,6 @@ export function SettingsView({ refreshKey }: Props) {
 	const [billing, setBilling] = useState<EntitlementStatus | null>(null)
 	const [billingLoading, setBillingLoading] = useState(true)
 	const [actionLoading, setActionLoading] = useState(false)
-
-	// Rendered from lib/pricing.ts so the prices here cannot drift from the
-	// landing page or from the billing configuration.
-	const planOptions = getEnabledBillingPlans()
 
 	const loadBilling = useCallback(async () => {
 		try {
@@ -504,31 +499,13 @@ export function SettingsView({ refreshKey }: Props) {
 							billing.accessState === "pre_trial" ||
 							billing.accessState === "trial") && (
 							<div className="space-y-3 pt-2">
-								<div
-									className={cn(
-										"grid gap-3",
-										planOptions.length > 1 ? "grid-cols-2" : "grid-cols-1"
-									)}
+								<button
+									disabled={actionLoading}
+									onClick={() => handleUpgrade(MONTHLY_PLAN_OPTION.plan)}
+									className="rounded-btn bg-accent hover:bg-accent-hover w-full cursor-pointer px-4 py-2.5 text-center text-xs font-bold text-[color:var(--accent-contrast)] shadow-sm transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
 								>
-									{planOptions.map((option) => (
-										<button
-											key={option.plan}
-											disabled={actionLoading}
-											onClick={() => handleUpgrade(option.plan)}
-											className={cn(
-												"rounded-btn cursor-pointer px-4 py-2.5 text-center text-xs font-bold shadow-sm transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60",
-												option.emphasis === "primary"
-													? "bg-accent hover:bg-accent-hover text-[color:var(--accent-contrast)]"
-													: "border-subtle bg-surface text-primary hover:bg-elevated hover:border-default border"
-											)}
-										>
-											{option.label} — {option.priceLabel}
-											{option.note ? (
-												<span className="text-2xs block font-normal opacity-80">{option.note}</span>
-											) : null}
-										</button>
-									))}
-								</div>
+									{MONTHLY_PLAN_OPTION.label} — {MONTHLY_PLAN_OPTION.priceLabel}
+								</button>
 								<p className="text-muted text-2xs text-center leading-relaxed">
 									Includes unlimited meal logging on the web, 25 AI Telegram logs a day, custom
 									targets, and full data export. Or add your own API key above to skip payment
