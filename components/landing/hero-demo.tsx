@@ -100,13 +100,27 @@ export function HeroDemo() {
 							<label className="text-secondary mb-1.5 block font-mono text-xs font-semibold">
 								What did you eat today?
 							</label>
-							<textarea
-								value={inputText}
-								onChange={(e) => setInputText(e.target.value)}
-								placeholder="Type here or click the sample below…"
-								className="border-subtle bg-elevated text-primary focus:ring-accent placeholder-muted/60 h-20 w-full resize-none rounded-lg border px-3 py-2 text-sm focus:ring-1 focus:outline-none"
-								disabled
-							/>
+							{/*
+							 * This box is a canned walkthrough, not a live extraction — running the
+							 * model for anonymous visitors would be an open invitation to burn the
+							 * platform key. It used to be a `disabled` textarea inviting people to
+							 * "type here", which reads as a broken input: the cursor turns to
+							 * not-allowed and clicks do nothing. It is now an explicit button, so
+							 * clicking anywhere in the box does what the label promises.
+							 */}
+							<button
+								type="button"
+								onClick={handleEstimate}
+								aria-label={`Load the sample log: ${SAMPLE_LOG}`}
+								className="border-subtle bg-elevated hover:border-accent/50 hover:bg-elevated/70 focus-visible:ring-accent flex h-20 w-full cursor-pointer flex-col justify-center gap-1 rounded-lg border border-dashed px-3 py-2 text-left transition-colors focus-visible:ring-1 focus-visible:outline-none"
+							>
+								<span className="text-secondary text-sm">
+									{inputText || "Click here to drop in the sample log"}
+								</span>
+								<span className="text-muted text-2xs font-mono">
+									Preview only — you type your own meals after signing in.
+								</span>
+							</button>
 						</div>
 
 						<button
@@ -149,7 +163,10 @@ export function HeroDemo() {
 
 						<div className="flex gap-2">
 							<button
-								onClick={() => setStep("input")}
+								onClick={() => {
+									setInputText("")
+									setStep("input")
+								}}
 								className="border-subtle text-secondary hover:text-primary hover:bg-elevated flex-1 cursor-pointer rounded-lg border px-3 py-2.5 text-xs font-bold transition-colors"
 							>
 								Reset
@@ -177,7 +194,10 @@ export function HeroDemo() {
 						<DayImprint summary={summary} mealGroups={mealGroups} />
 
 						<button
-							onClick={() => setStep("input")}
+							onClick={() => {
+								setInputText("")
+								setStep("input")
+							}}
 							className="border-subtle text-secondary hover:text-primary hover:bg-elevated flex w-full cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 text-xs font-bold transition-colors"
 						>
 							Start over <ChevronRight className="h-4 w-4" />
