@@ -4,6 +4,8 @@ import { auth } from "@/auth"
 import { extractNutrition } from "@/lib/nutrition"
 import { getSettings } from "@/lib/nutrition-queries"
 import { isFuture, addDays, localDate } from "@/lib/nutrition-date"
+import { z } from "zod"
+import { parseAndValidateBody } from "@/lib/validation"
 
 export const runtime = "nodejs"
 
@@ -19,26 +21,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	let body: any
-	try {
-		body = await req.json()
-	} catch {
-		return errResponse("INVALID_JSON", "Invalid JSON body", 400)
-	}
-
-	const { text, logDate } = body
-
-	if (typeof text !== "string" || text.trim().length === 0) {
-		return errResponse("INVALID_INPUT", "No text provided", 400)
-	}
-
-	if (text.length > 2000) {
-		return errResponse("INVALID_INPUT", "Text exceeds maximum length of 2000 characters", 400)
-	}
-
-	if (!logDate || !/^\d{4}-\d{2}-\d{2}$/.test(logDate)) {
-		return errResponse("INVALID_DATE", "logDate must be YYYY-MM-DD", 400)
-	}
+	const bodyResult = await parseAndValidateBody(
+		req,
+		z.object({
+			text: z.string().min(1).max(2000),
+			logDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+		}),
+		8192
+	)
+	if (!bodyResult.success) return bodyResult.response
+	const { text, logDate } = bodyResult.data
 
 	const userId = session.user.id
 	const settings = await getSettings(userId)

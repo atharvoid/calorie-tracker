@@ -7,6 +7,9 @@ import {
 	deleteDayOverride,
 	overrideInputSchema,
 } from "@/lib/nutrition-queries"
+import { z } from "zod"
+import { parseAndValidateQuery, parseAndValidateBody } from "@/lib/validation"
+import { parseLocalDate } from "@/lib/nutrition-date"
 
 export const runtime = "nodejs"
 
@@ -30,10 +33,27 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const date = req.nextUrl.searchParams.get("date")
-	if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-		return errResponse("INVALID_DATE", "date param must be YYYY-MM-DD", 400)
-	}
+	const queryResult = parseAndValidateQuery(
+		req.url,
+		z.object({
+			date: z
+				.string()
+				.regex(/^\d{4}-\d{2}-\d{2}$/)
+				.refine(
+					(dateStr) => {
+						try {
+							parseLocalDate(dateStr)
+							return true
+						} catch {
+							return false
+						}
+					},
+					{ message: "Invalid calendar date" }
+				),
+		})
+	)
+	if (!queryResult.success) return queryResult.response
+	const { date } = queryResult.data
 
 	const override = await getDayOverride(session.user.id, date)
 	return NextResponse.json({ override })
@@ -43,24 +63,11 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	let body: unknown
-	try {
-		body = await req.json()
-	} catch {
-		return errResponse("INVALID_JSON", "Invalid JSON body", 400)
-	}
+	const bodyResult = await parseAndValidateBody(req, overrideInputSchema, 4096)
+	if (!bodyResult.success) return bodyResult.response
+	const parsedData = bodyResult.data
 
-	const parsed = overrideInputSchema.safeParse(body)
-	if (!parsed.success) {
-		const fieldErrors: Record<string, string[]> = {}
-		for (const issue of parsed.error.issues) {
-			const key = issue.path.join(".") || "root"
-			fieldErrors[key] = [...(fieldErrors[key] ?? []), issue.message]
-		}
-		return errResponse("VALIDATION_ERROR", "Invalid input", 422, fieldErrors)
-	}
-
-	const { date, ...data } = parsed.data
+	const { date, ...data } = parsedData
 	const override = await upsertDayOverride(session.user.id, date, data)
 	return NextResponse.json({ override })
 }
@@ -69,10 +76,27 @@ export async function DELETE(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const date = req.nextUrl.searchParams.get("date")
-	if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-		return errResponse("INVALID_DATE", "date param must be YYYY-MM-DD", 400)
-	}
+	const queryResult = parseAndValidateQuery(
+		req.url,
+		z.object({
+			date: z
+				.string()
+				.regex(/^\d{4}-\d{2}-\d{2}$/)
+				.refine(
+					(dateStr) => {
+						try {
+							parseLocalDate(dateStr)
+							return true
+						} catch {
+							return false
+						}
+					},
+					{ message: "Invalid calendar date" }
+				),
+		})
+	)
+	if (!queryResult.success) return queryResult.response
+	const { date } = queryResult.data
 
 	await deleteDayOverride(session.user.id, date)
 	return NextResponse.json({ success: true })

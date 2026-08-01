@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic"
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { getSettings, upsertSettings, settingsInputSchema } from "@/lib/nutrition-queries"
+import { parseAndValidateBody } from "@/lib/validation"
 
 export const runtime = "nodejs"
 
@@ -33,23 +34,10 @@ export async function PUT(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	let body: unknown
-	try {
-		body = await req.json()
-	} catch {
-		return errResponse("INVALID_JSON", "Invalid JSON body", 400)
-	}
+	const bodyResult = await parseAndValidateBody(req, settingsInputSchema, 4096)
+	if (!bodyResult.success) return bodyResult.response
+	const parsedData = bodyResult.data
 
-	const parsed = settingsInputSchema.safeParse(body)
-	if (!parsed.success) {
-		const fieldErrors: Record<string, string[]> = {}
-		for (const issue of parsed.error.issues) {
-			const key = issue.path.join(".") || "root"
-			fieldErrors[key] = [...(fieldErrors[key] ?? []), issue.message]
-		}
-		return errResponse("VALIDATION_ERROR", "Invalid input", 422, fieldErrors)
-	}
-
-	const updated = await upsertSettings(session.user.id, parsed.data)
+	const updated = await upsertSettings(session.user.id, parsedData)
 	return NextResponse.json({ settings: updated })
 }

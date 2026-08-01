@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { updateMealItem, deleteMealItem } from "@/lib/nutrition-queries"
 import { z } from "zod"
+import { parseAndValidateParams, parseAndValidateBody } from "@/lib/validation"
 
 export const runtime = "nodejs"
 
@@ -38,27 +39,17 @@ export async function PATCH(req: NextRequest, { params }: RouteContext): Promise
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const { id } = await params
+	const resolvedParams = await params
+	const paramsResult = parseAndValidateParams(resolvedParams, z.object({ id: z.string().uuid() }))
+	if (!paramsResult.success) return paramsResult.response
+	const { id } = paramsResult.data
 
-	let body: unknown
-	try {
-		body = await req.json()
-	} catch {
-		return errResponse("INVALID_JSON", "Invalid JSON body", 400)
-	}
-
-	const parsed = patchSchema.safeParse(body)
-	if (!parsed.success) {
-		const fieldErrors: Record<string, string[]> = {}
-		for (const issue of parsed.error.issues) {
-			const key = issue.path.join(".") || "root"
-			fieldErrors[key] = [...(fieldErrors[key] ?? []), issue.message]
-		}
-		return errResponse("VALIDATION_ERROR", "Invalid input", 422, fieldErrors)
-	}
+	const bodyResult = await parseAndValidateBody(req, patchSchema, 4096)
+	if (!bodyResult.success) return bodyResult.response
+	const parsedData = bodyResult.data
 
 	try {
-		const updated = await updateMealItem(session.user.id, id, parsed.data)
+		const updated = await updateMealItem(session.user.id, id, parsedData)
 		return NextResponse.json({ item: updated })
 	} catch (err) {
 		if (err instanceof Error && err.message.includes("not found")) {
@@ -72,7 +63,10 @@ export async function DELETE(_req: NextRequest, { params }: RouteContext): Promi
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const { id } = await params
+	const resolvedParams = await params
+	const paramsResult = parseAndValidateParams(resolvedParams, z.object({ id: z.string().uuid() }))
+	if (!paramsResult.success) return paramsResult.response
+	const { id } = paramsResult.data
 
 	try {
 		await deleteMealItem(session.user.id, id)

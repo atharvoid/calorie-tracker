@@ -4,8 +4,11 @@ import { auth } from "@/auth"
 import { getSettings, getDayOverride, getMealItemsForDate } from "@/lib/nutrition-queries"
 import { computeDailySummary, computeInsights, numericToNumber } from "@/lib/nutrition-calculations"
 import type { MealGroupDTO, MealItemDTO } from "@/lib/nutrition-types"
+import { nutritionSchema } from "@/lib/nutrition-types"
 import { commitNutrition } from "@/lib/commit"
 import { isFuture, addDays, localDate } from "@/lib/nutrition-date"
+import { z } from "zod"
+import { parseAndValidateQuery, parseAndValidateBody } from "@/lib/validation"
 
 export const runtime = "nodejs"
 
@@ -21,10 +24,14 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const date = req.nextUrl.searchParams.get("date")
-	if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-		return errResponse("INVALID_DATE", "date param must be YYYY-MM-DD", 400)
-	}
+	const queryResult = parseAndValidateQuery(
+		req.url,
+		z.object({
+			date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+		})
+	)
+	if (!queryResult.success) return queryResult.response
+	const { date } = queryResult.data
 
 	const userId = session.user.id
 
@@ -104,18 +111,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	let body: any
-	try {
-		body = await req.json()
-	} catch {
-		return errResponse("INVALID_JSON", "Invalid JSON body", 400)
-	}
-
-	const { nutrition, logDate } = body
-
-	if (!logDate || !/^\d{4}-\d{2}-\d{2}$/.test(logDate)) {
-		return errResponse("INVALID_DATE", "logDate must be YYYY-MM-DD", 400)
-	}
+	const bodyResult = await parseAndValidateBody(
+		req,
+		z.object({
+			nutrition: nutritionSchema,
+			logDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+		}),
+		65536
+	)
+	if (!bodyResult.success) return bodyResult.response
+	const { nutrition, logDate } = bodyResult.data
 
 	const userId = session.user.id
 	const settings = await getSettings(userId)

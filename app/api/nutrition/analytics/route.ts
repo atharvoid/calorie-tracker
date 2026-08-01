@@ -9,6 +9,8 @@ import {
 } from "@/lib/nutrition-calculations"
 import { dateRange, addDays, localDate } from "@/lib/nutrition-date"
 import type { DailyNutritionSummary } from "@/lib/nutrition-types"
+import { z } from "zod"
+import { parseAndValidateQuery } from "@/lib/validation"
 
 export const runtime = "nodejs"
 
@@ -37,9 +39,25 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const params = req.nextUrl.searchParams
-	const rangeParam = params.get("range") ?? "4w"
-	const metric = params.get("metric") ?? "kcal"
+	const queryResult = parseAndValidateQuery(
+		req.url,
+		z.object({
+			range: z.enum(["7d", "4w", "12w", "3m", "custom"]).optional().default("4w"),
+			metric: z.enum(["kcal", "macros"]).optional().default("kcal"),
+			start: z
+				.string()
+				.regex(/^\d{4}-\d{2}-\d{2}$/)
+				.optional(),
+			end: z
+				.string()
+				.regex(/^\d{4}-\d{2}-\d{2}$/)
+				.optional(),
+		})
+	)
+
+	if (!queryResult.success) return queryResult.response
+	const { range: rangeParam, metric, start: startQuery, end: endQuery } = queryResult.data
+
 	const tz = "Asia/Kolkata"
 	const today = localDate(tz)
 
@@ -47,8 +65,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	let end: string
 
 	if (rangeParam === "custom") {
-		start = params.get("start") ?? addDays(today, -27)
-		end = params.get("end") ?? today
+		start = startQuery ?? addDays(today, -27)
+		end = endQuery ?? today
 	} else {
 		end = today
 		switch (rangeParam) {
@@ -73,7 +91,12 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		return errResponse("INVALID_DATE", "Dates must be YYYY-MM-DD", 400)
 	}
 
-	const dates = dateRange(start, end)
+	let dates: string[]
+	try {
+		dates = dateRange(start, end)
+	} catch (err: any) {
+		return errResponse("INVALID_DATE", err.message || "Invalid dates", 400)
+	}
 	if (dates.length > 366) {
 		return errResponse("RANGE_TOO_LARGE", "Max 366 days", 400)
 	}

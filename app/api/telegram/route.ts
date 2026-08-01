@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { bot } from "@/lib/telegram"
 import { secretsMatch } from "@/lib/byok"
+import { z } from "zod"
+import { parseAndValidateBody } from "@/lib/validation"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -25,7 +27,17 @@ export async function POST(req: NextRequest) {
 	}
 
 	try {
-		const update = await req.json()
+		const bodyResult = await parseAndValidateBody(
+			req,
+			z
+				.object({
+					update_id: z.number(),
+				})
+				.passthrough(),
+			65536
+		)
+		if (!bodyResult.success) return bodyResult.response
+		const update = bodyResult.data
 		await ensureBotReady()
 
 		// Await processing before the serverless runtime freezes this invocation.

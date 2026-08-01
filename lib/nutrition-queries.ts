@@ -27,7 +27,17 @@ export const settingsInputSchema = z.object({
 	carbsTargetG: z.number().min(0).max(1000).nullable().optional(),
 	fatTargetG: z.number().min(0).max(500).nullable().optional(),
 	targetToleranceKcal: z.number().int().min(0).max(1000).nullable().optional(),
-	timezone: z.string().optional(),
+	timezone: z
+		.string()
+		.refine((tz) => {
+			try {
+				Intl.DateTimeFormat(undefined, { timeZone: tz })
+				return true
+			} catch {
+				return false
+			}
+		}, "Invalid timezone")
+		.optional(),
 })
 
 export async function getSettings(

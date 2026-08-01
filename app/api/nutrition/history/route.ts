@@ -4,7 +4,9 @@ import { auth } from "@/auth"
 import { getSettings, getMealItemsForRange, getDayOverridesForRange } from "@/lib/nutrition-queries"
 import { computeDailySummary } from "@/lib/nutrition-calculations"
 import { dateRange } from "@/lib/nutrition-date"
-import type { DailyNutritionSummary, DailyNutritionStatus } from "@/lib/nutrition-types"
+import type { DailyNutritionSummary } from "@/lib/nutrition-types"
+import { z } from "zod"
+import { parseAndValidateQuery } from "@/lib/validation"
 
 export const runtime = "nodejs"
 
@@ -18,18 +20,21 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	const session = await auth()
 	if (!session?.user?.id) return errResponse("UNAUTHORIZED", "Not signed in", 401)
 
-	const params = req.nextUrl.searchParams
-	const start = params.get("start")
-	const end = params.get("end")
-	const sort = (params.get("sort") ?? "newest") as "newest" | "oldest" | "kcal-high" | "kcal-low"
-	const statusFilter = (params.get("status") ?? "all") as DailyNutritionStatus | "all" | "logged"
+	const queryResult = parseAndValidateQuery(
+		req.url,
+		z.object({
+			start: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+			end: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+			sort: z.enum(["newest", "oldest", "kcal-high", "kcal-low"]).optional().default("newest"),
+			status: z
+				.enum(["all", "logged", "no-data", "unconfigured", "under", "within", "over"])
+				.optional()
+				.default("all"),
+		})
+	)
+	if (!queryResult.success) return queryResult.response
+	const { start, end, sort, status: statusFilter } = queryResult.data
 
-	if (!start || !/^\d{4}-\d{2}-\d{2}$/.test(start)) {
-		return errResponse("INVALID_DATE", "start param must be YYYY-MM-DD", 400)
-	}
-	if (!end || !/^\d{4}-\d{2}-\d{2}$/.test(end)) {
-		return errResponse("INVALID_DATE", "end param must be YYYY-MM-DD", 400)
-	}
 	if (end < start) {
 		return errResponse("INVALID_RANGE", "end must be >= start", 400)
 	}
