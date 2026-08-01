@@ -31,8 +31,8 @@ describe("numericToNumber", () => {
 describe("sumTotals", () => {
 	it("sums multiple items correctly", () => {
 		const items = [
-			{ kcal: "200", proteinG: "25", carbsG: "30", fatG: "5" },
-			{ kcal: "300", proteinG: "15", carbsG: "40", fatG: "10" },
+			{ kcal: 200, proteinG: "25", carbsG: "30", fatG: "5" },
+			{ kcal: 300, proteinG: "15", carbsG: "40", fatG: "10" },
 		]
 		const result = sumTotals(items)
 		expect(result.kcal).toBe(500)
@@ -55,7 +55,7 @@ describe("sumTotals", () => {
 	})
 
 	it("rounds kcal to integer, macros to 1 decimal", () => {
-		const result = sumTotals([{ kcal: "100.7", proteinG: "25.35", carbsG: "10", fatG: "5" }])
+		const result = sumTotals([{ kcal: 101, proteinG: "25.35", carbsG: "10", fatG: "5" }])
 		expect(result.kcal).toBe(101)
 		expect(result.proteinG).toBe(25.4)
 	})
@@ -214,8 +214,8 @@ describe("computeRemaining", () => {
 
 describe("computeDailySummary", () => {
 	const items: DbMealItem[] = [
-		{ kcal: "500", proteinG: "40", carbsG: "60", fatG: "15", notes: "assumed home-cooked" },
-		{ kcal: "300", proteinG: "20", carbsG: "30", fatG: "10", notes: null },
+		{ kcal: 500, proteinG: "40", carbsG: "60", fatG: "15", notes: "assumed home-cooked" },
+		{ kcal: 300, proteinG: "20", carbsG: "30", fatG: "10", notes: null },
 	]
 
 	it("computes correct totals", () => {
@@ -244,14 +244,14 @@ describe("computeWeeklyAverage", () => {
 		const days = [
 			computeDailySummary(
 				"2026-07-14",
-				[{ kcal: "2000", proteinG: "100", carbsG: "200", fatG: "60", notes: null }],
+				[{ kcal: 2000, proteinG: "100", carbsG: "200", fatG: "60", notes: null }],
 				BASE_SETTINGS,
 				null
 			),
 			computeDailySummary("2026-07-15", [], BASE_SETTINGS, null), // no meals
 			computeDailySummary(
 				"2026-07-16",
-				[{ kcal: "1800", proteinG: "90", carbsG: "180", fatG: "50", notes: null }],
+				[{ kcal: 1800, proteinG: "90", carbsG: "180", fatG: "50", notes: null }],
 				BASE_SETTINGS,
 				null
 			),
@@ -281,7 +281,7 @@ describe("computeInsights", () => {
 
 	it("returns max 3 insights", () => {
 		const items: DbMealItem[] = [
-			{ kcal: "1500", proteinG: "80", carbsG: "200", fatG: "40", notes: null },
+			{ kcal: 1500, proteinG: "80", carbsG: "200", fatG: "40", notes: null },
 		]
 		const summary = computeDailySummary("2026-07-16", items, BASE_SETTINGS, null)
 		const insights = computeInsights(summary)
@@ -290,7 +290,7 @@ describe("computeInsights", () => {
 
 	it("does not include shaming language", () => {
 		const items: DbMealItem[] = [
-			{ kcal: "2800", proteinG: "120", carbsG: "300", fatG: "90", notes: null },
+			{ kcal: 2800, proteinG: "120", carbsG: "300", fatG: "90", notes: null },
 		]
 		const summary = computeDailySummary("2026-07-16", items, BASE_SETTINGS, null)
 		const insights = computeInsights(summary)

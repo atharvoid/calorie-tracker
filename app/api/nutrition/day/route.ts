@@ -75,8 +75,8 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 		const dtos: MealItemDTO[] = groupItems.map((it) => ({
 			id: it.id,
 			name: it.name,
-			grams: it.grams !== null ? numericToNumber(it.grams) : null,
-			kcal: numericToNumber(it.kcal),
+			grams: it.grams,
+			kcal: it.kcal ?? 0,
 			proteinG: numericToNumber(it.proteinG),
 			carbsG: numericToNumber(it.carbsG),
 			fatG: numericToNumber(it.fatG),

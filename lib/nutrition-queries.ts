@@ -267,13 +267,8 @@ export async function updateMealItem(
 		.update(mealItems)
 		.set({
 			name: data.name ?? existing.name,
-			grams:
-				data.grams !== undefined
-					? data.grams !== null
-						? String(data.grams)
-						: null
-					: existing.grams,
-			kcal: data.kcal !== undefined ? String(data.kcal) : existing.kcal,
+			grams: data.grams !== undefined ? data.grams : existing.grams,
+			kcal: data.kcal !== undefined ? data.kcal : existing.kcal,
 			proteinG: data.proteinG !== undefined ? String(data.proteinG) : existing.proteinG,
 			carbsG: data.carbsG !== undefined ? String(data.carbsG) : existing.carbsG,
 			fatG: data.fatG !== undefined ? String(data.fatG) : existing.fatG,

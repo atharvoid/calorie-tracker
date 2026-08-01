@@ -223,7 +223,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	for (const item of allItems) {
 		const key = item.name.trim().toLowerCase()
 		const existing = foodMap.get(key)
-		const kcal = numericToNumber(item.kcal)
+		const kcal = item.kcal ?? 0
 		const protein = numericToNumber(item.proteinG)
 		if (existing) {
 			existing.totalKcal += kcal
@@ -246,7 +246,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
 	const mealContribMap = new Map<string, number>()
 	for (const item of allItems) {
 		const key = item.mealType ?? "Other"
-		mealContribMap.set(key, (mealContribMap.get(key) ?? 0) + numericToNumber(item.kcal))
+		mealContribMap.set(key, (mealContribMap.get(key) ?? 0) + (item.kcal ?? 0))
 	}
 	const totalContribKcal = [...mealContribMap.values()].reduce((s, v) => s + v, 0)
 	const MEAL_ORDER = ["Breakfast", "Lunch", "Dinner", "Snack", "Other"]

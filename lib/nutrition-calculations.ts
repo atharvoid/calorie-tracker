@@ -29,7 +29,7 @@ export type DbOverride = {
 }
 
 export type DbMealItem = {
-	kcal: string | number | null
+	kcal: number | null
 	proteinG: string | number | null
 	carbsG: string | number | null
 	fatG: string | number | null
@@ -49,7 +49,7 @@ export function numericToNumber(val: string | number | null | undefined): number
 /** Sum macros across multiple meal items */
 export function sumTotals(
 	items: Array<{
-		kcal: string | number | null
+		kcal: number | null
 		proteinG: string | number | null
 		carbsG: string | number | null
 		fatG: string | number | null
@@ -61,7 +61,7 @@ export function sumTotals(
 	let fatG = 0
 
 	for (const item of items) {
-		kcal += numericToNumber(item.kcal)
+		kcal += item.kcal ?? 0
 		proteinG += numericToNumber(item.proteinG)
 		carbsG += numericToNumber(item.carbsG)
 		fatG += numericToNumber(item.fatG)
