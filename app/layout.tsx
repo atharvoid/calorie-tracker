@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Fraunces } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AppToaster } from "@/components/app-toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { headers } from "next/headers"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -79,7 +80,9 @@ export const viewport: Viewport = {
  */
 const THEME_BOOTSTRAP = `(function(){try{var t=localStorage.getItem('logcals-theme');var m=(t==='light'||t==='dark')?t:'dark';var r=document.documentElement;r.dataset.theme=m;r.classList.toggle('dark',m==='dark');r.style.colorScheme=m;}catch(e){var r2=document.documentElement;r2.dataset.theme='dark';r2.classList.add('dark');r2.style.colorScheme='dark';}})();`
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+	const nonce = (await headers()).get("x-nonce") ?? undefined
+
 	return (
 		<html
 			lang="en"
@@ -87,7 +90,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 			className={`${geistSans.variable} ${geistMono.variable} ${fraunces.variable}`}
 		>
 			<head>
-				<script dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
+				<script nonce={nonce} dangerouslySetInnerHTML={{ __html: THEME_BOOTSTRAP }} />
 			</head>
 			<body className="font-sans antialiased">
 				<ThemeProvider>
