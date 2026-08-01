@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { buildScene } from "../../lib/imprint/scene"
-import { MOCK_FIXTURES } from "../../lib/imprint/fixtures"
+import { buildScene } from "@/lib/imprint/scene"
+import { MOCK_FIXTURES } from "@/lib/imprint/fixtures"
 
 describe("imprint-scene", () => {
 	it("generates deterministic scene for identical inputs", () => {

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest"
-import { buildScene } from "../../lib/imprint/scene"
-import { MOCK_FIXTURES } from "../../lib/imprint/fixtures"
-import { fnv1a } from "../../lib/imprint/seed"
+import { buildScene } from "@/lib/imprint/scene"
+import { MOCK_FIXTURES } from "@/lib/imprint/fixtures"
+import { fnv1a } from "@/lib/imprint/seed"
 
 describe("imprint-determinism", () => {
 	it("produces identical scene hash across 100 runs for all fixtures", () => {

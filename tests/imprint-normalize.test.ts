@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest"
-import { normalizeInput } from "../../lib/imprint/normalize"
-import type { DailyNutritionSummary, MealGroupDTO } from "../../lib/nutrition-types"
+import { normalizeInput } from "@/lib/imprint/normalize"
+import type { DailyNutritionSummary, MealGroupDTO } from "@/lib/nutrition-types"
 
 describe("imprint-normalize", () => {
 	const mockSummary: DailyNutritionSummary = {
