@@ -4,10 +4,9 @@ Log what you ate in plain language — by web or Telegram — and get calories a
 macros back, tracked against your daily targets.
 
 > **Note on history:** this repository previously hosted a different project (an
-> invoice/order extraction tool called "Data Assistant"). Some of that code is
-> still present and is being removed. Anything marked `@deprecated` in
-> `db/schema.ts` or listed under "Legacy surface" below is not part of this
-> product. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
+> invoice/order extraction tool called "Data Assistant"). Most of that code has
+> been removed; what's left is tracked under "Legacy surface" below and in
+> [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
 ## How it works
 
@@ -23,7 +22,7 @@ There are three ways to use the app. The middle tier is the point: if you bring
 your own AI key, the app is free for you and costs the operator nothing.
 
 | Tier                   | Cost to you                                     | Cost to operator     | Limits                         |
-| ---------------------- | ----------------------------------------------- | --------------------- | ------------------------------ |
+| ---------------------- | ----------------------------------------------- | -------------------- | ------------------------------ |
 | **Free trial**         | Free                                            | Operator pays for AI | 7 days, 50 AI logs             |
 | **Bring your own key** | Free (you pay Google directly, usually pennies) | Nothing              | Unlimited AI logs              |
 | **Subscription**       | $2.99/month                                     | Operator pays for AI | Fair-use cap of 25 AI logs/day |
@@ -52,16 +51,16 @@ Implementation: [`lib/byok.ts`](lib/byok.ts),
 
 ## Stack
 
-| Layer     | Choice                                                       |
-| --------- | ------------------------------------------------------------ |
-| Framework | Next.js (App Router) + React + TypeScript                    |
-| Styling   | Tailwind CSS with semantic design tokens (`lib/ui.ts`)       |
-| Database  | Postgres via Drizzle ORM                                     |
-| Auth      | Auth.js (Google provider)                                    |
-| AI        | Google Gemini 2.5 Flash via the Vercel AI SDK                |
-| Messaging | Telegram bot (grammY)                                        |
-| Billing   | Stripe (Dodo Payments code also present — see plan task D-4) |
-| Tests     | Vitest                                                       |
+| Layer     | Choice                                                        |
+| --------- | ------------------------------------------------------------- |
+| Framework | Next.js (App Router) + React + TypeScript                     |
+| Styling   | Tailwind CSS with semantic design tokens (`lib/ui.ts`)        |
+| Database  | Postgres via Drizzle ORM                                      |
+| Auth      | Auth.js (Google provider)                                     |
+| AI        | Google Gemini 2.5 Flash via the Vercel AI SDK                 |
+| Messaging | Telegram bot (grammY)                                         |
+| Billing   | Dodo Payments (Stripe code still present — see plan task D-6) |
+| Tests     | Vitest                                                        |
 
 The model ID lives in one place, [`lib/ai.ts`](lib/ai.ts), alongside its pricing
 constants so cost reporting cannot drift from the model actually in use.
@@ -79,6 +78,11 @@ pnpm dev
 fails fast at boot if `DATABASE_URL` is missing rather than falling back to a
 localhost database.
 
+If `pnpm drizzle-kit migrate` reports migrations that are already applied, read
+[`docs/MIGRATION_STATE_RECOVERY.md`](docs/MIGRATION_STATE_RECOVERY.md) before
+forcing anything — the migration journal was repaired by hand and there is a
+backfill script for bringing a database's bookkeeping table back in line.
+
 ### Telegram development
 
 The webhook needs a public URL. `pnpm dev:tunnel` starts the dev server behind a
@@ -88,7 +92,7 @@ tunnel; point `setWebhook` at it and pass the same value as
 ## Scripts
 
 | Command                             | Purpose                                 |
-| ------------------------------------ | --------------------------------------- |
+| ----------------------------------- | --------------------------------------- |
 | `pnpm dev`                          | Dev server                              |
 | `pnpm dev:tunnel`                   | Dev server + public tunnel for Telegram |
 | `pnpm build` / `pnpm start`         | Production build / serve                |
@@ -96,6 +100,7 @@ tunnel; point `setWebhook` at it and pass the same value as
 | `pnpm lint`                         | ESLint                                  |
 | `pnpm format` / `pnpm format:check` | Prettier                                |
 | `pnpm test` / `pnpm test:run`       | Vitest watch / single run               |
+| `pnpm db:backfill-migrations`       | Reconcile the Drizzle bookkeeping table |
 
 CI runs typecheck, lint, format check, tests, and build on every pull request.
 
@@ -135,12 +140,20 @@ docs/               Implementation plan and design notes
 
 ## Legacy surface
 
-Routes `/api/extract`, `/api/extract-image`, `/api/insights`, `/api/entries`,
-and `/api/sheet` have been removed. Still present and scheduled for removal:
-the `entry` and `sheet_connection` database tables, and the spreadsheet-era
-components `editable-table`, `editable-cell`, `charts`, `kpi-card`,
-`status-pill`, `input-toggle`, and `dropzone`. Tracked as task group D in the
-implementation plan.
+The "Data Assistant" leftovers are gone. The unauthenticated `/api/extract`,
+`/api/extract-image`, `/api/insights`, `/api/entries`, and `/api/sheet` routes
+have been deleted, and so have the spreadsheet-era components
+(`editable-table`, `editable-cell`, `charts`, `kpi-card`, `status-pill`,
+`input-toggle`, `dropzone`, and neighbours).
+
+The `entry` and `sheet_connection` tables have now been dropped as well. Their
+Drizzle schema exports were removed first, then the tables themselves were
+dropped by the `0007_drop_legacy_tables` migration. Task D-2 is complete.
+
+What genuinely remains: the `lib/` modules listed under task D-4 (`normalize`,
+`analytics`, `parse-file`, `export-xlsx`, `extraction`, `extract-core`,
+`types`, `sheets-sync`, `google`) and the dependencies they pin, tracked as
+D-5. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
 
 ## License
 

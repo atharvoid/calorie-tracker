@@ -12,7 +12,8 @@
 		"format": "prettier --write .",
 		"format:check": "prettier --check .",
 		"test": "vitest",
-		"test:run": "vitest run"
+		"test:run": "vitest run",
+		"db:backfill-migrations": "pnpm dlx tsx scripts/backfill-drizzle-migrations.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/google": "^4.0.8",

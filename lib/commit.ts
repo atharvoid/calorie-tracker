@@ -22,8 +22,6 @@ type CommitInput = {
 type CommitResult = {
 	rowCount: number
 	date: string
-	spreadsheetId: string
-	syncWarning?: string
 	insertedIds: string[]
 }
 
@@ -115,8 +113,6 @@ export async function commitNutrition({
 	return {
 		rowCount: insertedIds.length,
 		date,
-		spreadsheetId: "",
-		syncWarning: undefined,
 		insertedIds,
 	}
 }

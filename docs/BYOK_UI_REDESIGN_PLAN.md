@@ -47,13 +47,16 @@ no UI is invisible, which is exactly what was reported.
   covers precedence at the state-resolution level already; this would add
   coverage for the new `setByokKey`/`clearByokKey` and the failure-classification
   logic in `extractNutrition`.
-- **A discrepancy found while reading `db/schema.ts`**: `docs/IMPLEMENTATION_PLAN.md`
-  (task D-2) classifies `sheet_connection` as "Data Assistant"-era dead weight
-  to delete. It is not dead — `components/nutrition/settings-view.tsx` actively
-  uses it for the live Google Sheets sync feature. `entries` does look like
-  genuine invoice-era leftover (customer/quantity/rate/amount/status fields),
-  but `sheet_connection` does not belong in the same deletion task. Worth
-  re-verifying before anyone acts on D-2 as written.
+- **Resolved:** the `sheet_connection` discrepancy noted in an earlier draft of
+  this document is now moot. At the time it was written, `settings-view.tsx`
+  still had the live Google Sheets sync panel, so `sheet_connection` genuinely
+  had a caller and did not belong in task D-2's deletion list alongside
+  `entry`. That panel and the whole Sheets feature were removed in PR #35
+  (stale-Sheets-references cleanup). A follow-up grep confirmed `sheetConnections`
+  now has zero references anywhere outside `db/schema.ts`, same as `entries` —
+  so both table exports have since been removed from the schema as part of
+  task D-2. The tables themselves still need a generated drop migration run
+  against the live database.
 
 ## Phase 2 — Onboarding tour (this PR)
 

@@ -364,7 +364,7 @@ bot.on("message:document", async (ctx) => {
 	await ctx.reply("📄 File input isn't supported yet — please describe your meal in text!")
 })
 
-// ✓ Save → commit to DB + sheet
+// ✓ Save → commit to DB
 bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 	const id = ctx.match[1]
 	const pending = await withRetry(async () => {
@@ -393,7 +393,7 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 
 	const nutrition = validationResult.data
 	try {
-		const { rowCount, syncWarning } = await commitNutrition({
+		const { rowCount } = await commitNutrition({
 			userId: pending.userId,
 			nutrition,
 			source: "telegram",
@@ -413,11 +413,9 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 			return
 		}
 
-		const warningText = syncWarning ? "\n⚠️ _Sheet sync failed but meals are saved._" : ""
 		await ctx.editMessageText(
 			summarizeMeals(nutrition) +
-				`\n\n✅ *Saved ${rowCount} meal${rowCount !== 1 ? "s" : ""} to your log!*` +
-				warningText,
+				`\n\n✅ *Saved ${rowCount} meal${rowCount !== 1 ? "s" : ""} to your log!*`,
 			{ parse_mode: "Markdown" }
 		)
 		await ctx.answerCallbackQuery("Meals saved!")
