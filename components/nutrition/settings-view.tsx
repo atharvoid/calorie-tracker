@@ -18,6 +18,7 @@ import {
 import { ConnectTelegram } from "../connect-telegram"
 import { signOutAction } from "../auth-actions"
 import { ByokPanel } from "./byok-panel"
+import { MONTHLY_PLAN_OPTION, TRIAL_DAYS, type BillingPlan } from "@/lib/pricing"
 
 type EntitlementStatus = {
 	accessState:
@@ -108,7 +109,7 @@ export function SettingsView({ refreshKey }: Props) {
 		void loadBilling()
 	}, [loadBilling])
 
-	async function handleUpgrade(plan: "monthly" | "annual") {
+	async function handleUpgrade(plan: BillingPlan) {
 		setActionLoading(true)
 		try {
 			const res = await fetch("/api/billing/checkout", {
@@ -122,8 +123,8 @@ export function SettingsView({ refreshKey }: Props) {
 			} else {
 				toast.error(data.error || "Failed to trigger checkout")
 			}
-		} catch (e: any) {
-			toast.error(e.message || "Failed to upgrade")
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : "Failed to upgrade")
 		} finally {
 			setActionLoading(false)
 		}
@@ -141,8 +142,8 @@ export function SettingsView({ refreshKey }: Props) {
 			} else {
 				toast.error(data.error || "Failed to trigger portal")
 			}
-		} catch (e: any) {
-			toast.error(e.message || "Failed to load portal")
+		} catch (e) {
+			toast.error(e instanceof Error ? e.message : "Failed to load portal")
 		} finally {
 			setActionLoading(false)
 		}
@@ -241,8 +242,8 @@ export function SettingsView({ refreshKey }: Props) {
 			document.body.removeChild(a)
 			URL.revokeObjectURL(url)
 			toast.success("Meal history exported successfully")
-		} catch (err: any) {
-			toast.error(err.message || "Failed to export data")
+		} catch (err) {
+			toast.error(err instanceof Error ? err.message : "Failed to export data")
 		} finally {
 			setExporting(false)
 		}
@@ -450,10 +451,15 @@ export function SettingsView({ refreshKey }: Props) {
 							</span>
 						</div>
 
+						{/*
+						 * This previously promised the trial "begins automatically when you log
+						 * your first meal". The trial is moving behind a card-capture checkout,
+						 * so that sentence was about to become false. It now states the fact
+						 * (not started) without promising how it starts.
+						 */}
 						{billing.accessState === "pre_trial" && (
 							<p className="text-muted text-xs leading-relaxed">
-								Your 7-day free trial has not started yet. It begins automatically when you log your
-								first meal.
+								Your {TRIAL_DAYS}-day trial has not started yet.
 							</p>
 						)}
 
@@ -493,26 +499,17 @@ export function SettingsView({ refreshKey }: Props) {
 							billing.accessState === "pre_trial" ||
 							billing.accessState === "trial") && (
 							<div className="space-y-3 pt-2">
-								<div className="grid grid-cols-2 gap-3">
-									<button
-										disabled={actionLoading}
-										onClick={() => handleUpgrade("monthly")}
-										className="rounded-btn border-subtle bg-surface text-primary hover:bg-elevated hover:border-default cursor-pointer border px-4 py-2.5 text-center text-xs font-bold shadow-sm transition-all focus:outline-none"
-									>
-										Personal Monthly — $2.99/mo
-									</button>
-									<button
-										disabled={actionLoading}
-										onClick={() => handleUpgrade("annual")}
-										className="rounded-btn bg-accent hover:bg-accent-hover cursor-pointer px-4 py-2.5 text-center text-xs font-bold text-[color:var(--accent-contrast)] shadow-sm transition-all focus:outline-none"
-									>
-										Personal Annual — $24.99/yr
-									</button>
-								</div>
+								<button
+									disabled={actionLoading}
+									onClick={() => handleUpgrade(MONTHLY_PLAN_OPTION.plan)}
+									className="rounded-btn bg-accent hover:bg-accent-hover w-full cursor-pointer px-4 py-2.5 text-center text-xs font-bold text-[color:var(--accent-contrast)] shadow-sm transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+								>
+									{MONTHLY_PLAN_OPTION.label} — {MONTHLY_PLAN_OPTION.priceLabel}
+								</button>
 								<p className="text-muted text-2xs text-center leading-relaxed">
-									Both plans include unlimited meals on the web, 25 daily AI Telegram logs, custom
-									targets, Google Sheets sync, and full data export. Or add your own API key above
-									to skip payment entirely.
+									Includes unlimited meal logging on the web, 25 AI Telegram logs a day, custom
+									targets, and full data export. Or add your own API key above to skip payment
+									entirely.
 								</p>
 							</div>
 						)}

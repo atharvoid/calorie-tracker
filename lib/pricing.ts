@@ -97,3 +97,41 @@ export function getPublicPlan(key: PlanKeyPublic): PublicPlan {
 	if (!plan) throw new Error(`Unknown public plan: ${key}`)
 	return plan
 }
+
+// ── Billing cadence ───────────────────────────────────────────────────
+
+/**
+ * The cadence values accepted by POST /api/billing/checkout.
+ *
+ * Monthly is the only cadence sold. An annual plan was once half-built: the
+ * settings panel shipped a "$24.99/yr" button as the *primary* action, but no
+ * annual product existed in Dodo Payments, so `DODO_PRODUCT_ANNUAL_ID` was
+ * unset and the checkout route fell back to the literal string
+ * "p_annual_placeholder". Every click on the loudest button in the billing
+ * panel produced a provider error. The decision was to drop annual rather than
+ * finish it.
+ *
+ * Note that `db/schema.ts` deliberately keeps its `personal_annual` plan key: a
+ * real subscriber row already carries that value, and removing a plan from the
+ * storefront is not the same as rewriting history.
+ */
+export type BillingPlan = "monthly"
+
+export type BillingPlanOption = {
+	plan: BillingPlan
+	label: string
+	/** Price and cadence, already formatted for a button. */
+	priceLabel: string
+}
+
+/**
+ * The single cadence the billing panel offers. Rendered from here rather than
+ * hardcoded in JSX so the settings panel cannot drift from the landing page,
+ * which was the original defect: the site advertised $2.99/mo everywhere while
+ * the billing panel's most prominent action was a different, unbuilt SKU.
+ */
+export const MONTHLY_PLAN_OPTION: BillingPlanOption = {
+	plan: "monthly",
+	label: "Personal Monthly",
+	priceLabel: `${formatUsdCents(PERSONAL_MONTHLY_PRICE_CENTS)}/mo`,
+}
