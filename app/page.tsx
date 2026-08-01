@@ -17,9 +17,6 @@ import { getActiveExperience } from "@/lib/experience-mode"
 import { signInAction } from "@/components/auth-actions"
 import { getPublicPlan, TRIAL_DAYS } from "@/lib/pricing"
 
-/** The spreadsheet the Drive scope is requested for. Must match lib/sheets-sync.ts. */
-const SHEET_TITLE = "Calorie Tracker — Meal Log"
-
 function BrandWordmark() {
 	return (
 		<span className="text-primary text-lg font-semibold tracking-tight">
@@ -233,39 +230,6 @@ export default async function Home(props: {
 								className="sm:col-span-2 lg:col-span-1"
 							/>
 						</BentoGrid>
-					</div>
-				</section>
-
-				{/* Google Sheets Integration & Purpose Disclosure */}
-				<section className="rounded-card border-subtle bg-surface mx-auto mb-24 max-w-2xl space-y-4 border p-8">
-					<h2 className="text-primary flex items-center gap-2 text-lg font-bold">
-						<span className="text-accent" aria-hidden="true">
-							●
-						</span>{" "}
-						Google Sheets Integration & Purpose
-					</h2>
-					<p className="text-secondary text-sm leading-relaxed">
-						Calorie Tracker is a personal nutrition logging application designed to help you build a
-						clear visual archive of your daily eating patterns. To provide a persistent backup and
-						personal copy of your data, the app offers a Google Sheets synchronization feature.
-					</p>
-					<div className="bg-elevated/40 border-subtle/30 space-y-2 rounded-xl border p-4 text-xs">
-						<p className="text-primary font-semibold">How we use your Google permissions:</p>
-						<ul className="text-secondary list-disc space-y-1 pl-5">
-							<li>
-								We request the <code className="text-accent">/auth/drive.file</code> scope, which
-								allows the app to create a single dedicated spreadsheet named{" "}
-								<strong>&ldquo;{SHEET_TITLE}&rdquo;</strong> in your Google Drive.
-							</li>
-							<li>
-								We write and append your daily meal logs, calorie counts, and macronutrient
-								calculations solely to this specific spreadsheet.
-							</li>
-							<li>
-								We do not access, view, or modify any other files or folders in your Google Drive.
-								Your data remains fully under your own control.
-							</li>
-						</ul>
 					</div>
 				</section>
 
