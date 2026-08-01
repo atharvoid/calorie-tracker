@@ -1,20 +1,20 @@
 import React from "react"
 import { describe, expect, it } from "vitest"
-import { renderToStaticMarkup } from "react-dom/server"
+import { render, screen } from "@testing-library/react"
 import { BentoGridItem } from "@/components/landing/bento-grid"
 
 describe("Component Layout Tests", () => {
-	it("renders BentoGridItem component layout correctly", () => {
-		const html = renderToStaticMarkup(
+	it("renders BentoGridItem in jsdom environment", () => {
+		render(
 			<BentoGridItem
 				index="01"
 				title="Log Meals"
 				description="Log your daily food intake instantly."
 			/>
 		)
-		expect(html).toContain("01")
-		expect(html).toContain("Log Meals")
-		expect(html).toContain("Log your daily food intake instantly.")
+		expect(screen.getByText("01")).toBeInTheDocument()
+		expect(screen.getByText("Log Meals")).toBeInTheDocument()
+		expect(screen.getByText("Log your daily food intake instantly.")).toBeInTheDocument()
 	})
 
 	it("verifies timezone options are valid IANA names", () => {

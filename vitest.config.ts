@@ -7,7 +7,8 @@ export default defineConfig({
 	},
 	test: {
 		globals: true,
-		environment: "node",
+		environment: "jsdom",
+		setupFiles: ["./tests/setup.ts"],
 		include: ["tests/**/*.test.{ts,tsx}"],
 		// Performance assertions are timing-sensitive and flake on shared CI
 		// runners. The pattern is intentionally `*perf.test.ts` rather than
