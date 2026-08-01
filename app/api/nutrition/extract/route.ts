@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { extractNutrition } from "@/lib/nutrition"
 import { getSettings } from "@/lib/nutrition-queries"
+import { logger } from "@/lib/logger"
 import { isFuture, addDays, localDate } from "@/lib/nutrition-date"
 import { z } from "zod"
 import { parseAndValidateBody } from "@/lib/validation"
@@ -52,7 +53,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 	} catch (err) {
 		const e = err as { code?: string; userMessage?: string; message?: string }
 		const msg = e.message || String(err)
-		console.error("[extract] failed:", err)
+		logger.error("[extract] failed", { error: msg, userId })
 
 		if (e.code === "byok_key_invalid") {
 			return errResponse("BYOK_KEY_INVALID", e.userMessage || msg, 400)

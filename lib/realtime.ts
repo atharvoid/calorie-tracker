@@ -6,6 +6,8 @@ type NutritionChangedPayload = {
 	itemIds: string[]
 }
 
+import { logger } from "@/lib/logger"
+
 /** Broadcast a nutrition_changed event to the user's realtime channel */
 export async function broadcastNutritionChanged(
 	userId: string,
@@ -39,6 +41,6 @@ export async function broadcastNutritionChanged(
 			],
 		}),
 	}).catch((err: unknown) => {
-		console.error("[broadcast] nutrition_changed failed:", err)
+		logger.error("[broadcast] nutrition_changed failed", { error: err, userId })
 	})
 }

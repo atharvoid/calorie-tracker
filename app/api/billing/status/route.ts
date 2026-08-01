@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { getUserEntitlement } from "@/lib/entitlements"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -15,7 +16,10 @@ export async function GET() {
 		return NextResponse.json(entitlement)
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err)
-		console.error("[billing-status] failed to get entitlement:", msg)
+		logger.error("[billing-status] failed to get entitlement", {
+			error: msg,
+			userId: session.user.id,
+		})
 		return NextResponse.json({ error: msg }, { status: 500 })
 	}
 }

@@ -5,6 +5,7 @@ import type { BillingProvider, SubscriptionStatus } from "@/db/schema"
 import { eq, desc } from "drizzle-orm"
 import { dodo } from "@/lib/dodo"
 import { resolveAccessState } from "@/lib/entitlements"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -84,7 +85,7 @@ async function handleSubscriptionChange(dodoSub: DodoSubscriptionShim) {
 	}
 
 	if (!userId) {
-		console.error("[webhook] Could not resolve userId for customer:", customerId)
+		logger.error("[webhook] Could not resolve userId for customer", { customerId })
 		return
 	}
 
@@ -209,7 +210,7 @@ export async function POST(req: NextRequest) {
 		}) as { type: string; data: unknown }
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err)
-		console.error("[webhook] signature verification failed:", msg)
+		logger.error("[webhook] signature verification failed", { error: msg })
 		return NextResponse.json({ error: "Invalid signature" }, { status: 400 })
 	}
 
@@ -224,7 +225,10 @@ export async function POST(req: NextRequest) {
 		return NextResponse.json({ received: true })
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err)
-		console.error("[webhook] error handling verified webhook:", msg)
+		logger.error("[webhook] error handling verified webhook", {
+			error: msg,
+			eventType: event.type,
+		})
 		// 5xx so Dodo retries. The subscription upsert is keyed on
 		// provider_subscription_id, so replaying the same event is safe.
 		return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 })

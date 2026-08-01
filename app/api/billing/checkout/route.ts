@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { dodo } from "@/lib/dodo"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -45,15 +46,12 @@ export async function POST(req: NextRequest) {
 		const e = err as { status?: number; message?: string; error?: unknown }
 		const status = e.status || 500
 		const msg = e.message || String(err)
-		console.error(
-			"[billing-checkout] failed to create checkout session. Status:",
+		logger.error("[billing-checkout] failed to create checkout session", {
 			status,
-			"Message:",
-			msg
-		)
-		if (e.error) {
-			console.error("[billing-checkout] Provider error body:", JSON.stringify(e.error))
-		}
+			error: msg,
+			userId: session.user.id,
+			providerError: e.error ? JSON.stringify(e.error) : undefined,
+		})
 
 		let friendlyMessage = msg
 		if (

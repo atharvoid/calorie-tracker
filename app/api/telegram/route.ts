@@ -3,6 +3,7 @@ import { bot } from "@/lib/telegram"
 import { secretsMatch } from "@/lib/byok"
 import { z } from "zod"
 import { parseAndValidateBody } from "@/lib/validation"
+import { logger } from "@/lib/logger"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
 	} catch (error) {
 		// Telegram retries every non-2xx response. Acknowledge authenticated updates
 		// even when processing fails so a slow or partial handler cannot duplicate a meal.
-		console.error("[telegram] failed to process authenticated update:", error)
+		logger.error("[telegram] failed to process authenticated update", { error })
 		return NextResponse.json({ ok: true, handled: false })
 	}
 }

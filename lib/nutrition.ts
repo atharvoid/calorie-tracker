@@ -2,6 +2,7 @@ import { generateObject } from "ai"
 import { getModel, MODEL_ID } from "@/lib/ai"
 import { nutritionSchema } from "@/lib/nutrition-types"
 import type { NutritionResult } from "@/lib/nutrition-types"
+import { logger } from "@/lib/logger"
 
 // The schemas themselves now live in lib/nutrition-types.ts so that db/schema.ts
 // can name NutritionResult without pulling the AI SDK into the database layer
@@ -85,7 +86,11 @@ export async function extractNutrition(
 		apiKey = resolved.apiKey
 		keyOwner = resolved.keyOwner
 	} catch (err) {
-		console.error("[nutrition] failed to resolve BYOK key, falling back to invalid-key error:", err)
+		logger.error("[nutrition] failed to resolve BYOK key, falling back to invalid-key error", {
+			error: err,
+			userId,
+			requestId,
+		})
 		const { EntitlementError } = await import("@/lib/entitlements")
 		throw new EntitlementError(
 			"byok_key_invalid",

@@ -4,6 +4,7 @@ import { db } from "@/db"
 import { billingCustomers } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { dodo } from "@/lib/dodo"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -41,7 +42,10 @@ export async function POST() {
 		return NextResponse.json({ url: portalSession.link })
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err)
-		console.error("[billing-portal] failed to create portal session:", msg)
+		logger.error("[billing-portal] failed to create portal session", {
+			error: msg,
+			userId: session.user.id,
+		})
 		return NextResponse.json({ error: msg }, { status: 500 })
 	}
 }

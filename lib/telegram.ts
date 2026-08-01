@@ -8,6 +8,7 @@ import { getSettings } from "@/lib/nutrition-queries"
 import { localDate, addDays, parseLocalDate, formatShortDate, isFuture } from "@/lib/nutrition-date"
 import { setByokKey, clearByokKey } from "@/lib/entitlements"
 import { ByokError } from "@/lib/byok"
+import { logger } from "@/lib/logger"
 
 export function parseTelegramDate(
 	text: string,
@@ -320,7 +321,7 @@ bot.on("message:text", async (ctx) => {
 		await presentNutritionConfirm(ctx, userId, nutrition, targetDate)
 	} catch (err) {
 		await ctx.api.deleteMessage(ctx.chat.id, thinking.message_id).catch(() => null)
-		console.error("[telegram] extractNutrition failed:", err)
+		logger.error("[telegram] extractNutrition failed", { error: err, userId, requestId })
 
 		const e = err as { code?: string; userMessage?: string; message?: string }
 		if (e.code === "byok_key_invalid") {
@@ -380,7 +381,10 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 	// Validate the stored payload before committing
 	const validationResult = nutritionSchema.safeParse(pending.payload)
 	if (!validationResult.success) {
-		console.error("[telegram] Invalid stored payload:", validationResult.error.message)
+		logger.error("[telegram] Invalid stored payload", {
+			error: validationResult.error.message,
+			captureId: id,
+		})
 		await ctx.answerCallbackQuery("Invalid data — please send your meal again.")
 		// Clean up invalid pending capture
 		await withRetry(async () => {
@@ -421,7 +425,11 @@ bot.callbackQuery(/^confirm:(.+)$/, async (ctx) => {
 		)
 		await ctx.answerCallbackQuery("Meals saved!")
 	} catch (err) {
-		console.error("[telegram] commitNutrition failed:", err)
+		logger.error("[telegram] commitNutrition failed", {
+			error: err,
+			captureId: id,
+			userId: pending.userId,
+		})
 		await ctx.answerCallbackQuery("Save failed — try again.")
 	}
 })
@@ -438,7 +446,7 @@ bot.callbackQuery(/^edit:(.+)$/, async (ctx) => {
 
 // Prevent uncaught errors from crashing the bot's long polling loop
 bot.catch((err) => {
-	console.error("[telegram] Uncaught error in bot middleware:", err.error)
+	logger.error("[telegram] Uncaught error in bot middleware", { error: err.error })
 	// Try to reply to the user if we have context
 	err.ctx.reply("❌ An unexpected error occurred. Please try again.").catch(() => null)
 })

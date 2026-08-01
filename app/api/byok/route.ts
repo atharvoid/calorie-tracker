@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { isByokEnabled } from "@/lib/byok"
 import { getUserEntitlement, setByokKey, clearByokKey } from "@/lib/entitlements"
 import { ByokError } from "@/lib/byok"
+import { logger } from "@/lib/logger"
 
 // node:crypto is required for AES-GCM, so this route cannot run on the edge.
 export const runtime = "nodejs"
@@ -85,7 +86,7 @@ export async function PUT(request: Request) {
 			return NextResponse.json({ error: error.message, code: error.code }, { status })
 		}
 		// Never include the key or the raw error in the response.
-		console.error("[byok] failed to store key", { userId })
+		logger.error("[byok] failed to store key", { userId, error })
 		return NextResponse.json({ error: "Could not save that API key." }, { status: 500 })
 	}
 }

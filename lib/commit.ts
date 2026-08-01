@@ -3,6 +3,7 @@ import { mealItems } from "@/db/schema"
 import { nutritionSchema, type NutritionResult } from "@/lib/nutrition"
 import { broadcastNutritionChanged } from "@/lib/realtime"
 import { localDate } from "@/lib/nutrition-date"
+import { logger } from "@/lib/logger"
 
 // Derived from the schema rather than restated, so these cannot drift from the
 // column definitions the way a hand-copied union would.
@@ -94,7 +95,7 @@ export async function commitNutrition({
 					await startTrialOnFirstMeal(userId)
 				}
 			} catch (err) {
-				console.error("[commit] Failed to start free trial:", err)
+				logger.error("[commit] Failed to start free trial", { error: err, userId })
 			}
 		}
 	}

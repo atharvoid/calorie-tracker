@@ -3,6 +3,7 @@ import { auth } from "@/auth"
 import { db } from "@/db"
 import { sql } from "drizzle-orm"
 import { isAdminEmail } from "@/lib/admin"
+import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
 
@@ -101,7 +102,7 @@ export async function GET() {
 		})
 	} catch (err: unknown) {
 		const msg = err instanceof Error ? err.message : String(err)
-		console.error("[admin-dashboard] failed to compile business metrics:", msg)
+		logger.error("[admin-dashboard] failed to compile business metrics", { error: msg })
 		return NextResponse.json({ error: msg }, { status: 500 })
 	}
 }
