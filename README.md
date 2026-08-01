@@ -4,9 +4,9 @@ Log what you ate in plain language — by web or Telegram — and get calories a
 macros back, tracked against your daily targets.
 
 > **Note on history:** this repository previously hosted a different project (an
-> invoice/order extraction tool called "Data Assistant"). Most of that code has
-> been removed; what's left is tracked under "Legacy surface" below and in
-> [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
+> invoice/order extraction tool called "Data Assistant"). That code has now been
+> removed in full — see "Legacy surface" below for what went, and
+> [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md) for the record.
 
 ## How it works
 
@@ -44,6 +44,12 @@ What this means in practice:
 - If Google rejects your key, the app tells you to rotate it. It does **not**
   silently fall back to the operator's key.
 - Removing your key returns you to whatever tier you were on before.
+
+The same rules apply on Telegram: `/setkey <key>` stores a key (the message
+containing it is deleted immediately, so it does not sit in your chat history in
+plaintext) and `/removekey` clears it. Meals logged through the bot are billed
+to the same key as meals logged on the web — both paths share one extraction
+function.
 
 Implementation: [`lib/byok.ts`](lib/byok.ts),
 [`app/api/byok/route.ts`](app/api/byok/route.ts), and the `byok_*` columns on
@@ -127,7 +133,7 @@ lib/
   entitlements.ts   Access states, quotas, usage accounting
   nutrition-*.ts    Extraction, queries, calculations, date maths
   telegram.ts       Bot command handling
-tests/__tests__/    Vitest suites
+tests/              Vitest suites
 docs/               Implementation plan and design notes
 ```
 
@@ -150,10 +156,24 @@ The `entry` and `sheet_connection` tables have now been dropped as well. Their
 Drizzle schema exports were removed first, then the tables themselves were
 dropped by the `0007_drop_legacy_tables` migration. Task D-2 is complete.
 
-What genuinely remains: the `lib/` modules listed under task D-4 (`normalize`,
-`analytics`, `parse-file`, `export-xlsx`, `extraction`, `extract-core`,
-`types`, `sheets-sync`, `google`) and the dependencies they pin, tracked as
-D-5. See [`docs/IMPLEMENTATION_PLAN.md`](docs/IMPLEMENTATION_PLAN.md).
+The `lib/` modules tracked as D-4 have since been deleted too: `normalize`,
+`analytics`, `extract-core`, `extraction`, `types`, and `data/demo-rows`, along
+with the `broadcastEntries` helper and the `NormalizedRow` import that kept
+`lib/realtime.ts` tied to the old data model. The dependencies they pinned —
+`xlsx`, `@react-pdf/renderer`, `@ai-sdk/openai-compatible`, and `googleapis` —
+are gone with them, as is the publicly reachable `app/imprint-prototype/` route
+(D-11).
+
+One deliberate exception: **`recharts` was kept.** It appeared on the D-5
+removal list, but it is not spreadsheet-era code — the calorie trend and meal
+contribution charts both import it, and removing it would break them.
+
+Nothing from the previous project remains in the application code. The mentions
+of "Data Assistant" still present in this repository are intentional history,
+not leftovers: this note, the comment in `db/schema.ts` recording why two tables
+were dropped, the header of `0007_drop_legacy_tables.sql`, and the planning
+documents under `docs/`. They are worth keeping — a migration that drops two
+tables should say why.
 
 ## License
 
