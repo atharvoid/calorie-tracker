@@ -18,6 +18,7 @@ export function middleware(request: NextRequest) {
 		base-uri 'self';
 		form-action 'self';
 		frame-ancestors 'none';
+		report-uri /api/csp-report;
 	`
 		.replace(/\s{2,}/g, " ")
 		.trim()
