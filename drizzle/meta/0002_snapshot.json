@@ -1,6 +1,6 @@
 {
-  "id": "6b154b99-de26-40cd-8565-8266d3d8b16c",
-  "prevId": "3fd96f55-e0a6-4e5f-b52d-18db26864fed",
+  "id": "d9bc5073-d45e-4656-a3df-758f06b95277",
+  "prevId": "b4b6344a-4b69-4f85-b699-2a68648aaa01",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -173,6 +173,116 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.entry": {
+      "name": "entry",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "customer": {
+          "name": "customer",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "quantity": {
+          "name": "quantity",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unit": {
+          "name": "unit",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "rate": {
+          "name": "rate",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Pending'"
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "flags": {
+          "name": "flags",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'[]'::jsonb"
+        },
+        "source": {
+          "name": "source",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'site'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "entry_user_id_user_id_fk": {
+          "name": "entry_user_id_user_id_fk",
+          "tableFrom": "entry",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.link_token": {
       "name": "link_token",
       "schema": "",
@@ -261,31 +371,31 @@
         },
         "grams": {
           "name": "grams",
-          "type": "numeric(9, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "kcal": {
           "name": "kcal",
-          "type": "numeric(9, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "protein_g": {
           "name": "protein_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "carbs_g": {
           "name": "carbs_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "fat_g": {
           "name": "fat_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -379,19 +489,6 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "no action"
-        },
-        "meal_item_capture_id_pending_capture_id_fk": {
-          "name": "meal_item_capture_id_pending_capture_id_fk",
-          "tableFrom": "meal_item",
-          "tableTo": "pending_capture",
-          "columnsFrom": [
-            "capture_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "set null",
-          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -437,19 +534,19 @@
         },
         "protein_target_g": {
           "name": "protein_target_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "carbs_target_g": {
           "name": "carbs_target_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "fat_target_g": {
           "name": "fat_target_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -536,19 +633,19 @@
         },
         "protein_target_g": {
           "name": "protein_target_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "carbs_target_g": {
           "name": "carbs_target_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
         "fat_target_g": {
           "name": "fat_target_g",
-          "type": "numeric(7, 2)",
+          "type": "numeric",
           "primaryKey": false,
           "notNull": false
         },
@@ -658,10 +755,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
+      "uniqueConstraints": {}
     },
     "public.product_entitlement": {
       "name": "product_entitlement",
@@ -839,6 +933,66 @@
           "tableTo": "user",
           "columnsFrom": [
             "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.sheet_connection": {
+      "name": "sheet_connection",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "spreadsheet_id": {
+          "name": "spreadsheet_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "sheet_title": {
+          "name": "sheet_title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'Orders'"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "sheet_connection_user_id_user_id_fk": {
+          "name": "sheet_connection_user_id_user_id_fk",
+          "tableFrom": "sheet_connection",
+          "tableTo": "user",
+          "columnsFrom": [
+            "user_id"
           ],
           "columnsTo": [
             "id"

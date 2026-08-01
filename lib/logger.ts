@@ -11,7 +11,7 @@ function serializeError(err: Error): Record<string, unknown> {
 	}
 	// Copy any custom enumerable properties attached to the Error object
 	for (const key of Object.keys(err)) {
-		serialized[key] = (err as Record<string, unknown>)[key]
+		serialized[key] = (err as unknown as Record<string, unknown>)[key]
 	}
 	return serialized
 }
