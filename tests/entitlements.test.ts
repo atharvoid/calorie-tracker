@@ -130,4 +130,15 @@ describe("resolveAccessState", () => {
 		const state = resolveAccessState(ent, null, now)
 		expect(state).toBe("trial")
 	})
+
+	it("returns active for an active annual subscription", () => {
+		const sub = mockSubscription({
+			status: "active",
+			planKey: "personal_annual",
+			currentPeriodEnd: new Date("2027-07-01T00:00:00Z"),
+		})
+		const now = new Date("2026-07-15T00:00:00Z")
+		const state = resolveAccessState(null, sub, now)
+		expect(state).toBe("active")
+	})
 })

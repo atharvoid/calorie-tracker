@@ -57,16 +57,16 @@ Implementation: [`lib/byok.ts`](lib/byok.ts),
 
 ## Stack
 
-| Layer     | Choice                                                        |
-| --------- | ------------------------------------------------------------- |
-| Framework | Next.js (App Router) + React + TypeScript                     |
-| Styling   | Tailwind CSS with semantic design tokens (`lib/ui.ts`)        |
-| Database  | Postgres via Drizzle ORM                                      |
-| Auth      | Auth.js (Google provider)                                     |
-| AI        | Google Gemini 2.5 Flash via the Vercel AI SDK                 |
-| Messaging | Telegram bot (grammY)                                         |
-| Billing   | Dodo Payments (Stripe code still present — see plan task D-6) |
-| Tests     | Vitest                                                        |
+| Layer     | Choice                                                 |
+| --------- | ------------------------------------------------------ |
+| Framework | Next.js (App Router) + React + TypeScript              |
+| Styling   | Tailwind CSS with semantic design tokens (`lib/ui.ts`) |
+| Database  | Postgres via Drizzle ORM                               |
+| Auth      | Auth.js (Google provider)                              |
+| AI        | Google Gemini 2.5 Flash via the Vercel AI SDK          |
+| Messaging | Telegram bot (grammY)                                  |
+| Billing   | Dodo Payments                                          |
+| Tests     | Vitest                                                 |
 
 The model ID lives in one place, [`lib/ai.ts`](lib/ai.ts), alongside its pricing
 constants so cost reporting cannot drift from the model actually in use.

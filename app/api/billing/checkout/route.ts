@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
 	try {
 		const { plan } = await req.json()
-		if (plan !== "monthly" && plan !== "annual") {
+		if (plan !== "monthly") {
 			return NextResponse.json({ error: "Invalid plan selection" }, { status: 400 })
 		}
 
@@ -21,12 +21,7 @@ export async function POST(req: NextRequest) {
 		const userName = session.user.name || ""
 
 		// 1. Resolve Dodo Product ID based on plan type
-		let productId = ""
-		if (plan === "monthly") {
-			productId = process.env.DODO_PRODUCT_MONTHLY_ID || "p_monthly_placeholder"
-		} else {
-			productId = process.env.DODO_PRODUCT_ANNUAL_ID || "p_annual_placeholder"
-		}
+		const productId = process.env.DODO_PRODUCT_MONTHLY_ID || "p_monthly_placeholder"
 
 		// 2. Create Dodo Checkout Session
 		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
