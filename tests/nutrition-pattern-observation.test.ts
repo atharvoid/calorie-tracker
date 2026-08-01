@@ -12,7 +12,7 @@ import {
 	buildPatternObservation,
 	renderPatternObservation,
 	type PatternObservationInput,
-} from "../../lib/nutrition-pattern-observation"
+} from "@/lib/nutrition-pattern-observation"
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 

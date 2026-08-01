@@ -23,9 +23,9 @@
  */
 
 import { describe, it, expect } from "vitest"
-import { buildScene } from "../../lib/imprint/scene"
-import { MOCK_FIXTURES } from "../../lib/imprint/fixtures"
-import type { DayImprintInput } from "../../lib/imprint/types"
+import { buildScene } from "@/lib/imprint/scene"
+import { MOCK_FIXTURES } from "@/lib/imprint/fixtures"
+import type { DayImprintInput } from "@/lib/imprint/types"
 
 const ITERATIONS = 1000
 
