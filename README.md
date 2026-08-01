@@ -127,8 +127,8 @@ docs/               Implementation plan and design notes
 
 ## Data and privacy
 
-- Google sign-in requests the `drive.file` scope only, which grants access
-  solely to files this app creates — not your existing Drive contents.
+- Google sign-in requests only `openid`, `email`, and `profile` — no Drive
+  access.
 - Nutrition figures are AI estimates, not medical or dietary advice.
 - Deleting your account cascades to all meal, settings, and entitlement rows.
 
