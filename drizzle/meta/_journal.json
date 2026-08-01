@@ -40,8 +40,22 @@
     {
       "idx": 5,
       "version": "7",
+      "when": 1785450000000,
+      "tag": "0005_capture_id_uuid_fk",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1785460000000,
+      "tag": "0006_column_constraints",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
       "when": 1785517704535,
-      "tag": "0005_opposite_blue_marvel",
+      "tag": "0007_drop_legacy_tables",
       "breakpoints": true
     }
   ]
