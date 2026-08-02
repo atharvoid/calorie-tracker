@@ -31,7 +31,9 @@ const APP_DESCRIPTION =
 
 // Without metadataBase, Next cannot resolve relative Open Graph image URLs and
 // every shared link renders an empty preview card.
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+const APP_URL =
+	process.env.NEXT_PUBLIC_APP_URL ||
+	(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000")
 
 export const metadata: Metadata = {
 	metadataBase: new URL(APP_URL),
