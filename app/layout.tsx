@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Fraunces } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { AppToaster } from "@/components/app-toaster"
 import { TooltipProvider } from "@/components/ui/tooltip"
+import { getAppUrl } from "@/lib/app-url"
 import { headers } from "next/headers"
 import "./globals.css"
 
@@ -31,7 +32,12 @@ const APP_DESCRIPTION =
 
 // Without metadataBase, Next cannot resolve relative Open Graph image URLs and
 // every shared link renders an empty preview card.
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
+//
+// This previously fell back to `http://localhost:3000`, which is the worse
+// failure: the build succeeds and the metadata looks valid, but every
+// canonical and Open Graph URL points at a machine nobody can reach.
+// `getAppUrl()` throws in production instead. See lib/app-url.ts and task A-17.
+const APP_URL = getAppUrl()
 
 export const metadata: Metadata = {
 	metadataBase: new URL(APP_URL),
