@@ -9,6 +9,7 @@ import { localDate, addDays, parseLocalDate, formatShortDate, isFuture } from "@
 import { setByokKey, clearByokKey } from "@/lib/entitlements"
 import { ByokError } from "@/lib/byok"
 import { logger } from "@/lib/logger"
+import { getAppUrl } from "@/lib/app-url"
 
 export function parseTelegramDate(
 	text: string,
@@ -279,9 +280,7 @@ bot.on("message:text", async (ctx) => {
 		return
 	}
 	const requestId = `tg-${ctx.update.update_id}`
-	const appUrl =
-		process.env.NEXT_PUBLIC_APP_URL ||
-		"https://willing-exhibition-inherited-subaru.trycloudflare.com"
+	const appUrl = getAppUrl()
 
 	// Pre-extract entitlement check to avoid sending thinking message if already blocked
 	try {
