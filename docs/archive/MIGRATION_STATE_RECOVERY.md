@@ -116,6 +116,7 @@ pnpm drizzle-kit migrate
 - **Step 3 above (the scratch-database schema diff)** has not been run. Until it
   passes, treat the rebuilt journal as "believed correct" rather than "proven
   correct".
+- **Legacy spreadsheet backups secured.** The temporary backup file `scratch/backup_pre_migration_*.json` containing legacy table data (including live Google Spreadsheet IDs) has been deleted from disk to prevent exposure of sensitive IDs. All legacy data has already been successfully migrated and verified.
 
 ## Rules going forward
 
