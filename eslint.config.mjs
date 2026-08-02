@@ -24,11 +24,12 @@ const eslintConfig = defineConfig([
 			// CI could stay green while the existing sites were cleaned up, and
 			// E-8 is the promotion to "error" once that count reaches zero.
 			//
-			// A staged "warn" only works if someone eventually promotes it. A
-			// warning nothing enforces is indistinguishable from "off" after the
-			// first week, because nobody reads a clean-exit log.
+			// no-explicit-any reached zero and was promoted. set-state-in-effect
+			// has NOT: promoting it was attempted in PR #59 and CI rejected it,
+			// so live violations remain. Run `pnpm lint` to enumerate them before
+			// trying again - do not promote this rule on optimism.
 			"@typescript-eslint/no-explicit-any": "error",
-			"react-hooks/set-state-in-effect": "error",
+			"react-hooks/set-state-in-effect": "warn",
 			"@typescript-eslint/no-unused-vars": [
 				"error",
 				{ argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrors: "all" },
