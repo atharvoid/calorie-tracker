@@ -1,7 +1,16 @@
 import React from "react"
-import { describe, expect, it } from "vitest"
+import { describe, expect, it, vi } from "vitest"
+
+// Mock auth actions to prevent next-auth/next/server from being imported in jsdom environment
+vi.mock("@/components/auth-actions", () => ({
+	signOutAction: () => {},
+	signInAction: () => {},
+}))
+
 import { render, screen } from "@testing-library/react"
 import { BentoGridItem } from "@/components/landing/bento-grid"
+import { MobileUserSheet } from "@/components/nutrition/mobile-user-sheet"
+import { TIMEZONES } from "@/components/nutrition/settings-view"
 
 describe("Component Layout Tests", () => {
 	it("renders BentoGridItem in jsdom environment", () => {
@@ -17,14 +26,14 @@ describe("Component Layout Tests", () => {
 		expect(screen.getByText("Log your daily food intake instantly.")).toBeInTheDocument()
 	})
 
-	it("verifies timezone options are valid IANA names", () => {
-		const TIMEZONES = [
-			"Asia/Kolkata",
-			"UTC",
-			"America/New_York",
-			"America/Los_Angeles",
-			"Europe/London",
-		]
+	it("renders MobileUserSheet trigger button in jsdom environment", () => {
+		render(<MobileUserSheet user={{ name: "Test User", email: "test@example.com" }} />)
+		const avatarButton = screen.getByRole("button", { name: /open account menu/i })
+		expect(avatarButton).toBeInTheDocument()
+	})
+
+	it("verifies imported app TIMEZONES are valid IANA names", () => {
+		expect(TIMEZONES.length).toBeGreaterThan(0)
 		for (const tz of TIMEZONES) {
 			expect(() => Intl.DateTimeFormat(undefined, { timeZone: tz })).not.toThrow()
 		}

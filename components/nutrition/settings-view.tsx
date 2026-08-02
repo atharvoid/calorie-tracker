@@ -52,7 +52,7 @@ type Settings = {
 
 type ApiResponse = { settings: Settings | null }
 
-const TIMEZONES = [
+export const TIMEZONES = [
 	"Asia/Kolkata",
 	"UTC",
 	"America/New_York",

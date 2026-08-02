@@ -1,25 +1,34 @@
 import { defineConfig } from "vitest/config"
 import { resolve } from "path"
 
+const alias = { "@": resolve(__dirname, ".") }
+
 export default defineConfig({
-	resolve: {
-		alias: { "@": resolve(__dirname, ".") },
-	},
+	resolve: { alias },
 	test: {
 		globals: true,
-		environment: "jsdom",
-		setupFiles: ["./tests/setup.ts"],
-		include: ["tests/**/*.test.{ts,tsx}"],
-		// Performance assertions are timing-sensitive and flake on shared CI
-		// runners. The pattern is intentionally `*perf.test.ts` rather than
-		// `*.perf.test.ts` so it matches the existing imprint-perf.test.ts
-		// without a rename.
-		//
-		// Excluding these is the correct fix for a flaky timing assertion.
-		// Raising the threshold until it stops failing just relocates the flake
-		// and destroys the benchmark's value as a regression signal.
-		// Run them deliberately with: pnpm test:perf
 		exclude: ["tests/**/*perf.test.ts", "node_modules/**"],
+		projects: [
+			{
+				resolve: { alias },
+				test: {
+					name: "unit",
+					environment: "node",
+					include: ["tests/**/*.test.ts"],
+					exclude: ["tests/**/*.test.tsx", "tests/**/*perf.test.ts", "node_modules/**"],
+				},
+			},
+			{
+				resolve: { alias },
+				test: {
+					name: "components",
+					environment: "jsdom",
+					setupFiles: ["./tests/setup.ts"],
+					include: ["tests/**/*.test.tsx"],
+					exclude: ["tests/**/*perf.test.ts", "node_modules/**"],
+				},
+			},
+		],
 		coverage: {
 			provider: "v8",
 			reporter: ["text", "lcov"],
