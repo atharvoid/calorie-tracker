@@ -1,0 +1,2 @@
+ALTER TABLE "meal_item" ADD CONSTRAINT "meal_item_grams_upper_bound" CHECK (grams IS NULL OR grams <= 5000);--> statement-breakpoint
+ALTER TABLE "meal_item" ADD CONSTRAINT "meal_item_kcal_upper_bound" CHECK (kcal IS NULL OR kcal <= 10000);

@@ -10,7 +10,9 @@ import {
 	index,
 	unique,
 	boolean,
+	check,
 } from "drizzle-orm/pg-core"
+import { sql } from "drizzle-orm"
 import type { AdapterAccountType } from "next-auth/adapters"
 // Imported from lib/nutrition-types (pure zod shapes) rather than lib/nutrition,
 // so the database layer does not pull in the AI SDK. See task S-6.
@@ -161,6 +163,17 @@ export const mealItems = pgTable(
 		index("meal_item_user_date_idx").on(t.userId, t.date),
 		// captureId + itemIndex is the deduplication lookup key and was unindexed.
 		index("meal_item_capture_idx").on(t.captureId, t.itemIndex),
+		check(
+			"meal_item_meal_type_valid",
+			sql`meal_type IS NULL OR meal_type IN ('Breakfast','Lunch','Dinner','Snack')`
+		),
+		check("meal_item_source_valid", sql`source IN ('web','telegram')`),
+		check(
+			"meal_item_non_negative",
+			sql`COALESCE(grams, 0) >= 0 AND COALESCE(kcal, 0) >= 0 AND COALESCE(protein_g, 0) >= 0 AND COALESCE(carbs_g, 0) >= 0 AND COALESCE(fat_g, 0) >= 0`
+		),
+		check("meal_item_grams_upper_bound", sql`grams IS NULL OR grams <= 5000`),
+		check("meal_item_kcal_upper_bound", sql`kcal IS NULL OR kcal <= 10000`),
 	]
 )
 
