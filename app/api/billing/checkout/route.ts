@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/auth"
 import { dodo } from "@/lib/dodo"
+import { getAppUrl } from "@/lib/app-url"
 import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
@@ -25,7 +26,10 @@ export async function POST(req: NextRequest) {
 		const productId = process.env.DODO_PRODUCT_MONTHLY_ID || "p_monthly_placeholder"
 
 		// 2. Create Dodo Checkout Session
-		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+		// A localhost fallback here would let a real payment complete and then
+		// redirect the customer to their own machine. getAppUrl refuses to start
+		// the checkout instead — see lib/app-url.ts.
+		const appUrl = getAppUrl()
 		const checkoutSession = await dodo.checkoutSessions.create({
 			product_cart: [{ product_id: productId, quantity: 1 }],
 			customer: {

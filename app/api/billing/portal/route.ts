@@ -4,6 +4,7 @@ import { db } from "@/db"
 import { billingCustomers } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { dodo } from "@/lib/dodo"
+import { getAppUrl } from "@/lib/app-url"
 import { logger } from "@/lib/logger"
 
 export const dynamic = "force-dynamic"
@@ -29,7 +30,9 @@ export async function POST() {
 			)
 		}
 
-		const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+		// See lib/app-url.ts: a localhost return_url would strand the customer
+		// inside the provider's portal with no way back to the app.
+		const appUrl = getAppUrl()
 		const portalSession = await dodo.customers.customerPortal.create(
 			customerRow.providerCustomerId,
 			{ return_url: `${appUrl}/?tab=settings` }
