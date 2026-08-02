@@ -57,6 +57,13 @@
       "when": 1785517704535,
       "tag": "0007_drop_legacy_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1785665930671,
+      "tag": "0008_public_william_stryker",
+      "breakpoints": true
     }
   ]
 }
