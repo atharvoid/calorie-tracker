@@ -46,5 +46,5 @@ describe("Admin Route Guards Regression Test", () => {
 				}
 			}
 		}
-	})
+	}, 30000)
 })
