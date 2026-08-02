@@ -13,6 +13,7 @@
 		"format:check": "prettier --check .",
 		"test": "vitest",
 		"test:run": "vitest run",
+		"test:perf": "vitest run --config vitest.perf.config.ts",
 		"db:backfill-migrations": "pnpm dlx tsx scripts/backfill-drizzle-migrations.ts"
 	},
 	"dependencies": {
