@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from "vitest"
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest"
 import { getAppUrl } from "@/lib/app-url"
 
 const DEV_FALLBACK = "http://localhost:3000"
@@ -7,6 +7,11 @@ const DEV_FALLBACK = "http://localhost:3000"
  * `getAppUrl` reads `process.env` on every call rather than at module scope, so
  * each case can set the environment it needs without resetting modules.
  *
+ * `vi.stubEnv` is used rather than assigning `process.env` directly because
+ * Next.js augments `NodeJS.ProcessEnv` with a readonly `NODE_ENV`, so a direct
+ * assignment does not typecheck. Passing `undefined` removes the variable
+ * outright, which is what "unset" has to mean here.
+ *
  * The point of these tests is narrow but worth stating: this module's entire
  * job is to *refuse* to guess an origin in production. A guard is only useful
  * if someone has confirmed which way it points — an inverted condition here
@@ -14,39 +19,31 @@ const DEV_FALLBACK = "http://localhost:3000"
  * runs with NODE_ENV set to "test" and would take the development branch.
  */
 describe("getAppUrl", () => {
-	const originalAppUrl = process.env.NEXT_PUBLIC_APP_URL
-	const originalNodeEnv = process.env.NODE_ENV
-
 	beforeEach(() => {
-		delete process.env.NEXT_PUBLIC_APP_URL
-		process.env.NODE_ENV = "development"
+		vi.stubEnv("NEXT_PUBLIC_APP_URL", undefined)
+		vi.stubEnv("NODE_ENV", "development")
 	})
 
 	afterEach(() => {
-		if (originalAppUrl === undefined) {
-			delete process.env.NEXT_PUBLIC_APP_URL
-		} else {
-			process.env.NEXT_PUBLIC_APP_URL = originalAppUrl
-		}
-		process.env.NODE_ENV = originalNodeEnv
+		vi.unstubAllEnvs()
 	})
 
 	describe("when an origin is configured", () => {
 		it("returns it unchanged", () => {
-			process.env.NEXT_PUBLIC_APP_URL = "https://logcals.example"
+			vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://logcals.example")
 			expect(getAppUrl()).toBe("https://logcals.example")
 		})
 
 		it("trims surrounding whitespace", () => {
 			// A trailing newline is the usual shape of a value pasted into a
 			// hosting provider's environment editor.
-			process.env.NEXT_PUBLIC_APP_URL = "  https://logcals.example\n"
+			vi.stubEnv("NEXT_PUBLIC_APP_URL", "  https://logcals.example\n")
 			expect(getAppUrl()).toBe("https://logcals.example")
 		})
 
 		it("returns it in production without throwing", () => {
-			process.env.NODE_ENV = "production"
-			process.env.NEXT_PUBLIC_APP_URL = "https://logcals.example"
+			vi.stubEnv("NODE_ENV", "production")
+			vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://logcals.example")
 			expect(getAppUrl()).toBe("https://logcals.example")
 		})
 	})
@@ -57,14 +54,14 @@ describe("getAppUrl", () => {
 		})
 
 		it("falls back to localhost when the value is only whitespace", () => {
-			process.env.NEXT_PUBLIC_APP_URL = "   "
+			vi.stubEnv("NEXT_PUBLIC_APP_URL", "   ")
 			expect(getAppUrl()).toBe(DEV_FALLBACK)
 		})
 	})
 
 	describe("in production", () => {
 		beforeEach(() => {
-			process.env.NODE_ENV = "production"
+			vi.stubEnv("NODE_ENV", "production")
 		})
 
 		it("throws when unset", () => {
@@ -75,7 +72,7 @@ describe("getAppUrl", () => {
 			// Paired deliberately with the development case above: an empty string
 			// must mean "unset" in both branches, or the trim and the guard drift
 			// apart and a blank variable silently becomes a localhost origin.
-			process.env.NEXT_PUBLIC_APP_URL = "   "
+			vi.stubEnv("NEXT_PUBLIC_APP_URL", "   ")
 			expect(() => getAppUrl()).toThrow(/NEXT_PUBLIC_APP_URL is required in production/)
 		})
 
