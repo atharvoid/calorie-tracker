@@ -19,11 +19,16 @@ const eslintConfig = defineConfig([
 			"react-hooks": reactHooksPlugin,
 		},
 		rules: {
-			// Previously "off", which hid real typing gaps project-wide.
-			// Staged as "warn" so CI stays green while the remaining sites are
-			// typed; flip to "error" once the count reaches zero.
+			// Both of these were globally "off" before task E-4, which hid real
+			// typing and effect bugs project-wide. They were staged as "warn" so
+			// CI could stay green while the existing sites were cleaned up, and
+			// E-8 is the promotion to "error" once that count reaches zero.
+			//
+			// A staged "warn" only works if someone eventually promotes it. A
+			// warning nothing enforces is indistinguishable from "off" after the
+			// first week, because nobody reads a clean-exit log.
 			"@typescript-eslint/no-explicit-any": "error",
-			"react-hooks/set-state-in-effect": "warn",
+			"react-hooks/set-state-in-effect": "error",
 			"@typescript-eslint/no-unused-vars": [
 				"error",
 				{ argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrors: "all" },
