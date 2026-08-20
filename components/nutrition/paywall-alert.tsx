@@ -60,13 +60,6 @@ export function PaywallAlert({ trialUsed, trialLimit, isLimitReached, onAddKey }
 
 					<div className="flex flex-col gap-2 sm:flex-row">
 						<button
-							onClick={onAddKey}
-							className="border-subtle bg-elevated text-primary hover:bg-surface rounded-btn flex w-full cursor-pointer items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all sm:w-auto"
-						>
-							<KeyRound className="h-4 w-4" />
-							Use my own key — free
-						</button>
-						<button
 							onClick={handleUpgrade}
 							disabled={loading}
 							className={cn(
@@ -76,6 +69,13 @@ export function PaywallAlert({ trialUsed, trialLimit, isLimitReached, onAddKey }
 						>
 							{loading && <Loader2 className="h-4 w-4 animate-spin" />}
 							Continue with Personal ($2.99/mo)
+						</button>
+						<button
+							onClick={onAddKey}
+							className="border-subtle bg-elevated text-primary hover:bg-surface rounded-btn flex w-full cursor-pointer items-center justify-center gap-2 py-2.5 text-sm font-semibold transition-all sm:w-auto"
+						>
+							<KeyRound className="h-4 w-4" />
+							Use my own key — free
 						</button>
 					</div>
 				</div>

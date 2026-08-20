@@ -56,7 +56,10 @@ export function OnboardingTour() {
 	useEffect(() => {
 		try {
 			const dismissed = window.localStorage.getItem(STORAGE_KEY)
-			if (!dismissed) setVisible(true)
+			if (!dismissed) {
+				const id = requestAnimationFrame(() => setVisible(true))
+				return () => cancelAnimationFrame(id)
+			}
 		} catch {
 			// localStorage unavailable (e.g. privacy mode) — skip tour rather than throw
 		}

@@ -142,16 +142,16 @@ export function FeaturesSection() {
 
 export function PricingSection({ personal, byok }: { personal: PublicPlan; byok: PublicPlan }) {
 	return (
-		<section className="mx-auto mb-24 max-w-3xl text-center">
+		<section className="mx-auto mb-24 max-w-xl text-center">
 			<h2 className="mb-2 text-2xl font-semibold">Simple, transparent pricing</h2>
-			<p className="text-secondary mb-10 text-sm">
-				One plan, one price. Start with a {TRIAL_DAYS}-day trial.
+			<p className="text-secondary mb-8 text-sm">
+				One plan, one price. Start with a {TRIAL_DAYS}-day free trial.
 			</p>
 
-			<div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
-				{/* Personal Plan */}
-				<GlareCard className="rounded-card h-full">
-					<div className="rounded-card border-accent/40 bg-surface relative flex h-full flex-col justify-between border-2 p-8 text-left">
+			<div className="space-y-6">
+				{/* Personal Plan (Hero Pricing Card) */}
+				<GlareCard className="rounded-card w-full">
+					<div className="rounded-card border-accent/40 bg-surface relative flex h-full flex-col justify-between border-2 p-8 text-left shadow-lg">
 						<div>
 							<span className="bg-accent text-2xs absolute -top-3 left-6 rounded-full px-3 py-1 font-bold tracking-wide text-[color:var(--accent-contrast)] uppercase">
 								Recommended
@@ -170,47 +170,38 @@ export function PricingSection({ personal, byok }: { personal: PublicPlan; byok:
 
 							<PlanFeatures features={personal.features} />
 						</div>
-						<div className="mt-6 space-y-3">
+						<div className="mt-8 space-y-3">
 							<SignInForm label={personal.ctaLabel} className="w-full" />
 							{personal.footnote ? (
-								<p className="text-muted text-2xs leading-relaxed">{personal.footnote}</p>
+								<p className="text-muted text-2xs text-center leading-relaxed">
+									{personal.footnote}
+								</p>
 							) : null}
 						</div>
 					</div>
 				</GlareCard>
 
-				{/* BYOK Plan */}
-				<GlareCard className="rounded-card h-full">
-					<div className="rounded-card border-subtle bg-surface/90 relative flex h-full flex-col justify-between border p-8 text-left">
+				{/* BYOK Developer Option (Secondary Power-User Callout) */}
+				<div className="border-subtle bg-surface/60 rounded-xl border p-5 text-left">
+					<div className="flex items-start justify-between gap-4">
 						<div>
-							<span className="bg-muted text-secondary border-subtle text-2xs bg-surface absolute -top-3 left-6 rounded-full border px-3 py-1 font-bold tracking-wide uppercase">
-								Free forever
+							<span className="text-muted text-2xs font-semibold tracking-wider uppercase">
+								Developer & Power Users
 							</span>
-							<div className="mb-6">
-								<h3 className="text-primary flex items-center gap-2 text-xl font-semibold">
-									<KeyRound className="text-accent h-5 w-5" aria-hidden="true" />
-									{byok.name}
-								</h3>
-								<p className="text-secondary mt-1 text-sm">{byok.tagline}</p>
-							</div>
-
-							<div className="mb-6 flex items-baseline gap-1">
-								<span className="text-primary text-3xl font-bold tracking-tight">
-									{byok.priceLabel}
-								</span>
-								<span className="text-muted text-sm">{byok.periodLabel}</span>
-							</div>
-
-							<PlanFeatures features={byok.features} />
-						</div>
-						<div className="mt-6 space-y-3">
-							<SignInForm label={byok.ctaLabel} variant="outline" className="w-full" />
-							{byok.footnote ? (
-								<p className="text-muted text-2xs leading-relaxed">{byok.footnote}</p>
-							) : null}
+							<h4 className="text-primary mt-0.5 flex items-center gap-1.5 text-sm font-semibold">
+								<KeyRound className="text-accent h-4 w-4" aria-hidden="true" />
+								{byok.name}
+							</h4>
+							<p className="text-muted mt-1 text-xs leading-relaxed">{byok.tagline}</p>
 						</div>
 					</div>
-				</GlareCard>
+					<div className="mt-4 flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
+						<SignInForm label={byok.ctaLabel} variant="outline" className="w-full sm:w-auto" />
+						{byok.footnote && (
+							<p className="text-muted text-2xs leading-relaxed">{byok.footnote}</p>
+						)}
+					</div>
+				</div>
 			</div>
 		</section>
 	)
