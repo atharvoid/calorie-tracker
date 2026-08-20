@@ -26,11 +26,11 @@
 	--action-accent-hover: #34d399; /* Emerald 400 */
 	--action-accent-strong: #047857; /* Emerald 700 - WCAG AA compliant */
 	--action-accent-strong-foreground: #ffffff;
-	--action-accent-foreground: #052e24;
+	--action-accent-foreground: #ffffff;
 
 	--accent: var(--action-accent);
 	--accent-hover: var(--action-accent-hover);
-	--accent-contrast: var(--action-accent-foreground);
+	--accent-contrast: #ffffff;
 
 	/* Status */
 	--paid: #10b981;
@@ -58,7 +58,7 @@
 	--popover: var(--bg-elevated);
 	--popover-foreground: var(--text-primary);
 	--primary: var(--accent);
-	--primary-foreground: var(--accent-contrast);
+	--primary-foreground: #ffffff;
 	--secondary: var(--bg-elevated);
 	--secondary-foreground: var(--text-primary);
 	--muted: var(--bg-elevated);
@@ -85,15 +85,15 @@
 	--text-muted: #8c877e;
 
 	/* Functional Emerald Action System */
-	--action-accent: #10b981; /* Emerald 500 */
-	--action-accent-hover: #059669; /* Emerald 600 */
+	--action-accent: #059669; /* Emerald 600 for rich contrast in light mode */
+	--action-accent-hover: #047857; /* Emerald 700 */
 	--action-accent-strong: #047857; /* Emerald 700 */
 	--action-accent-strong-foreground: #ffffff;
-	--action-accent-foreground: #052e24;
+	--action-accent-foreground: #ffffff;
 
 	--accent: var(--action-accent);
 	--accent-hover: var(--action-accent-hover);
-	--accent-contrast: var(--action-accent-foreground);
+	--accent-contrast: #ffffff;
 
 	--paid: #69765b;
 	--pending: #e5673f;

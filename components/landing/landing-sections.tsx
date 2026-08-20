@@ -28,7 +28,7 @@ export function SignInForm({
 			<button
 				type="submit"
 				className={cn(
-					"rounded-btn w-full cursor-pointer py-3 text-center font-semibold transition-all",
+					"rounded-btn w-full cursor-pointer px-6 py-3 text-center text-sm font-semibold shadow-sm transition-all",
 					"focus-visible:ring-accent focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none",
 					variant === "primary"
 						? PRIMARY_BTN
