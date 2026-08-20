@@ -19,6 +19,7 @@ import { ConnectTelegram } from "../connect-telegram"
 import { signOutAction } from "../auth-actions"
 import { ByokPanel } from "./byok-panel"
 import { MONTHLY_PLAN_OPTION, TRIAL_DAYS, type BillingPlan } from "@/lib/pricing"
+import { cn } from "@/lib/utils"
 
 type EntitlementStatus = {
 	accessState:
@@ -262,6 +263,146 @@ export function SettingsView({ refreshKey }: Props) {
 
 	return (
 		<div className="mx-auto max-w-xl space-y-6">
+			{/* Subscription & Billing Section (Primary Plan Management) */}
+			<Panel className="flex flex-col gap-4">
+				<div>
+					<h2 className="text-primary flex items-center gap-2 text-base font-bold">
+						<CreditCard className="text-accent h-4.5 w-4.5" />
+						Subscription & Billing
+					</h2>
+					<p className="text-secondary mt-1 text-xs">
+						Manage your active plans, usage counts, and upgrades.
+					</p>
+				</div>
+
+				{billingLoading ? (
+					<div className="flex justify-center p-4">
+						<Loader2 className="text-muted h-5 w-5 animate-spin" />
+					</div>
+				) : billing ? (
+					<div className="text-secondary space-y-4 text-sm">
+						<div className="border-subtle flex items-center justify-between border-b pb-3">
+							<span className="text-xs font-medium">Status</span>
+							<span
+								className={cn(
+									"rounded-full px-2.5 py-0.5 text-xs font-bold capitalize",
+									billing.accessState === "active"
+										? "bg-accent/15 text-accent"
+										: billing.accessState === "byok"
+											? "border-subtle bg-elevated text-secondary border"
+											: billing.accessState === "trial"
+												? "bg-accent/10 text-accent"
+												: "bg-danger/10 text-danger"
+								)}
+							>
+								{billing.accessState.replace(/_/g, " ")}
+							</span>
+						</div>
+
+						{billing.accessState === "pre_trial" && (
+							<div className="space-y-1">
+								<p className="text-primary text-xs font-semibold">
+									Your {TRIAL_DAYS}-day free trial has not started yet.
+								</p>
+								<p className="text-muted text-xs leading-relaxed">
+									Start your trial to unlock full AI meal logging on web and Telegram with no
+									immediate charge.
+								</p>
+							</div>
+						)}
+
+						{billing.accessState === "byok" && (
+							<p className="text-accent text-xs leading-relaxed font-semibold">
+								You&apos;re logging with your own API key — unlimited and free, forever. No
+								subscription needed.
+							</p>
+						)}
+
+						{billing.accessState === "trial" && (
+							<div className="space-y-2.5">
+								<div className="flex justify-between text-xs font-semibold">
+									<span>Trial usage</span>
+									<span className="text-primary">
+										{billing.trialAiLogsUsed} of {billing.trialAiLogLimit} meal logs used
+									</span>
+								</div>
+								{/* Visual progress bar */}
+								<div className="bg-elevated h-2 w-full overflow-hidden rounded-full">
+									<div
+										className="bg-accent h-full rounded-full transition-all duration-300"
+										style={{
+											width: `${Math.min(100, Math.max(0, (billing.trialAiLogsUsed / billing.trialAiLogLimit) * 100))}%`,
+										}}
+									/>
+								</div>
+								{billing.trialEndsAt && (
+									<p className="text-muted text-2xs">
+										Your trial ends on {new Date(billing.trialEndsAt).toLocaleDateString()}
+									</p>
+								)}
+							</div>
+						)}
+
+						{(billing.accessState === "trial_ended" ||
+							billing.accessState === "quota_exhausted") && (
+							<div className="border-danger/25 bg-danger/5 rounded-lg border p-3">
+								<p className="text-danger text-xs leading-relaxed font-semibold">
+									Your trial is complete. Your meal history is still available. Upgrade to continue
+									logging meals with our AI, or add your own key below.
+								</p>
+							</div>
+						)}
+
+						{(billing.accessState === "trial_ended" ||
+							billing.accessState === "quota_exhausted" ||
+							billing.accessState === "pre_trial" ||
+							billing.accessState === "trial") && (
+							<div className="space-y-3 pt-2">
+								<button
+									disabled={actionLoading}
+									onClick={() => handleUpgrade(MONTHLY_PLAN_OPTION.plan)}
+									className="rounded-btn bg-accent hover:bg-accent-hover w-full cursor-pointer px-4 py-2.5 text-center text-xs font-bold text-[color:var(--accent-contrast)] shadow-sm transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
+								>
+									{billing.accessState === "pre_trial"
+										? `Start ${TRIAL_DAYS}-Day Free Trial (${MONTHLY_PLAN_OPTION.priceLabel} after)`
+										: `${MONTHLY_PLAN_OPTION.label} — ${MONTHLY_PLAN_OPTION.priceLabel}`}
+								</button>
+								<p className="text-muted text-2xs text-center leading-relaxed">
+									Includes unlimited meal logging on the web, 25 AI Telegram logs a day, custom
+									targets, and full data export.
+								</p>
+							</div>
+						)}
+
+						{(billing.accessState === "active" || billing.accessState === "grace") && (
+							<div className="space-y-3">
+								<div className="flex items-center justify-between text-xs font-semibold">
+									<span>Active subscription status:</span>
+									<span className="text-accent font-bold uppercase">
+										{billing.subscriptionStatus}
+									</span>
+								</div>
+								{billing.subscriptionEnd && (
+									<div className="flex items-center justify-between text-xs">
+										<span>Renewal date:</span>
+										<span>{new Date(billing.subscriptionEnd).toLocaleDateString()}</span>
+									</div>
+								)}
+								<button
+									disabled={actionLoading}
+									onClick={handleManage}
+									className="rounded-btn border-subtle bg-elevated text-primary hover:bg-surface w-full cursor-pointer border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none"
+								>
+									Manage Subscription
+								</button>
+							</div>
+						)}
+					</div>
+				) : (
+					<p className="text-danger text-xs">Failed to load billing status.</p>
+				)}
+			</Panel>
+
 			{/* Nutrition Goals Section */}
 			<Panel>
 				<h2 className="text-primary mb-1 text-base font-bold">Nutrition Goals</h2>
@@ -408,9 +549,6 @@ export function SettingsView({ refreshKey }: Props) {
 				</div>
 			</Panel>
 
-			{/* Bring Your Own Key Section */}
-			<ByokPanel onChanged={loadBilling} />
-
 			{/* Telegram Connection Section */}
 			<Panel>
 				<h2 className="text-primary mb-1 flex items-center gap-2 text-base font-bold">
@@ -418,129 +556,13 @@ export function SettingsView({ refreshKey }: Props) {
 					Telegram Bot Log
 				</h2>
 				<p className="text-muted mb-3 text-xs leading-relaxed">
-					Connect your Telegram account to log meals by sending a message to the bot. Once
-					connected, use <code className="text-accent">/setkey</code> in the chat to add your own
-					API key there too.
+					Connect your Telegram account to log meals by sending a message to the bot.
 				</p>
 				<ConnectTelegram />
 			</Panel>
 
-			{/* Subscription & Billing Section */}
-			<Panel className="flex flex-col gap-4">
-				<div>
-					<h2 className="text-primary flex items-center gap-2 text-base font-bold">
-						<CreditCard className="text-accent h-4.5 w-4.5" />
-						Subscription & Billing
-					</h2>
-					<p className="text-secondary mt-1 text-xs">
-						Manage your active plans, usage counts, and upgrades.
-					</p>
-				</div>
-
-				{billingLoading ? (
-					<div className="flex justify-center p-4">
-						<Loader2 className="text-muted h-5 w-5 animate-spin" />
-					</div>
-				) : billing ? (
-					<div className="text-secondary space-y-4 text-sm">
-						<div className="border-subtle flex items-center justify-between border-b pb-3">
-							<span>Status</span>
-							<span className="text-primary font-bold capitalize">
-								{billing.accessState.replace(/_/g, " ")}
-							</span>
-						</div>
-
-						{/*
-						 * This previously promised the trial "begins automatically when you log
-						 * your first meal". The trial is moving behind a card-capture checkout,
-						 * so that sentence was about to become false. It now states the fact
-						 * (not started) without promising how it starts.
-						 */}
-						{billing.accessState === "pre_trial" && (
-							<p className="text-muted text-xs leading-relaxed">
-								Your {TRIAL_DAYS}-day trial has not started yet.
-							</p>
-						)}
-
-						{billing.accessState === "byok" && (
-							<p className="text-accent text-xs leading-relaxed font-semibold">
-								You&apos;re logging with your own API key — unlimited and free, forever. No
-								subscription needed.
-							</p>
-						)}
-
-						{billing.accessState === "trial" && (
-							<div className="space-y-2">
-								<div className="flex justify-between text-xs font-semibold">
-									<span>Trial usage</span>
-									<span className="text-primary">
-										{billing.trialAiLogsUsed} of {billing.trialAiLogLimit} meal logs used
-									</span>
-								</div>
-								{billing.trialEndsAt && (
-									<p className="text-muted text-xs">
-										Your trial ends on {new Date(billing.trialEndsAt).toLocaleDateString()}
-									</p>
-								)}
-							</div>
-						)}
-
-						{(billing.accessState === "trial_ended" ||
-							billing.accessState === "quota_exhausted") && (
-							<p className="text-danger text-xs leading-relaxed font-semibold">
-								Your trial is complete. Your meal history is still available. Add your own API key
-								above for free unlimited logging, or upgrade to keep using ours.
-							</p>
-						)}
-
-						{(billing.accessState === "trial_ended" ||
-							billing.accessState === "quota_exhausted" ||
-							billing.accessState === "pre_trial" ||
-							billing.accessState === "trial") && (
-							<div className="space-y-3 pt-2">
-								<button
-									disabled={actionLoading}
-									onClick={() => handleUpgrade(MONTHLY_PLAN_OPTION.plan)}
-									className="rounded-btn bg-accent hover:bg-accent-hover w-full cursor-pointer px-4 py-2.5 text-center text-xs font-bold text-[color:var(--accent-contrast)] shadow-sm transition-all focus:outline-none disabled:cursor-not-allowed disabled:opacity-60"
-								>
-									{MONTHLY_PLAN_OPTION.label} — {MONTHLY_PLAN_OPTION.priceLabel}
-								</button>
-								<p className="text-muted text-2xs text-center leading-relaxed">
-									Includes unlimited meal logging on the web, 25 AI Telegram logs a day, custom
-									targets, and full data export. Or add your own API key above to skip payment
-									entirely.
-								</p>
-							</div>
-						)}
-
-						{(billing.accessState === "active" || billing.accessState === "grace") && (
-							<div className="space-y-3">
-								<div className="flex items-center justify-between text-xs font-semibold">
-									<span>Active subscription status:</span>
-									<span className="text-accent font-bold uppercase">
-										{billing.subscriptionStatus}
-									</span>
-								</div>
-								{billing.subscriptionEnd && (
-									<div className="flex items-center justify-between text-xs">
-										<span>Renewal date:</span>
-										<span>{new Date(billing.subscriptionEnd).toLocaleDateString()}</span>
-									</div>
-								)}
-								<button
-									disabled={actionLoading}
-									onClick={handleManage}
-									className="rounded-btn border-subtle bg-elevated text-primary hover:bg-surface w-full cursor-pointer border px-4 py-2.5 text-center text-xs font-bold transition-colors focus:outline-none"
-								>
-									Manage Subscription
-								</button>
-							</div>
-						)}
-					</div>
-				) : (
-					<p className="text-danger text-xs">Failed to load billing status.</p>
-				)}
-			</Panel>
+			{/* Bring Your Own Key Section (Advanced / Power User Addon) */}
+			<ByokPanel onChanged={loadBilling} />
 
 			{/* Account and Data Section (Separate Destructive Action Section) */}
 			<Panel className="flex flex-col gap-4">

@@ -107,15 +107,19 @@ export function ByokPanel({ onChanged }: Props) {
 	if (!status?.enabled) return null
 
 	return (
-		<Panel>
+		<Panel className="border-subtle/80 bg-surface/80">
+			<div className="mb-2 flex items-center justify-between">
+				<span className="text-muted text-2xs font-semibold tracking-wider uppercase">
+					Advanced Addon · Power Users
+				</span>
+			</div>
 			<h2 className="text-primary mb-1 flex items-center gap-2 text-base font-bold">
 				<KeyRound className="text-accent h-4.5 w-4.5" />
-				Bring Your Own Key
+				Use Your Own API Key
 			</h2>
 			<p className="text-muted mb-3 text-xs leading-relaxed">
-				Add your own free Google AI Studio API key and log meals with no trial limit, no daily cap,
-				and no subscription — billed directly (and for free, within Google&apos;s generous quota) to
-				your own account.
+				Technical users can connect a free Google AI Studio API key to log meals with no trial limit
+				or subscription — billed directly to your own Google account within their free tier.
 			</p>
 
 			{status.hasKey ? (

@@ -183,6 +183,25 @@ export function NutritionShell({ userId, user }: Props) {
 
 				{/* Header Right Actions */}
 				<div className="flex items-center gap-2">
+					{billing && !billingLoading && billing.accessState !== "active" && (
+						<button
+							onClick={() => handleTabChange("settings")}
+							className={cn(
+								"text-2xs cursor-pointer rounded-full px-2.5 py-1 font-bold transition-all",
+								billing.accessState === "byok"
+									? "border-subtle bg-elevated text-secondary border"
+									: billing.accessState === "trial"
+										? "bg-accent/15 text-accent border-accent/25 border"
+										: "bg-accent text-[color:var(--accent-contrast)] shadow-sm"
+							)}
+						>
+							{billing.accessState === "byok"
+								? "BYOK"
+								: billing.accessState === "trial"
+									? `${billing.trialAiLogsUsed}/${billing.trialAiLogLimit}`
+									: "Upgrade"}
+						</button>
+					)}
 					<ThemeToggle />
 					{activeTab === "today" && (
 						<Tooltip>
@@ -215,21 +234,20 @@ export function NutritionShell({ userId, user }: Props) {
 								onClick={() => handleTabChange("settings")}
 								className="text-accent cursor-pointer border-0 bg-transparent font-semibold hover:underline focus:outline-none"
 							>
-								Add your own key or upgrade
+								View billing or upgrade
 							</button>
 						</div>
 					)}
 					{(billing.accessState === "trial_ended" || billing.accessState === "quota_exhausted") && (
 						<div className="border-danger/25 bg-danger/5 text-secondary mb-4 flex items-center justify-between rounded-lg border px-4 py-2 text-xs">
 							<span>
-								<strong>Trial Completed:</strong> Add your own free API key or upgrade to continue
-								adding meals.
+								<strong>Trial Completed:</strong> Upgrade to continue logging meals with our AI.
 							</span>
 							<button
 								onClick={() => handleTabChange("settings")}
 								className="text-danger cursor-pointer border-0 bg-transparent font-semibold hover:underline focus:outline-none"
 							>
-								Fix this now
+								Upgrade now
 							</button>
 						</div>
 					)}
@@ -243,30 +261,57 @@ export function NutritionShell({ userId, user }: Props) {
 				</div>
 			)}
 
-			{/* Desktop navigation only */}
-			<nav className="border-subtle bg-surface mb-6 hidden overflow-x-auto rounded-xl border p-1 md:flex">
-				{TABS.map(({ id, label, Icon }) => {
-					const displayLabel = isImprint && id === "analytics" ? "Patterns" : label
-					return (
-						<button
-							key={id}
-							onClick={() => handleTabChange(id)}
-							className={cn(
-								"flex flex-1 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
-								activeTab === id
-									? "bg-elevated text-primary shadow-sm"
-									: "text-muted hover:text-secondary"
-							)}
-							aria-selected={activeTab === id}
-							role="tab"
-						>
-							<Icon className="h-4 w-4 shrink-0" />
-							<span className="hidden sm:inline">{displayLabel}</span>
-							<span className="text-xs sm:hidden">{displayLabel}</span>
-						</button>
-					)
-				})}
-			</nav>
+			{/* Desktop navigation & status bar */}
+			<div className="mb-6 hidden items-center justify-between gap-3 md:flex">
+				<nav className="border-subtle bg-surface flex flex-1 overflow-x-auto rounded-xl border p-1">
+					{TABS.map(({ id, label, Icon }) => {
+						const displayLabel = isImprint && id === "analytics" ? "Patterns" : label
+						return (
+							<button
+								key={id}
+								onClick={() => handleTabChange(id)}
+								className={cn(
+									"flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
+									activeTab === id
+										? "bg-elevated text-primary shadow-sm"
+										: "text-muted hover:text-secondary"
+								)}
+								aria-selected={activeTab === id}
+								role="tab"
+							>
+								<Icon className="h-4 w-4 shrink-0" />
+								<span>{displayLabel}</span>
+							</button>
+						)
+					})}
+				</nav>
+
+				{billing && !billingLoading && (
+					<button
+						onClick={() => handleTabChange("settings")}
+						className={cn(
+							"focus-visible:ring-accent shrink-0 cursor-pointer rounded-xl px-3.5 py-2.5 text-xs font-bold whitespace-nowrap shadow-sm transition-all focus-visible:ring-2 focus-visible:outline-none",
+							billing.accessState === "active"
+								? "border-subtle bg-surface text-accent hover:bg-elevated border"
+								: billing.accessState === "byok"
+									? "border-subtle bg-surface text-secondary hover:bg-elevated border"
+									: billing.accessState === "trial"
+										? "bg-accent/15 text-accent hover:bg-accent/25 border-accent/30 border"
+										: "bg-accent hover:bg-accent-hover text-[color:var(--accent-contrast)]"
+						)}
+					>
+						{billing.accessState === "active" && "✓ Pro Plan"}
+						{billing.accessState === "byok" && "🔑 BYOK Active"}
+						{billing.accessState === "trial" &&
+							`⚡ Trial: ${billing.trialAiLogsUsed}/${billing.trialAiLogLimit} logs`}
+						{(billing.accessState === "pre_trial" ||
+							billing.accessState === "trial_ended" ||
+							billing.accessState === "quota_exhausted" ||
+							billing.accessState === "blocked") &&
+							"✨ Start Free Trial"}
+					</button>
+				)}
+			</div>
 
 			{/* Tab content */}
 			<div role="tabpanel" className="mt-4 px-2 md:mt-0 md:px-0">
