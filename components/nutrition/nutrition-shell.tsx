@@ -2,7 +2,17 @@
 
 import { useCallback, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
-import { BarChart2, Clock, Settings, Utensils, Plus } from "lucide-react"
+import {
+	BarChart2,
+	Clock,
+	Settings,
+	Utensils,
+	Plus,
+	Sparkles,
+	Zap,
+	KeyRound,
+	Check,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import { RealtimeListener } from "@/components/realtime-listener"
 import { TodayView } from "./today-view"
@@ -16,6 +26,8 @@ import { getActiveExperience } from "@/lib/experience-mode"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { MobileUserSheet } from "./mobile-user-sheet"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { signOutAction } from "@/components/auth-actions"
+import { GHOST_BTN } from "@/lib/ui"
 
 type Tab = "today" | "history" | "analytics" | "settings"
 
@@ -53,6 +65,67 @@ type Props = {
 		email?: string | null
 		image?: string | null
 	}
+}
+
+function PlanStatusPill({
+	billing,
+	billingLoading,
+	onUpgrade,
+	className,
+}: {
+	billing: EntitlementStatus | null
+	billingLoading: boolean
+	onUpgrade: () => void
+	className?: string
+}) {
+	if (billingLoading || !billing) return null
+
+	return (
+		<button
+			onClick={onUpgrade}
+			className={cn(
+				"focus-visible:ring-accent inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap shadow-sm transition-all focus-visible:ring-2 focus-visible:outline-none",
+				billing.accessState === "active"
+					? "border-subtle bg-surface text-accent hover:bg-elevated border"
+					: billing.accessState === "byok"
+						? "border-subtle bg-elevated text-secondary hover:bg-surface border"
+						: billing.accessState === "trial"
+							? "bg-accent/15 text-accent hover:bg-accent/25 border-accent/25 border"
+							: "bg-accent hover:bg-accent-hover text-white",
+				className
+			)}
+		>
+			{billing.accessState === "active" && (
+				<>
+					<Check className="text-accent h-3.5 w-3.5" aria-hidden="true" />
+					<span>Pro</span>
+				</>
+			)}
+			{billing.accessState === "byok" && (
+				<>
+					<KeyRound className="text-secondary h-3.5 w-3.5" aria-hidden="true" />
+					<span>BYOK</span>
+				</>
+			)}
+			{billing.accessState === "trial" && (
+				<>
+					<Zap className="fill-accent text-accent h-3.5 w-3.5" aria-hidden="true" />
+					<span>
+						{billing.trialAiLogsUsed}/{billing.trialAiLogLimit} Logs
+					</span>
+				</>
+			)}
+			{(billing.accessState === "pre_trial" ||
+				billing.accessState === "trial_ended" ||
+				billing.accessState === "quota_exhausted" ||
+				billing.accessState === "blocked") && (
+				<>
+					<Sparkles className="h-3.5 w-3.5 text-white" aria-hidden="true" />
+					<span>Start Free Trial</span>
+				</>
+			)}
+		</button>
+	)
 }
 
 export function NutritionShell({ userId, user }: Props) {
@@ -165,6 +238,51 @@ export function NutritionShell({ userId, user }: Props) {
 			<RealtimeListener userId={userId} onNutritionChanged={handleNutritionChanged} />
 			<OnboardingTour />
 
+			{/* Desktop Header */}
+			<div className="mb-6 hidden items-center justify-between md:mb-8 md:flex">
+				<Link
+					href="/?tab=today"
+					className="focus-visible:ring-accent rounded-btn flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
+				>
+					<span className="text-primary text-lg font-semibold tracking-tight">
+						Calorie <span className="text-accent">Tracker</span>
+					</span>
+				</Link>
+				<div className="flex items-center gap-3">
+					<PlanStatusPill
+						billing={billing}
+						billingLoading={billingLoading}
+						onUpgrade={() => handleTabChange("settings")}
+					/>
+					<ThemeToggle />
+					{/* Desktop User Avatar & Sign Out */}
+					<div className="flex items-center gap-3">
+						{user.image ? (
+							// eslint-disable-next-line @next/next/no-img-element
+							<img
+								src={user.image}
+								alt={user.name ?? ""}
+								title={user.name ?? user.email ?? ""}
+								className="border-subtle ring-accent/20 h-8 w-8 rounded-full border ring-1"
+							/>
+						) : (
+							<div className="border-subtle bg-elevated text-primary flex h-8 w-8 items-center justify-center rounded-full border text-xs font-medium">
+								{(user.name ?? user.email ?? "?")[0].toUpperCase()}
+							</div>
+						)}
+						<div className="hidden flex-col sm:flex">
+							<span className="text-primary text-xs leading-none font-medium">{user.name}</span>
+							<span className="text-muted mt-0.5 text-xs leading-none">{user.email}</span>
+						</div>
+						<form action={signOutAction}>
+							<button type="submit" className={cn("rounded px-2 py-1 text-xs", GHOST_BTN)}>
+								Sign out
+							</button>
+						</form>
+					</div>
+				</div>
+			</div>
+
 			{/* Mobile-only Header */}
 			<header className="border-subtle bg-surface/90 sticky top-0 z-30 flex items-center justify-between border-b px-4 py-2.5 backdrop-blur-md md:hidden">
 				<div className="flex items-center gap-1.5">
@@ -183,25 +301,11 @@ export function NutritionShell({ userId, user }: Props) {
 
 				{/* Header Right Actions */}
 				<div className="flex items-center gap-2">
-					{billing && !billingLoading && billing.accessState !== "active" && (
-						<button
-							onClick={() => handleTabChange("settings")}
-							className={cn(
-								"text-2xs cursor-pointer rounded-full px-2.5 py-1 font-bold transition-all",
-								billing.accessState === "byok"
-									? "border-subtle bg-elevated text-secondary border"
-									: billing.accessState === "trial"
-										? "bg-accent/15 text-accent border-accent/25 border"
-										: "bg-accent text-[color:var(--accent-contrast)] shadow-sm"
-							)}
-						>
-							{billing.accessState === "byok"
-								? "BYOK"
-								: billing.accessState === "trial"
-									? `${billing.trialAiLogsUsed}/${billing.trialAiLogLimit}`
-									: "Upgrade"}
-						</button>
-					)}
+					<PlanStatusPill
+						billing={billing}
+						billingLoading={billingLoading}
+						onUpgrade={() => handleTabChange("settings")}
+					/>
 					<ThemeToggle />
 					{activeTab === "today" && (
 						<Tooltip>
@@ -221,97 +325,29 @@ export function NutritionShell({ userId, user }: Props) {
 				</div>
 			</header>
 
-			{/* Trial / Expiry Banner */}
-			{!billingLoading && billing && (
-				<div className="mt-4 px-2 md:px-0">
-					{billing.accessState === "trial" && (
-						<div className="border-accent/25 bg-accent/5 text-secondary mb-4 flex items-center justify-between rounded-lg border px-4 py-2 text-xs">
-							<span>
-								<strong>Free Trial:</strong> {billing.trialAiLogsUsed} of {billing.trialAiLogLimit}{" "}
-								meal logs used.
-							</span>
-							<button
-								onClick={() => handleTabChange("settings")}
-								className="text-accent cursor-pointer border-0 bg-transparent font-semibold hover:underline focus:outline-none"
-							>
-								View billing or upgrade
-							</button>
-						</div>
-					)}
-					{(billing.accessState === "trial_ended" || billing.accessState === "quota_exhausted") && (
-						<div className="border-danger/25 bg-danger/5 text-secondary mb-4 flex items-center justify-between rounded-lg border px-4 py-2 text-xs">
-							<span>
-								<strong>Trial Completed:</strong> Upgrade to continue logging meals with our AI.
-							</span>
-							<button
-								onClick={() => handleTabChange("settings")}
-								className="text-danger cursor-pointer border-0 bg-transparent font-semibold hover:underline focus:outline-none"
-							>
-								Upgrade now
-							</button>
-						</div>
-					)}
-					{billing.accessState === "byok" && (
-						<div className="border-accent/25 bg-accent/5 text-secondary mb-4 flex items-center justify-between rounded-lg border px-4 py-2 text-xs">
-							<span>
-								<strong>Bring Your Own Key:</strong> Unlimited free logging with your own API key.
-							</span>
-						</div>
-					)}
-				</div>
-			)}
-
-			{/* Desktop navigation & status bar */}
-			<div className="mb-6 hidden items-center justify-between gap-3 md:flex">
-				<nav className="border-subtle bg-surface flex flex-1 overflow-x-auto rounded-xl border p-1">
-					{TABS.map(({ id, label, Icon }) => {
-						const displayLabel = isImprint && id === "analytics" ? "Patterns" : label
-						return (
-							<button
-								key={id}
-								onClick={() => handleTabChange(id)}
-								className={cn(
-									"flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
-									activeTab === id
-										? "bg-elevated text-primary shadow-sm"
-										: "text-muted hover:text-secondary"
-								)}
-								aria-selected={activeTab === id}
-								role="tab"
-							>
-								<Icon className="h-4 w-4 shrink-0" />
-								<span>{displayLabel}</span>
-							</button>
-						)
-					})}
-				</nav>
-
-				{billing && !billingLoading && (
-					<button
-						onClick={() => handleTabChange("settings")}
-						className={cn(
-							"focus-visible:ring-accent shrink-0 cursor-pointer rounded-xl px-3.5 py-2.5 text-xs font-bold whitespace-nowrap shadow-sm transition-all focus-visible:ring-2 focus-visible:outline-none",
-							billing.accessState === "active"
-								? "border-subtle bg-surface text-accent hover:bg-elevated border"
-								: billing.accessState === "byok"
-									? "border-subtle bg-surface text-secondary hover:bg-elevated border"
-									: billing.accessState === "trial"
-										? "bg-accent/15 text-accent hover:bg-accent/25 border-accent/30 border"
-										: "bg-accent hover:bg-accent-hover text-[color:var(--accent-contrast)]"
-						)}
-					>
-						{billing.accessState === "active" && "✓ Pro Plan"}
-						{billing.accessState === "byok" && "🔑 BYOK Active"}
-						{billing.accessState === "trial" &&
-							`⚡ Trial: ${billing.trialAiLogsUsed}/${billing.trialAiLogLimit} logs`}
-						{(billing.accessState === "pre_trial" ||
-							billing.accessState === "trial_ended" ||
-							billing.accessState === "quota_exhausted" ||
-							billing.accessState === "blocked") &&
-							"✨ Start Free Trial"}
-					</button>
-				)}
-			</div>
+			{/* Desktop navigation only — full-width clean 4-tab bar */}
+			<nav className="border-subtle bg-surface mb-6 hidden overflow-x-auto rounded-xl border p-1 md:flex">
+				{TABS.map(({ id, label, Icon }) => {
+					const displayLabel = isImprint && id === "analytics" ? "Patterns" : label
+					return (
+						<button
+							key={id}
+							onClick={() => handleTabChange(id)}
+							className={cn(
+								"flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors",
+								activeTab === id
+									? "bg-elevated text-primary shadow-sm"
+									: "text-muted hover:text-secondary"
+							)}
+							aria-selected={activeTab === id}
+							role="tab"
+						>
+							<Icon className="h-4 w-4 shrink-0" />
+							<span>{displayLabel}</span>
+						</button>
+					)
+				})}
+			</nav>
 
 			{/* Tab content */}
 			<div role="tabpanel" className="mt-4 px-2 md:mt-0 md:px-0">

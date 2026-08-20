@@ -1,7 +1,6 @@
 import { AuthButton } from "@/components/auth-button"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { auth } from "@/auth"
-import Link from "next/link"
 import { Suspense } from "react"
 import { NutritionShell } from "@/components/nutrition/nutrition-shell"
 import { EmptyState } from "@/components/ui/empty-state"
@@ -56,20 +55,6 @@ export default async function Home(props: {
 		return (
 			<main className={rootClassName}>
 				<div className="mx-auto max-w-5xl px-4 pt-6 pb-20 sm:px-6 sm:pt-14 md:pt-10">
-					{/* Desktop nav. The mobile equivalent lives in the nutrition shell. */}
-					<div className="mb-6 hidden items-center justify-between md:mb-10 md:flex">
-						<Link
-							href="/?tab=today"
-							className="focus-visible:ring-accent rounded-btn flex items-center gap-2 hover:opacity-90 focus-visible:ring-2 focus-visible:outline-none"
-						>
-							<BrandWordmark />
-						</Link>
-						<div className="flex items-center gap-3">
-							<ThemeToggle />
-							<AuthButton />
-						</div>
-					</div>
-
 					<div className="w-full">
 						{session?.user?.id ? (
 							<Suspense fallback={null}>
